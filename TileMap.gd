@@ -190,26 +190,14 @@ func get_movement(startX, startY, endX, endY):
 	var path = Curve2D.new()
 	# TODO: SPAGETTI CODE!
 	if startX != endX:
-		var should_go_left = startX < endX
-		if should_go_left:
-			for x in range(startX, endX+1):
-				var world_pos = map_to_world_center(Vector2(x, startY))
-				path.add_point(world_pos)
-		else:
-			for x in range(endX, startX+1):
-				var world_pos = map_to_world_center(Vector2(x, startY))
-				path.add_point(world_pos)
+		for x in range(startX, endX + (1 if startX < endX else -1), 1 if startX < endX else -1):
+			var world_pos = map_to_world_center(Vector2(x, startY))
+			path.add_point(world_pos)
 
 	if startY != endY:
-		var should_go_up = startY < endY
-		if should_go_up:
-			for y in range(startY, endY+1):
-				var world_pos = map_to_world_center(Vector2(endX, y))
-				path.add_point(world_pos)
-		else:
-			for y in range(endY, startY+1):
-				var world_pos = map_to_world_center(Vector2(endX, y))
-				path.add_point(world_pos)
+		for y in range(startY, endY + (1 if startY < endY else -1), 1 if startY < endY else -1):
+			var world_pos = map_to_world_center(Vector2(endX, y))
+			path.add_point(world_pos)
 	return path
 
 func map_to_world_center(v : Vector2):
@@ -279,6 +267,12 @@ func find_green(x, y):
 
 func place_green_tiles(x,y):
 	var greens = get_all_possible_movement_destinations(xy_to_flat(x,y), 3)
+
+	# Remove the one corresponding to the current position
+	for i in range(len(greens)):
+		if greens[i][0] == x and greens[i][1] == y:
+			greens.remove(i)
+			break
 
 	active_greens = []
 	for vec in greens:
