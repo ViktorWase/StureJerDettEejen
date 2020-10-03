@@ -25,15 +25,31 @@ func _ready():
 
 	# Just a helper array that I don't wanna reallocate all the time.
 	number_of_steps_to = []
+	
+	# Read data from scene
+	var cells = get_used_cells()
+	var maxX = 0
+	var maxY = 0
+	for cell in cells:
+		if (cell.x > maxX):
+			maxX = cell.x
+		if (cell.y > maxY):
+			maxY = cell.x
+	X = maxX
+	Y = maxY
+	SIZE = X * Y
 
-	var idx = 0
+	#var idx = 0
 	for y in range(Y):  # TODO: Y is too small, and also it's set somewhere else I think.
 		for x in range(X):
-			set_cell(x, y, 0)
 			flat_game_board.append(null)
 			number_of_steps_to.append(false)
-			flat_map.append(1)
-			idx += 1
+			flat_map.append(0)
+	
+	# populate flat map
+	for cell in cells:
+		var i = xy_to_flat(cell.x, cell.y)
+		flat_map[i] = 1
 
 	# This is were the level is created.
 	update_bitmask_region(Vector2(0, 0), Vector2(X, Y))
@@ -158,7 +174,7 @@ func get_obj_from_tile(x, y):
 
 func _input(event):
 	if event.is_action_pressed("ui_left_click"):
-		var map_pos = world_to_map(event.position)
+		var map_pos = world_to_map(event.position - position)
 		
 		var relevant_obj = get_obj_from_tile(map_pos[0], map_pos[1])
 		if relevant_obj != null:
