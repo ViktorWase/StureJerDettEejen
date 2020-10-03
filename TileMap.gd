@@ -70,6 +70,7 @@ func flat_to_xy(idx):
 	return Vector2(x, y)
 
 func get_all_possible_movement_destinations_rec_func(idx, current_number_of_steps, max_movement, the_lava_is_floor):
+	idx = int(idx)
 	if number_of_steps_to[idx] == null:
 		number_of_steps_to[idx] = current_number_of_steps
 	else:
@@ -80,22 +81,22 @@ func get_all_possible_movement_destinations_rec_func(idx, current_number_of_step
 
 	# Up
 	var idx_up = idx + X
-	if idx_up < SIZE and (flat_map[idx_up] or the_lava_is_floor) and (number_of_steps_to[idx_up]==null or number_of_steps_to[idx_up] < current_number_of_steps):
+	if idx_up < SIZE and (flat_map[idx_up] or the_lava_is_floor) and (number_of_steps_to[idx_up]==null or number_of_steps_to[idx_up] > current_number_of_steps):
 		get_all_possible_movement_destinations_rec_func(idx_up, current_number_of_steps+1, max_movement, the_lava_is_floor)
 
 	# Down
 	var idx_down = idx - X
-	if idx_down < SIZE and (flat_map[idx_down] or the_lava_is_floor) and (number_of_steps_to[idx_down]==null or number_of_steps_to[idx_down] < current_number_of_steps):
+	if idx_down >= 0 and (flat_map[idx_down] or the_lava_is_floor) and (number_of_steps_to[idx_down]==null or number_of_steps_to[idx_down] > current_number_of_steps):
 		get_all_possible_movement_destinations_rec_func(idx_down, current_number_of_steps+1, max_movement, the_lava_is_floor)
 
 	# Left
 	var idx_left = idx - 1
-	if idx_left/X == idx/X and idx_left>0 and (flat_map[idx_left] or the_lava_is_floor) and (number_of_steps_to[idx_left]==null or number_of_steps_to[idx_left] < current_number_of_steps):
+	if idx_left/X == idx/X and idx_left>0 and (flat_map[idx_left] or the_lava_is_floor) and (number_of_steps_to[idx_left]==null or number_of_steps_to[idx_left] > current_number_of_steps):
 		get_all_possible_movement_destinations_rec_func(idx_left, current_number_of_steps+1, max_movement, the_lava_is_floor)
 
 	# Right
 	var idx_right = idx + 1
-	if idx_right/X == idx/X and idx_right<SIZE and (flat_map[idx_right] or the_lava_is_floor) and (number_of_steps_to[idx_right]==null or number_of_steps_to[idx_right] < current_number_of_steps):
+	if idx_right/X == idx/X and idx_right<SIZE and (flat_map[idx_right] or the_lava_is_floor) and (number_of_steps_to[idx_right]==null or number_of_steps_to[idx_right] > current_number_of_steps):
 		get_all_possible_movement_destinations_rec_func(idx_right, current_number_of_steps+1, max_movement, the_lava_is_floor)
 
 func get_all_possible_movement_destinations(idx, max_movement, the_lava_is_floor=false):
@@ -164,3 +165,18 @@ func _input(event):
 		if relevant_obj != null:
 			relevant_obj.on_click(xy_to_flat(map_pos[0], map_pos[1]))
 
+func place_green_tiles(x,y):
+	
+	var greens = get_all_possible_movement_destinations(xy_to_flat(x,y), 3)
+	print(greens)
+	for vec in greens:
+		var green = preload("res://Green.tscn")
+		var GR = green.instance()
+		owner.add_child(GR)
+		GR.position.x = map_to_world(vec)[0] + 16
+		GR.position.y = map_to_world(vec)[1] + 16
+	var green_tiles = get_tree().get_nodes_in_group("green tiles")
+		
+func remove_green_tiles():
+	for tile in get_tree().get_nodes_in_group("green tiles"):
+		tile.queue_free()

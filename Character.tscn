@@ -4,7 +4,7 @@
 [ext_resource path="res://sprite_example.jpg" type="Texture" id=2]
 
 [node name="Character" type="Sprite"]
-position = Vector2( 32.7949, 35.3176 )
-scale = Vector2( 0.0707865, 0.0726157 )
+position = Vector2( 16, 16 )
+scale = Vector2( 0.031, 0.031 )
 texture = ExtResource( 2 )
 script = ExtResource( 1 )
