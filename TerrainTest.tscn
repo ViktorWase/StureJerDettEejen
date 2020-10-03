@@ -1,12 +1,88 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://Assets/terrain_tileset.tres" type="TileSet" id=1]
+[ext_resource path="res://Assets/terrain_tileset_32x32.tres" type="TileSet" id=1]
+[ext_resource path="res://Assets/lava.png" type="Texture" id=2]
+[ext_resource path="res://Assets/terrain_tilemap_32x32.png" type="Texture" id=3]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+"
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends TileMap
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	var arr = [
+		[1,1,1,0,1,1,1,0,1,0,1,0,1,1,1,0,1,1,1],
+		[1,0,0,0,0,1,0,0,1,0,1,0,1,0,1,0,1,0,0],
+		[1,1,1,0,0,1,0,0,1,0,1,0,1,1,0,0,1,1,1],
+		[0,0,1,0,0,1,0,0,1,0,1,0,1,0,1,0,1,0,0],
+		[1,1,1,0,0,1,0,0,1,1,1,0,1,0,1,0,1,1,1]
+	]
+	for y in range(len(arr)):
+		for x in range(len(arr[0])):
+			if (arr[y][x] == 1):
+				set_cell(x,y,0)
+	
+	update_bitmask_region(Vector2(0,0), Vector2(len(arr[0]),len(arr)))
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+"
+
+[sub_resource type="ImageTexture" id=3]
 
 [node name="Node2D" type="Node2D"]
+script = SubResource( 1 )
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = ExtResource( 1 )
-cell_size = Vector2( 128, 128 )
+cell_size = Vector2( 32, 32 )
 cell_custom_transform = Transform2D( 0, 0, 0, 0, 0, 0 )
 format = 1
-tile_data = PoolIntArray( 2, 0, 0, 3, 0, 1, 4, 0, 1, 5, 0, 131076, 6, 0, 2, 65537, 0, 0, 65538, 0, 131077, 65539, 0, 65537, 65540, 0, 65537, 65541, 0, 65537, 65542, 0, 65538, 131072, 0, 0, 131073, 0, 131077, 131074, 0, 65537, 131075, 0, 65537, 131076, 0, 65537, 131077, 0, 65537, 131078, 0, 65538, 196608, 0, 65541, 196609, 0, 65537, 196610, 0, 65537, 196611, 0, 65537, 196612, 0, 65537, 196613, 0, 65537, 196614, 0, 65539, 262144, 0, 131072, 262145, 0, 4, 262146, 0, 4, 262147, 0, 131073, 262148, 0, 131073, 262149, 0, 4, 262150, 0, 131074 )
+script = SubResource( 2 )
+
+[node name="Sprite" type="Sprite" parent="."]
+visible = false
+scale = Vector2( 493.921, 159.557 )
+texture = ExtResource( 3 )
+centered = false
+region_enabled = true
+region_rect = Rect2( 64, 64, 32, 32 )
+
+[node name="Sprite2" type="Sprite" parent="."]
+visible = false
+texture = SubResource( 3 )
+
+[node name="TextureRect" type="TextureRect" parent="."]
+margin_right = 1023.0
+margin_bottom = 599.0
+texture = ExtResource( 2 )
+stretch_mode = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
