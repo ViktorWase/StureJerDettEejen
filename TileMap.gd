@@ -2,9 +2,11 @@ extends TileMap
 
 var flat_game_board
 var flat_map
+var number_of_steps_to
 
 var X = 10
 var Y = 10
+var SIZE = X * Y
 
 # var MAX_MOVEMENT = 10  # For performance reasons
 
@@ -17,18 +19,23 @@ func _ready():
 	# then the player grabs the object I guess?) and a player and an enem can't
 	# be on the same tile either.
 	flat_game_board = []
-	
+
 	# The map is a boolean representation of the terrain.
 	# 0 means that one can't go there, 1 means that one can. 
 	flat_map = []
+
+	# Just a helper array that I don't wanna reallocate all the time.
+	number_of_steps_to = []
+
 	var idx = 0
 	for y in range(Y):  # TODO: Y is too small, and also it's set somewhere else I think.
 		for x in range(X):
 			set_cell(x, y, idx)
 			flat_game_board.append(null)
+			number_of_steps_to.append(false)
 			flat_map.append(0)
 			idx += 1
-			
+
 	# This is were the level is created.
 	var maindude = $MainDude
 	flat_game_board[0] = maindude
@@ -44,6 +51,50 @@ func flat_to_xy(idx):
 	var x = idx % X
 	var y = int(idx) / Y
 	return Vector2(x, y)
+
+func get_all_possible_movement_destinations_rec_func(idx, current_number_of_steps, max_movement, the_lava_is_floor):
+	if number_of_steps_to[idx] == null:
+		number_of_steps_to[idx] = current_number_of_steps
+	else:
+		number_of_steps_to[idx] = min(number_of_steps_to[idx], current_number_of_steps)
+
+	if current_number_of_steps >= max_movement:
+		return
+
+	# Up
+	var idx_up = idx + X
+	if idx_up < SIZE and (flat_map[idx_up] or the_lava_is_floor) and (number_of_steps_to[idx_up]==null or number_of_steps_to[idx_up] < current_number_of_steps):
+		get_all_possible_movement_destinations_rec_func(idx_up, current_number_of_steps+1, max_movement, the_lava_is_floor)
+
+	# Down
+	var idx_down = idx - X
+	if idx_down < SIZE and (flat_map[idx_down] or the_lava_is_floor) and (number_of_steps_to[idx_down]==null or number_of_steps_to[idx_down] < current_number_of_steps):
+		get_all_possible_movement_destinations_rec_func(idx_down, current_number_of_steps+1, max_movement, the_lava_is_floor)
+
+	# Left
+	var idx_left = idx - 1
+	if idx_left/X == idx/X and idx_left>0 and (flat_map[idx_left] or the_lava_is_floor) and (number_of_steps_to[idx_left]==null or number_of_steps_to[idx_left] < current_number_of_steps):
+		get_all_possible_movement_destinations_rec_func(idx_left, current_number_of_steps+1, max_movement, the_lava_is_floor)
+
+	# Right
+	var idx_right = idx + 1
+	if idx_right/X == idx/X and idx_right<SIZE and (flat_map[idx_right] or the_lava_is_floor) and (number_of_steps_to[idx_right]==null or number_of_steps_to[idx_right] < current_number_of_steps):
+		get_all_possible_movement_destinations_rec_func(idx_right, current_number_of_steps+1, max_movement, the_lava_is_floor)
+
+func get_all_possible_movement_destinations(idx, max_movement, the_lava_is_floor=false):
+	for i in range(X*Y):
+		number_of_steps_to[i] = null
+
+	# Calculate all positions that can be reached. 
+	get_all_possible_movement_destinations_rec_func(idx, 0, max_movement, the_lava_is_floor)
+
+	# Convert to a more readable data format. 
+	var destinations = []
+	for idx in range(SIZE):
+		if number_of_steps_to[idx] != null:
+			var pos = flat_to_xy(idx)
+			destinations.append(pos)
+	return destinations
 
 func get_movement(startX, startY, endX, endY):
 	# Returns a Curve2D that goes from the start position
