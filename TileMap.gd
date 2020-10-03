@@ -25,24 +25,45 @@ func _ready():
 
 	# Just a helper array that I don't wanna reallocate all the time.
 	number_of_steps_to = []
+	
+	# Read data from scene
+	var cells = get_used_cells()
+	var maxX = 0
+	var maxY = 0
+	for cell in cells:
+		if (cell.x > maxX):
+			maxX = cell.x
+		if (cell.y > maxY):
+			maxY = cell.x
+	X = int(maxX)
+	Y = int(maxY)
+	SIZE = X * Y
 
-	var idx = 0
+	#var idx = 0
 	for y in range(Y):  # TODO: Y is too small, and also it's set somewhere else I think.
 		for x in range(X):
-			set_cell(x, y, 0)
 			flat_game_board.append(null)
 			number_of_steps_to.append(false)
-			flat_map.append(1)
-			idx += 1
+			flat_map.append(0)
+	
+	# populate flat map
+	for cell in cells:
+		var i = xy_to_flat(cell.x, cell.y)
+		flat_map[i] = 1
 
 	# This is were the level is created.
 	update_bitmask_region(Vector2(0, 0), Vector2(X, Y))
 
 	var maindude = load("res://Character.tscn").instance()
+	maindude.set_good()
 	self.add_child(maindude)
-	#var maindude = $MainDude
 	flat_game_board[0] = maindude
-"""
+
+	var evulfella = load("res://Character.tscn").instance()
+	evulfella.set_evul()
+	self.add_child(evulfella)
+	flat_game_board[3] = evulfella
+
 func get_next_enemy():
 	# Returns the next enemy, or if all the enemies have been returned
 	# then null is returned.
@@ -54,11 +75,14 @@ func get_next_enemy():
 
 	var idx = start_idx + 1
 	while idx < SIZE:
-		
+		if flat_game_board[idx] != null:
+			var character = flat_game_board[idx]
+			if character.is_evul():
+				idx += 1
+				return character
 	
 	current_enemy_idx = null
 	return null
-	"""
 
 func xy_to_flat(x, y):
 	return y * X + x
@@ -114,6 +138,27 @@ func get_all_possible_movement_destinations(idx, max_movement, the_lava_is_floor
 			destinations.append(pos)
 	return destinations
 
+func calc_dist(from, to, max_steps):
+	for i in range(X*Y):
+		number_of_steps_to[i] = null
+
+	# Calculate all positions that can be reached. 
+	var idx = xy_to_flat(from[0], from[1])
+	get_all_possible_movement_destinations(idx, max_steps)
+	var dist = number_of_steps_to[xy_to_flat(to[0], to[1])]
+	return dist
+
+func get_positions_of_good_chars_from_list_of_positions(positions):
+	# Checks if there is a good character in any of the specified positions.
+	# If it is, those positions are returned.
+	# Otherwise an empty array is returned.
+	var found_positions = []
+	for pos in positions:
+		var obj = get_obj_from_tile(pos[0], pos[1])
+		if obj != null and obj.is_good():
+			found_positions.append(pos)
+	return found_positions
+
 func get_movement(startX, startY, endX, endY):
 	# Returns a Curve2D that goes from the start position
 	# to the end position..
@@ -155,14 +200,17 @@ func get_obj_from_tile(x, y):
 		print("YOU CLICKED OUTSIDE THE MAP! NOT ALLOWED")
 		return null
 	else:
+		print([x, y])
 		return flat_game_board[xy_to_flat(x, y)]
 
 func _input(event):
 	if event.is_action_pressed("ui_left_click"):
-		var map_pos = world_to_map(event.position)
-		
+		var map_pos = world_to_map(event.position - position)
+
 		var relevant_obj = get_obj_from_tile(map_pos[0], map_pos[1])
+		print(relevant_obj)
 		if relevant_obj != null:
+			print("You clicked on something")
 			relevant_obj.on_click(xy_to_flat(map_pos[0], map_pos[1]))
 
 func place_green_tiles(x,y):
