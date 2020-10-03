@@ -35,8 +35,8 @@ func _ready():
 			maxX = cell.x
 		if (cell.y > maxY):
 			maxY = cell.x
-	X = maxX
-	Y = maxY
+	X = int(maxX)
+	Y = int(maxY)
 	SIZE = X * Y
 
 	#var idx = 0
