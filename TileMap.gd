@@ -7,6 +7,7 @@ var number_of_steps_to
 var X = 10
 var Y = 10
 var SIZE = X * Y
+var current_enemy_idx = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -38,10 +39,23 @@ func _ready():
 	update_bitmask_region(Vector2(0, 0), Vector2(X, Y))
 	var maindude = $MainDude
 	flat_game_board[0] = maindude
+"""
+func get_next_enemy():
+	# Returns the next enemy, or if all the enemies have been returned
+	# then null is returned.
+	var start_idx
+	if current_enemy_idx == null:
+		start_idx = 0
+	else:
+		start_idx = current_enemy_idx
 
-	#flat_map[0] = 1
-	#flat_map[1] = 1
-	#flat_map[2] = 1
+	var idx = start_idx + 1
+	while idx < SIZE:
+		
+	
+	current_enemy_idx = null
+	return null
+	"""
 
 func xy_to_flat(x, y):
 	return y * X + x
