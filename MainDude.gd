@@ -1,4 +1,4 @@
-extends Sprite
+extends AnimatedSprite
 
 signal reached_waypoint
 
@@ -21,6 +21,7 @@ var cy : int
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	play("idle")
 	return
 
 func is_evul():
@@ -101,6 +102,8 @@ func move_along_path(path : Curve2D):
 	waypoints = path.get_baked_points()
 	waypoint_index = 0
 	is_done_moving = false
+	
+	play("run")
 
 func has_reached_destination():
 	# TODO: USE SIGNLARS
@@ -117,6 +120,7 @@ func _physics_process(delta):
 	if position.distance_to(target) < 1:
 		waypoint_index += 1
 		if (waypoint_index >= len(waypoints)):
+			play("idle")
 			waypoints = null
 			print("end")
 			is_done_moving = true
@@ -125,6 +129,12 @@ func _physics_process(delta):
 			return
 		target = waypoints[waypoint_index]
 	velocity = (target - position).normalized() * move_speed
+	
+	if (velocity.x < -0.1):
+		scale.x = -abs(scale.x)
+	else:
+		scale.x = abs(scale.x)
+		
 	#velocity = move_and_slide(velocity)
 	position += velocity*delta
 
