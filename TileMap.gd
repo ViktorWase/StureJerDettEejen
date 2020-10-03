@@ -8,8 +8,6 @@ var X = 10
 var Y = 10
 var SIZE = X * Y
 
-# var MAX_MOVEMENT = 10  # For performance reasons
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	
@@ -30,19 +28,20 @@ func _ready():
 	var idx = 0
 	for y in range(Y):  # TODO: Y is too small, and also it's set somewhere else I think.
 		for x in range(X):
-			set_cell(x, y, idx)
+			set_cell(x, y, 0)
 			flat_game_board.append(null)
 			number_of_steps_to.append(false)
-			flat_map.append(0)
+			flat_map.append(1)
 			idx += 1
 
 	# This is were the level is created.
+	update_bitmask_region(Vector2(0, 0), Vector2(X, Y))
 	var maindude = $MainDude
 	flat_game_board[0] = maindude
 
-	flat_map[0] = 1
-	flat_map[1] = 1
-	flat_map[2] = 1
+	#flat_map[0] = 1
+	#flat_map[1] = 1
+	#flat_map[2] = 1
 
 func xy_to_flat(x, y):
 	return y * X + x
@@ -133,12 +132,11 @@ func get_movement(startX, startY, endX, endY):
 func get_obj_from_tile(x, y):
 	# Returns null if there is nothing there, otherwise it
 	# returns the thing that is in the tile.
-	var idx = get_cell(x, y)
-	if idx == -1:
+	if x < 0 or x >= X or y < 0 or y >= Y:
 		print("YOU CLICKED OUTSIDE THE MAP! NOT ALLOWED")
 		return null
 	else:
-		return flat_game_board[idx]
+		return flat_game_board[xy_to_flat(x, y)]
 
 func _input(event):
 	if event.is_action_pressed("ui_left_click"):
