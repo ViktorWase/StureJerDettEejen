@@ -48,6 +48,7 @@ func xy_to_flat(x, y):
 	return y * X + x
 
 func flat_to_xy(idx):
+	idx = int(idx)
 	var x = idx % X
 	var y = int(idx) / Y
 	return Vector2(x, y)
@@ -146,4 +147,5 @@ func _input(event):
 		
 		var relevant_obj = get_obj_from_tile(map_pos[0], map_pos[1])
 		if relevant_obj != null:
-			relevant_obj.on_click()
+			relevant_obj.on_click(xy_to_flat(map_pos[0], map_pos[1]))
+			
