@@ -3,11 +3,28 @@ extends TileMap
 var flat_game_board
 var flat_map
 var number_of_steps_to
+var active_greens = []
 
 var X = 10
 var Y = 10
 var SIZE = X * Y
 var current_enemy_idx = null
+var active_character
+
+enum game_states {
+	player_turn,
+	enemy_turn
+}
+
+enum game_turn_states {
+	choose_character,
+	select_tile,
+	character_moving,
+	end_turn
+}
+
+var game_state = game_states.player_turn
+var game_turn_state = game_turn_states.choose_character
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -57,12 +74,14 @@ func _ready():
 	var maindude = load("res://Character.tscn").instance()
 	maindude.set_good()
 	self.add_child(maindude)
+	# TODO: create function
 	flat_game_board[0] = maindude
+	maindude.set_coordinates(Vector2(0, 0))
 
-	var evulfella = load("res://Character.tscn").instance()
-	evulfella.set_evul()
-	self.add_child(evulfella)
-	flat_game_board[3] = evulfella
+#	var evulfella = load("res://Character.tscn").instance()
+#	evulfella.set_evul()
+#	self.add_child(evulfella)
+#	flat_game_board[3] = evulfella
 
 func get_next_enemy():
 	# Returns the next enemy, or if all the enemies have been returned
@@ -168,30 +187,33 @@ func get_movement(startX, startY, endX, endY):
 		push_error("MOVING TO TERRAIN THAT IS NOT ALLOWED!")
 	# TODO: ADD SOME SORT OF A* ALGO, cause this is stooopid and weird and stuff.
 
-	var path = Curve2D
+	var path = Curve2D.new()
 	# TODO: SPAGETTI CODE!
 	if startX != endX:
 		var should_go_left = startX < endX
 		if should_go_left:
 			for x in range(startX, endX+1):
-				var world_pos = map_to_world(Vector2(x, startY))
+				var world_pos = map_to_world_center(Vector2(x, startY))
 				path.add_point(world_pos)
 		else:
 			for x in range(endX, startX+1):
-				var world_pos = map_to_world(Vector2(x, startY))
+				var world_pos = map_to_world_center(Vector2(x, startY))
 				path.add_point(world_pos)
 
 	if startY != endY:
 		var should_go_up = startY < endY
 		if should_go_up:
 			for y in range(startY, endY+1):
-				var world_pos = map_to_world(Vector2(endX, y))
+				var world_pos = map_to_world_center(Vector2(endX, y))
 				path.add_point(world_pos)
 		else:
 			for y in range(endY, startY+1):
-				var world_pos = map_to_world(Vector2(endX, y))
+				var world_pos = map_to_world_center(Vector2(endX, y))
 				path.add_point(world_pos)
 	return path
+
+func map_to_world_center(v : Vector2):
+	return map_to_world(v) + Vector2.ONE * 16
 
 func get_obj_from_tile(x, y):
 	# Returns null if there is nothing there, otherwise it
@@ -206,25 +228,67 @@ func get_obj_from_tile(x, y):
 func _input(event):
 	if event.is_action_pressed("ui_left_click"):
 		var map_pos = world_to_map(event.position - position)
+		var obj = get_obj_from_tile(map_pos[0], map_pos[1])
+		
+		match(game_state):
+			game_states.player_turn:
+				match(game_turn_state):
+					game_turn_states.choose_character:
+						if (!obj or !obj.is_good()):
+							return
+						active_character = obj
+						obj.on_click(xy_to_flat(map_pos[0], map_pos[1]))
+						game_turn_state = game_turn_states.select_tile
+					
+					game_turn_states.select_tile:
+						var green = find_green(map_pos[0], map_pos[1])
+						if (green):
+							game_turn_state = game_turn_states.character_moving
+							# TODO: get move path
+							var path = get_movement(active_character.cx, active_character.cy, green.cx, green.cy)
+							active_character.move_along_path(path)
+							
+							# move character to new position
+							flat_game_board[xy_to_flat(active_character.cx, active_character.cy)] = null
+							flat_game_board[xy_to_flat(green.cx, green.cy)] = active_character
+							active_character.set_coordinates_only(Vector2(green.cx, green.cy))
+							
+							remove_green_tiles()
+						else:
+							game_turn_state = game_turn_states.choose_character
+							remove_green_tiles()
 
-		var relevant_obj = get_obj_from_tile(map_pos[0], map_pos[1])
-		print(relevant_obj)
-		if relevant_obj != null:
-			print("You clicked on something")
-			relevant_obj.on_click(xy_to_flat(map_pos[0], map_pos[1]))
+func _on_reached_goal():
+	print("callback hoolabandoola")
+
+func _process(delta):
+	match(game_state):
+		game_states.player_turn:
+			match(game_turn_state):
+				game_turn_states.character_moving:
+					if (active_character.has_reached_destination()):
+						game_turn_state = game_turn_states.choose_character
+						print("is done")
+						#game_turn_state = game_turn_states.end_turn # TODO: gå till nästa dude
+
+func find_green(x, y):
+	for green in active_greens:
+		if (green.cx == x and green.cy == y):
+			return green
+	return null
 
 func place_green_tiles(x,y):
-	
 	var greens = get_all_possible_movement_destinations(xy_to_flat(x,y), 3)
-	print(greens)
+
+	active_greens = []
 	for vec in greens:
 		var green = preload("res://Green.tscn")
 		var GR = green.instance()
 		self.add_child(GR)
-		GR.position.x = map_to_world(vec)[0] + 16
-		GR.position.y = map_to_world(vec)[1] + 16
-	var green_tiles = get_tree().get_nodes_in_group("green tiles")
-		
+		GR.set_coordinates(vec)
+		active_greens.append(GR)
+
 func remove_green_tiles():
 	for tile in get_tree().get_nodes_in_group("green tiles"):
 		tile.queue_free()
+	active_greens = []

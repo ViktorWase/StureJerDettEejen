@@ -38,7 +38,7 @@ func _physics_process(delta):
 	velocity = move_and_slide(velocity)
 "
 
-[sub_resource type="SpriteFrames" id=4]
+[sub_resource type="SpriteFrames" id=3]
 animations = [ {
 "frames": [ ExtResource( 2 ), ExtResource( 3 ), ExtResource( 4 ), ExtResource( 5 ) ],
 "loop": true,
@@ -51,7 +51,7 @@ animations = [ {
 "speed": 9.0
 } ]
 
-[sub_resource type="CircleShape2D" id=3]
+[sub_resource type="CircleShape2D" id=4]
 radius = 29.2784
 
 [node name="Node2D" type="Node2D"]
@@ -66,9 +66,10 @@ patrol_path = NodePath("../Path2D")
 [node name="AnimatedSprite" type="AnimatedSprite" parent="KinematicBody2D"]
 position = Vector2( 0, -21.4285 )
 scale = Vector2( 3.67216, 3.67216 )
-frames = SubResource( 4 )
+frames = SubResource( 3 )
 animation = "run"
+frame = 3
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="KinematicBody2D"]
-shape = SubResource( 3 )
+shape = SubResource( 4 )

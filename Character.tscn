@@ -8,3 +8,4 @@ position = Vector2( 16, 16 )
 scale = Vector2( 0.031, 0.031 )
 texture = ExtResource( 2 )
 script = ExtResource( 1 )
+move_speed = 120
