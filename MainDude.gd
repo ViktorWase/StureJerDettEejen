@@ -10,8 +10,11 @@ extends Sprite
 func _ready():
 	pass # Replace with function body.
 
-func on_click():
+func on_click(idx):
 	print("YOU CLICKED THE MAIN DUDE")
+	var x = self.get_parent().flat_to_xy(idx)[0]
+	var y = self.get_parent().flat_to_xy(idx)[1]
+	self.get_parent().place_green_tiles(x,y)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
