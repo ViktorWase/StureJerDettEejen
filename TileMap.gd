@@ -7,8 +7,7 @@ var number_of_steps_to
 var X = 10
 var Y = 10
 var SIZE = X * Y
-
-# var MAX_MOVEMENT = 10  # For performance reasons
+var current_enemy_idx = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -30,19 +29,36 @@ func _ready():
 	var idx = 0
 	for y in range(Y):  # TODO: Y is too small, and also it's set somewhere else I think.
 		for x in range(X):
-			set_cell(x, y, idx)
+			set_cell(x, y, 0)
 			flat_game_board.append(null)
 			number_of_steps_to.append(false)
-			flat_map.append(0)
+			flat_map.append(1)
 			idx += 1
 
 	# This is were the level is created.
-	var maindude = $MainDude
-	flat_game_board[0] = maindude
+	update_bitmask_region(Vector2(0, 0), Vector2(X, Y))
 
-	flat_map[0] = 1
-	flat_map[1] = 1
-	flat_map[2] = 1
+	var maindude = load("res://Character.tscn").instance()
+	self.add_child(maindude)
+	#var maindude = $MainDude
+	flat_game_board[0] = maindude
+"""
+func get_next_enemy():
+	# Returns the next enemy, or if all the enemies have been returned
+	# then null is returned.
+	var start_idx
+	if current_enemy_idx == null:
+		start_idx = 0
+	else:
+		start_idx = current_enemy_idx
+
+	var idx = start_idx + 1
+	while idx < SIZE:
+		
+	
+	current_enemy_idx = null
+	return null
+	"""
 
 func xy_to_flat(x, y):
 	return y * X + x
@@ -134,12 +150,11 @@ func get_movement(startX, startY, endX, endY):
 func get_obj_from_tile(x, y):
 	# Returns null if there is nothing there, otherwise it
 	# returns the thing that is in the tile.
-	var idx = get_cell(x, y)
-	if idx == -1:
+	if x < 0 or x >= X or y < 0 or y >= Y:
 		print("YOU CLICKED OUTSIDE THE MAP! NOT ALLOWED")
 		return null
 	else:
-		return flat_game_board[idx]
+		return flat_game_board[xy_to_flat(x, y)]
 
 func _input(event):
 	if event.is_action_pressed("ui_left_click"):
@@ -148,4 +163,4 @@ func _input(event):
 		var relevant_obj = get_obj_from_tile(map_pos[0], map_pos[1])
 		if relevant_obj != null:
 			relevant_obj.on_click(xy_to_flat(map_pos[0], map_pos[1]))
-			
+
