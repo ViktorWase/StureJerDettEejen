@@ -220,7 +220,7 @@ func place_green_tiles(x,y):
 	for vec in greens:
 		var green = preload("res://Green.tscn")
 		var GR = green.instance()
-		owner.add_child(GR)
+		self.add_child(GR)
 		GR.position.x = map_to_world(vec)[0] + 16
 		GR.position.y = map_to_world(vec)[1] + 16
 	var green_tiles = get_tree().get_nodes_in_group("green tiles")
