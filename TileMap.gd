@@ -16,7 +16,8 @@ var number_of_turns_till_apocalypse = 12
 enum game_states {
 	player_turn,
 	enemy_turn,
-	DEATH_DESTRUCTION_AND_THE_APOCALYPSE
+	DEATH_DESTRUCTION_AND_THE_APOCALYPSE,
+	winning
 }
 
 enum game_turn_states {
@@ -89,6 +90,13 @@ func _ready():
 		var i = xy_to_flat(charX, charY)
 		flat_game_board[i] = enemy
 		enemy.set_start_coordinates(Vector2(charX, charY))
+	
+	var rocket = $Rocket
+	var charX = floor(rocket.position.x / 32)
+	var charY = floor(rocket.position.y / 32)
+	var i = xy_to_flat(charX, charY)
+	flat_game_board[i] = rocket
+	rocket.set_coordinates(Vector2(charX, charY))
 
 #	var evulfella = load("res://Character.tscn").instance()
 #	evulfella.set_evul()
@@ -327,6 +335,9 @@ func end_of_player_turn():
 	reset_movement_of_good_chars()
 	
 	# check winning condition
+	if ($Rocket.is_character_nearby()):
+		print("YOU WON")
+		game_state = game_states.winning
 
 func _on_reached_goal():
 	print("callback hoolabandoola")
