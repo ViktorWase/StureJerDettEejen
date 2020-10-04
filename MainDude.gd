@@ -162,6 +162,8 @@ func move_evul(idx, max_look_distance):
 	
 	# TODO: There is a lot of recalculation in this function. Might be worth fixing?
 	# TODO: Possibly move it randomly or in a pattern if no char is detected?
+	# TODO: THIS WILL NOT WORK FOR SNIPERS! They should stay at a distance, but this
+	#       code will put them as close as possible.
 
 	var possible_squares = get_parent().get_all_possible_movement_destinations(idx, max_look_distance, can_walk_on_lava)
 	var positions_of_good_chars = get_parent().get_positions_of_good_chars_from_list_of_positions(possible_squares)

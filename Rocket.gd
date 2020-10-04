@@ -60,6 +60,17 @@ func _ready():
 	
 	$fire.hide()
 
+func calculate_score():
+	var remaining_time = get_parent().number_of_turns_till_apocalypse
+	var number_of_units_close_to_rocket = 0
+	for y in range(3):
+		for x in range(3):
+			var obj = get_parent().get_obj_from_tile(cx+x-1, cy+y-1)
+			if (obj and obj.is_good()):
+				number_of_units_close_to_rocket += 1
+
+	return remaining_time + number_of_units_close_to_rocket  # TODO: Make this better somehow?
+
 func is_character_nearby():
 	var tilemap = get_parent()
 	var has_character = false
