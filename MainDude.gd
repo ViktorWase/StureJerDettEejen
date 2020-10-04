@@ -184,3 +184,9 @@ func _physics_process(delta):
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
+
+func darken_character():
+	modulate = Color(0.25,0.25,0.25,1.0)
+	
+func reset_darkened_character():
+	modulate = Color(1.0,1.0,1.0,1.0)
