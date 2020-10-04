@@ -21,6 +21,8 @@ var is_done_moving
 var cx : int
 var cy : int
 
+var startCoords : Vector2
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	if (is_good):
@@ -48,7 +50,12 @@ func set_evul():
 func set_neutral():
 	alignment = neutral
 
+func set_start_coordinates(coord : Vector2):
+	startCoords = coord.floor()
+	set_coordinates(startCoords)
+
 func set_coordinates_only(coord):
+	coord = coord.floor()
 	# kolla om vi får ett fel, hälsningar Intrud
 	cx = coord.x
 	cy = coord.y
@@ -59,6 +66,10 @@ func set_coordinates(coord):
 	var tilemap = get_parent()
 	position.x = tilemap.map_to_world(coord)[0] + 16
 	position.y = tilemap.map_to_world(coord)[1] + 16
+
+func reset_graphics():
+	play("idle")
+	scale.x = abs(scale.x)
 
 func move_evul(idx, max_look_distance):
 	# Checks if there is a player within max_look_distance (not as the crow flies -
@@ -116,6 +127,11 @@ func move_along_path(path : Curve2D):
 	is_done_moving = false
 	
 	play("run")
+
+func move_to_start_coordinates():
+	waypoints = [get_parent().map_to_world(startCoords) + Vector2.ONE*16]
+	waypoint_index = 0
+	is_done_moving = false
 
 func has_reached_destination():
 	# TODO: USE SIGNLARS

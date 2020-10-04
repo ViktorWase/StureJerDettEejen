@@ -10,6 +10,7 @@ var Y = 10
 var SIZE = X * Y
 var current_enemy_idx = null
 var active_character
+var resetting_characters = []
 
 enum game_states {
 	player_turn,
@@ -78,14 +79,14 @@ func _ready():
 		var charY = floor(character.position.y / 32)
 		var i = xy_to_flat(charX, charY)
 		flat_game_board[i] = character
-		character.set_coordinates(Vector2(charX, charY))
+		character.set_start_coordinates(Vector2(charX, charY))
 	
 	for enemy in get_tree().get_nodes_in_group("Enemies"):
 		var charX = floor(enemy.position.x / 32)
 		var charY = floor(enemy.position.y / 32)
 		var i = xy_to_flat(charX, charY)
 		flat_game_board[i] = enemy
-		enemy.set_coordinates(Vector2(charX, charY))
+		enemy.set_start_coordinates(Vector2(charX, charY))
 
 #	var evulfella = load("res://Character.tscn").instance()
 #	evulfella.set_evul()
@@ -247,7 +248,8 @@ func _input(event):
 						if (!obj or !obj.is_evul()):
 							# cancel, next turn
 							remove_green_tiles()
-							game_turn_state = game_turn_states.choose_character
+							reset_game_board()
+							#game_turn_state = game_turn_states.choose_character
 							return
 						
 						# attack!
@@ -262,7 +264,9 @@ func _input(event):
 						# game_turn_state = game_turn_states.character_attacking
 						
 						# TODO: next state
-						game_turn_state = game_turn_states.choose_character
+						#game_turn_state = game_turn_states.choose_character
+						
+						reset_game_board()
 					
 					game_turn_states.select_tile:
 						var green = find_green(map_pos[0], map_pos[1])
@@ -300,6 +304,21 @@ func _process(delta):
 						else:
 							# TODO: select next turn
 							game_turn_state = game_turn_states.select_character
+				
+				game_turn_states.end_turn:
+					for character in resetting_characters:
+						if (character.has_reached_destination()):
+							resetting_characters.erase(character)
+							active_character = null
+							break
+					
+					if (resetting_characters.empty()):
+						for character in get_tree().get_nodes_in_group("Characters"):
+							character.reset_graphics()
+						for enemy in get_tree().get_nodes_in_group("Enemies"):
+							enemy.reset_graphics()
+						
+						game_turn_state = game_turn_states.choose_character
 
 func find_green(x, y):
 	for green in active_greens:
@@ -329,3 +348,25 @@ func remove_green_tiles():
 	for tile in get_tree().get_nodes_in_group("green tiles"):
 		tile.queue_free()
 	active_greens = []
+
+func reset_game_board():
+	game_turn_state = game_turn_states.end_turn
+	resetting_characters = []
+	
+	for character in get_tree().get_nodes_in_group("Characters"):
+		# reference character
+		active_character = character
+		character.move_to_start_coordinates()
+		flat_game_board[xy_to_flat(character.cx, character.cy)] = null
+		flat_game_board[xy_to_flat(character.startCoords.x, character.startCoords.y)] = character
+		character.set_coordinates_only(character.startCoords)
+		
+		resetting_characters.append(character)
+	
+	for enemy in get_tree().get_nodes_in_group("Enemies"):
+		enemy.move_to_start_coordinates()
+		flat_game_board[xy_to_flat(enemy.cx, enemy.cy)] = null
+		flat_game_board[xy_to_flat(enemy.startCoords.x, enemy.startCoords.y)] = enemy
+		enemy.set_coordinates_only(enemy.startCoords)
+		
+		resetting_characters.append(enemy)
