@@ -130,7 +130,7 @@ func _physics_process(delta):
 		target = waypoints[waypoint_index]
 	velocity = (target - position).normalized() * move_speed
 	
-	if (velocity.x < -0.1):
+	if (velocity.x < -32):
 		scale.x = -abs(scale.x)
 	else:
 		scale.x = abs(scale.x)

@@ -23,11 +23,11 @@ animations = [ {
 "speed": 10.0
 } ]
 
-[node name="AnimatedSprite" type="AnimatedSprite"]
+[node name="Character" type="AnimatedSprite"]
 scale = Vector2( 2, 2 )
 frames = SubResource( 1 )
 animation = "idle"
-frame = 3
+frame = 1
 playing = true
 offset = Vector2( 0, -6.057 )
 script = ExtResource( 1 )
