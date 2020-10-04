@@ -81,7 +81,7 @@ func _ready():
 		var charX = floor(character.position.x / 32)
 		var charY = floor(character.position.y / 32)
 		var i = xy_to_flat(charX, charY)
-		character.set_as_runner()
+		character.set_as_basic_b()
 		flat_game_board[i] = character
 		character.set_start_coordinates(Vector2(charX, charY))
 	
@@ -99,22 +99,29 @@ func _ready():
 	flat_game_board[i] = rocket
 	rocket.set_coordinates(Vector2(charX, charY))
 
-	var plane = load("res://Wings.tscn").instance()  # TODO: The plane really looks like a dude.
+	var plane = load("res://Wings.tscn").instance()
 	plane.object_type = 'plane'
-	flat_game_board[xy_to_flat(9, 2)] = plane
+	flat_game_board[xy_to_flat(5, 4)] = plane
 	self.add_child(plane)
 	plane.set_neutral()
-	plane.set_start_coordinates(Vector2(9, 2))
+	plane.set_start_coordinates(Vector2(5, 4))
+	
+	var plane2 = load("res://Wings.tscn").instance()
+	plane2.object_type = 'plane'
+	flat_game_board[xy_to_flat(5, 5)] = plane2
+	self.add_child(plane2)
+	plane2.set_neutral()
+	plane2.set_start_coordinates(Vector2(5, 5))
 	
 	get_tree().get_root().get_node("Node2D").find_node("WinningScreen").hide()
 	get_tree().get_root().get_node("Node2D").find_node("DeathScreen").hide()
 
-	var armor = load("res://Shield.tscn").instance()  # TODO: The armor really looks like a dude.
-	armor.object_type = 'armor'
-	flat_game_board[xy_to_flat(9, 3)] = armor
-	self.add_child(armor)
-	armor.set_neutral()
-	armor.set_start_coordinates(Vector2(9, 3))
+	#var armor = load("res://Shield.tscn").instance()  # TODO: The armor really looks like a dude.
+	#armor.object_type = 'armor'
+	#flat_game_board[xy_to_flat(9, 3)] = armor
+	#self.add_child(armor)
+	#armor.set_neutral()
+	#armor.set_start_coordinates(Vector2(9, 3))
 
 func get_number_of_turns_till_reset():
 	if number_of_turns_till_apocalypse <= 0:
