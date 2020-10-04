@@ -331,6 +331,17 @@ func end_of_enemy_turn():
 	if get_number_of_turns_till_reset() == 0:
 		reset_game_board()
 
+func should_be_able_to_end_player_turn():
+	# Sometimes the player can end their turn. Other times, they cannot.
+	# For exmaple, when it's the enemy's turn, or when a character is moving.
+	return game_state == game_states.player_turn and game_turn_state == game_turn_states.choosing_character
+
+func player_ends_their_turn():
+	if should_be_able_to_end_player_turn():
+		end_of_player_turn()
+	else:
+		push_warning("Stop trying to end player turn when it's not allowed!")
+
 func end_of_player_turn():
 	reset_movement_of_good_chars()
 	
