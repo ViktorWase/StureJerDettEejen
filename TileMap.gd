@@ -347,6 +347,7 @@ func _input(event):
 							active_character.set_coordinates_only(Vector2(green.cx, green.cy))
 							
 							remove_green_tiles()
+							active_character.darken_character()
 						else:
 							game_turn_state = game_turn_states.choose_character
 							remove_green_tiles()
@@ -361,6 +362,8 @@ func end_of_enemy_turn():
 	print("TURNS LEFT ", get_number_of_turns_till_reset())
 	if get_number_of_turns_till_reset() == 0:
 		reset_game_board()
+	for character in get_tree().get_nodes_in_group("Characters"):
+		character.reset_darkened_character()
 
 func should_be_able_to_end_player_turn():
 	# Sometimes the player can end their turn. Other times, they cannot.
