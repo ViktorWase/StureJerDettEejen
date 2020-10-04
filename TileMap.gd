@@ -289,7 +289,7 @@ func _input(event):
 			print("ending turn")
 		match(game_state):
 			game_states.player_turn:
-				get_tree().get_root().get_node("Node2D").find_node("End Turn").show()
+				
 				print(game_turn_state)
 				match(game_turn_state):
 					game_turn_states.choose_character:
@@ -395,6 +395,8 @@ func _on_reached_goal():
 	print("callback hoolabandoola")
 
 func _process(delta):
+	if should_be_able_to_end_player_turn():
+		get_tree().get_root().get_node("Node2D").find_node("End Turn").show()
 	match(game_state):
 		game_states.player_turn:
 			match(game_turn_state):
