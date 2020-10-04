@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://TileMap.gd" type="Script" id=1]
 [ext_resource path="res://Character.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Enemy.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Assets/terrain_pixel_tilemap.tres" type="TileSet" id=4]
 [ext_resource path="res://LavaBackground.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Rocket.tscn" type="PackedScene" id=6]
 
 [node name="Node2D" type="Node2D"]
 
@@ -24,15 +25,17 @@ script = ExtResource( 1 )
 
 [node name="Character" parent="TileMap" instance=ExtResource( 2 )]
 position = Vector2( 15.3956, 16.7132 )
-frame = 2
 
 [node name="Character2" parent="TileMap" instance=ExtResource( 2 )]
 position = Vector2( 207.239, 80.506 )
+frame = 0
 
 [node name="Character3" parent="TileMap" instance=ExtResource( 2 )]
 position = Vector2( 110.386, 141.039 )
-frame = 0
+frame = 1
 
 [node name="Enemy" parent="TileMap" instance=ExtResource( 3 )]
 position = Vector2( 112.714, 48.3768 )
-frame = 3
+
+[node name="Rocket" parent="TileMap" instance=ExtResource( 6 )]
+position = Vector2( 302.335, 266.7 )

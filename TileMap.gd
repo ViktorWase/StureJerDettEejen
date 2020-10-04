@@ -313,14 +313,20 @@ func _input(event):
 							game_turn_state = game_turn_states.choose_character
 							remove_green_tiles()
 
-func end_of_turn():
+func end_of_enemy_turn():
 	number_of_turns_till_apocalypse -= 1
 	if number_of_turns_till_apocalypse <= 0:
 		game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
+		return
+
 	print("TURNS LEFT ", get_number_of_turns_till_reset())
 	if get_number_of_turns_till_reset() == 0:
 		reset_game_board()
-		
+
+func end_of_player_turn():
+	reset_movement_of_good_chars()
+	
+	# check winning condition
 
 func _on_reached_goal():
 	print("callback hoolabandoola")
@@ -343,9 +349,11 @@ func _process(delta):
 							game_turn_state = game_turn_states.choose_character
 				game_turn_states.choose_character:
 					if !any_player_moves_left():
-						reset_movement_of_good_chars()
 						game_state = game_states.enemy_turn
 						game_turn_state = game_turn_states.choose_character
+						
+						# end of player turn
+						end_of_player_turn()
 		game_states.enemy_turn:
 			match(game_turn_state):
 				game_turn_states.choose_character:
@@ -356,7 +364,7 @@ func _process(delta):
 						game_state = game_states.player_turn
 						game_turn_state = game_turn_states.choose_character
 						reset_movement_of_evul_chars()
-						end_of_turn()
+						end_of_enemy_turn()
 					else:
 						game_turn_state = game_turn_states.character_moving
 						
