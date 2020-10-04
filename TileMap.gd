@@ -346,8 +346,8 @@ func _input(event):
 
 func end_of_enemy_turn():
 	number_of_turns_till_apocalypse -= 1
-	get_tree().get_root().get_node("Node2D").find_node("DeathScreen").show()
 	if number_of_turns_till_apocalypse <= 0:
+		get_tree().get_root().get_node("Node2D").find_node("DeathScreen").show()
 		game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
 		return
 
