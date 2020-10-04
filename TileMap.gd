@@ -281,7 +281,6 @@ func _input(event):
 	if event.is_action_pressed("ui_left_click"):
 		var map_pos = world_to_map(event.position - position)
 		var obj = get_obj_from_tile(map_pos[0], map_pos[1])
-
 		var end_turn_button = [Vector2(-10,-4),Vector2(-10,-3),Vector2(-9,-4),Vector2(-9,-3)]
 		print(map_pos)
 		if map_pos in end_turn_button:
@@ -397,6 +396,18 @@ func _on_reached_goal():
 func _process(delta):
 	if should_be_able_to_end_player_turn():
 		get_tree().get_root().get_node("Node2D").find_node("End Turn").show()
+	if number_of_turns_till_apocalypse > 8:
+		$"Loop Counter/LoopIcon3".frame = get_number_of_turns_till_reset()
+	elif number_of_turns_till_apocalypse > 4:
+		$"Loop Counter/LoopIcon3".frame = 4
+		$"Loop Counter/LoopIcon2".frame = get_number_of_turns_till_reset()
+	elif number_of_turns_till_apocalypse > 0:
+		$"Loop Counter/LoopIcon2".frame = 4
+		$"Loop Counter/LoopIcon1".frame = get_number_of_turns_till_reset()
+	else:
+#		$"Loop Counter/LoopIcon3".frame = 4
+#		$"Loop Counter/LoopIcon2".frame = 4
+		$"Loop Counter/LoopIcon1".frame = 4
 	match(game_state):
 		game_states.player_turn:
 			match(game_turn_state):
