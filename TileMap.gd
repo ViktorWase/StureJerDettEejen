@@ -81,7 +81,7 @@ func _ready():
 		var charX = floor(character.position.x / 32)
 		var charY = floor(character.position.y / 32)
 		var i = xy_to_flat(charX, charY)
-		character.set_as_sniper()
+		character.set_as_runner()
 		flat_game_board[i] = character
 		character.set_start_coordinates(Vector2(charX, charY))
 	
