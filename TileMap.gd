@@ -99,7 +99,7 @@ func _ready():
 	flat_game_board[i] = rocket
 	rocket.set_coordinates(Vector2(charX, charY))
 
-	var plane = load("res://Character.tscn").instance()  # TODO: The plane really looks like a dude.
+	var plane = load("res://Wings.tscn").instance()  # TODO: The plane really looks like a dude.
 	plane.object_type = 'plane'
 	flat_game_board[xy_to_flat(9, 2)] = plane
 	self.add_child(plane)
@@ -109,7 +109,7 @@ func _ready():
 	get_tree().get_root().get_node("Node2D").find_node("WinningScreen").hide()
 	get_tree().get_root().get_node("Node2D").find_node("DeathScreen").hide()
 
-	var armor = load("res://Character.tscn").instance()  # TODO: The armor really looks like a dude.
+	var armor = load("res://Shield.tscn").instance()  # TODO: The armor really looks like a dude.
 	armor.object_type = 'armor'
 	flat_game_board[xy_to_flat(9, 3)] = armor
 	self.add_child(armor)
@@ -281,7 +281,6 @@ func _input(event):
 	if event.is_action_pressed("ui_left_click"):
 		var map_pos = world_to_map(event.position - position)
 		var obj = get_obj_from_tile(map_pos[0], map_pos[1])
-
 		var end_turn_button = [Vector2(-10,-4),Vector2(-10,-3),Vector2(-9,-4),Vector2(-9,-3)]
 		print(map_pos)
 		if map_pos in end_turn_button:
@@ -289,7 +288,7 @@ func _input(event):
 			print("ending turn")
 		match(game_state):
 			game_states.player_turn:
-				get_tree().get_root().get_node("Node2D").find_node("End Turn").show()
+				
 				print(game_turn_state)
 				match(game_turn_state):
 					game_turn_states.choose_character:
@@ -395,6 +394,18 @@ func _on_reached_goal():
 	print("callback hoolabandoola")
 
 func _process(delta):
+	if should_be_able_to_end_player_turn():
+		get_tree().get_root().get_node("Node2D").find_node("End Turn").show()
+	if number_of_turns_till_apocalypse > 8:
+		$"Loop Counter/LoopIcon3".frame = get_number_of_turns_till_reset()
+	elif number_of_turns_till_apocalypse > 4:
+		$"Loop Counter/LoopIcon3".frame = 4
+		$"Loop Counter/LoopIcon2".frame = get_number_of_turns_till_reset()
+	elif number_of_turns_till_apocalypse > 0:
+		$"Loop Counter/LoopIcon2".frame = 4
+		$"Loop Counter/LoopIcon1".frame = get_number_of_turns_till_reset()
+	else:
+		$"Loop Counter/LoopIcon1".frame = 4
 	match(game_state):
 		game_states.player_turn:
 			match(game_turn_state):
