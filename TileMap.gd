@@ -385,11 +385,12 @@ func place_green_tiles(x,y):
 
 	active_greens = []
 	for vec in greens:
-		var green = preload("res://Green.tscn")
-		var GR = green.instance()
-		self.add_child(GR)
-		GR.set_coordinates(vec)
-		active_greens.append(GR)
+		if(flat_game_board[xy_to_flat(vec[0],vec[1])] == null or flat_game_board[xy_to_flat(vec[0],vec[1])].is_neutral()):
+			var green = preload("res://Green.tscn")
+			var GR = green.instance()
+			self.add_child(GR)
+			GR.set_coordinates(vec)
+			active_greens.append(GR)
 
 func remove_green_tiles():
 	for tile in get_tree().get_nodes_in_group("green tiles"):
