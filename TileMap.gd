@@ -11,10 +11,12 @@ var SIZE = X * Y
 var current_enemy_idx = null
 var active_character
 var resetting_characters = []
+var number_of_turns_till_apocalypse = 12
 
 enum game_states {
 	player_turn,
-	enemy_turn
+	enemy_turn,
+	DEATH_DESTRUCTION_AND_THE_APOCALYPSE
 }
 
 enum game_turn_states {
