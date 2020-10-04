@@ -295,7 +295,7 @@ func _process(delta):
 						# if (can attack)
 						if (true):
 							# TODO: fixa nya place green tiles som visar var man kan attackera
-							place_green_tiles(active_character.cx, active_character.cy)
+							place_attack_tiles(active_character.cx, active_character.cy)
 							game_turn_state = game_turn_states.select_attack
 						else:
 							# TODO: select next turn
@@ -329,3 +329,12 @@ func remove_green_tiles():
 	for tile in get_tree().get_nodes_in_group("green tiles"):
 		tile.queue_free()
 	active_greens = []
+	
+func place_attack_tiles(x,y):
+	var attackable_tiles = [Vector2(x+1,y),Vector2(x-1,y),Vector2(x,y+1),Vector2(x,y-1)]
+	for vec in attackable_tiles:
+		if(flat_game_board[xy_to_flat(vec[0],vec[1])] != null and flat_game_board[xy_to_flat(vec[0],vec[1])].is_evul()):
+			var attack_icon = preload("res://Attack.tscn")
+			var attackable = attack_icon.instance()
+			self.add_child(attackable)
+			attackable.set_coordinates(vec)
