@@ -243,6 +243,11 @@ func get_movement(startX, startY, endX, endY):
 		for y in range(startY, endY + (1 if startY < endY else -1), 1 if startY < endY else -1):
 			var world_pos = map_to_world_center(Vector2(endX, y))
 			path.add_point(world_pos)
+	
+	if startX == endX and startY == endY:
+		var world_pos = map_to_world_center(Vector2(endX, endY))
+		path.add_point(world_pos)
+		
 	return path
 
 func map_to_world_center(v : Vector2):
