@@ -104,6 +104,9 @@ func _ready():
 	self.add_child(plane)
 	plane.set_neutral()
 	plane.set_start_coordinates(Vector2(9, 2))
+	
+	get_tree().get_root().get_node("Node2D").find_node("WinningScreen").hide()
+	get_tree().get_root().get_node("Node2D").find_node("DeathScreen").hide()
 
 func get_number_of_turns_till_reset():
 	if number_of_turns_till_apocalypse <= 0:
@@ -324,6 +327,7 @@ func _input(event):
 func end_of_enemy_turn():
 	number_of_turns_till_apocalypse -= 1
 	if number_of_turns_till_apocalypse <= 0:
+		get_tree().get_root().get_node("Node2D").find_node("DeathScreen").show()
 		game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
 		return
 
@@ -347,7 +351,7 @@ func end_of_player_turn():
 	
 	# check winning condition
 	if ($Rocket.is_character_nearby()):
-		print("YOU WON")
+		get_tree().get_root().get_node("Node2D").find_node("WinningScreen").show()
 		game_state = game_states.winning
 
 func _on_reached_goal():
