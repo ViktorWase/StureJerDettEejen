@@ -95,6 +95,12 @@ func _ready():
 #	self.add_child(evulfella)
 #	flat_game_board[3] = evulfella
 
+func get_number_of_turns_till_reset():
+	if number_of_turns_till_apocalypse <= 0:
+		return 0
+	else:
+		return number_of_turns_till_apocalypse % 4
+
 func get_next_enemy():
 	# Returns the next enemy, or if all the enemies have been returned
 	# then null is returned.
@@ -307,6 +313,15 @@ func _input(event):
 							game_turn_state = game_turn_states.choose_character
 							remove_green_tiles()
 
+func end_of_turn():
+	number_of_turns_till_apocalypse -= 1
+	if number_of_turns_till_apocalypse <= 0:
+		game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
+	print("TURNS LEFT ", get_number_of_turns_till_reset())
+	if get_number_of_turns_till_reset() == 0:
+		reset_game_board()
+		
+
 func _on_reached_goal():
 	print("callback hoolabandoola")
 
@@ -341,6 +356,7 @@ func _process(delta):
 						game_state = game_states.player_turn
 						game_turn_state = game_turn_states.choose_character
 						reset_movement_of_evul_chars()
+						end_of_turn()
 					else:
 						game_turn_state = game_turn_states.character_moving
 						
