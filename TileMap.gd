@@ -116,12 +116,12 @@ func _ready():
 	get_tree().get_root().get_node("Node2D").find_node("WinningScreen").hide()
 	get_tree().get_root().get_node("Node2D").find_node("DeathScreen").hide()
 
-	#var armor = load("res://Shield.tscn").instance()  # TODO: The armor really looks like a dude.
-	#armor.object_type = 'armor'
-	#flat_game_board[xy_to_flat(9, 3)] = armor
-	#self.add_child(armor)
-	#armor.set_neutral()
-	#armor.set_start_coordinates(Vector2(9, 3))
+#	#var armor = load("res://Shield.tscn").instance()  # TODO: The armor really looks like a dude.
+#	#armor.object_type = 'armor'
+#	#flat_game_board[xy_to_flat(9, 3)] = armor
+#	#self.add_child(armor)
+#	#armor.set_neutral()
+#	#armor.set_start_coordinates(Vector2(9, 3))
 
 func get_number_of_turns_till_reset():
 	if number_of_turns_till_apocalypse <= 0:

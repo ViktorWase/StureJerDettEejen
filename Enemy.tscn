@@ -19,7 +19,6 @@ animations = [ {
 ]]
 scale = Vector2( 2, 2 )
 frames = SubResource( 1 )
-playing = true
 offset = Vector2( 0, -6 )
 script = ExtResource( 2 )
 is_good = false
