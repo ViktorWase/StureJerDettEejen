@@ -17,6 +17,7 @@ var waypoint_index
 var velocity
 export var move_speed = 20
 var is_done_moving
+var has_moved_current_turn
 
 var cx : int
 var cy : int
@@ -28,6 +29,7 @@ func _ready():
 	else:
 		set_evul()
 	play("idle")
+	has_moved_current_turn = false
 	return
 
 func is_evul():
@@ -53,6 +55,18 @@ func set_coordinates(coord):
 	var tilemap = get_parent()
 	position.x = tilemap.map_to_world(coord)[0] + 16
 	position.y = tilemap.map_to_world(coord)[1] + 16
+
+func find_idx_of_victim():
+	# Checks if there is a neighbour that can be attacked!
+	for neighbour_delta in [[1, 0], [-1, 0], [0, 1], [0, -1]]:
+		var x = int(cx + neighbour_delta[0])
+		var y = int(cy + neighbour_delta[1])
+		
+		if x >= 0 and y >= 0 and x < get_parent().X and y < get_parent().Y:
+			var obj = get_parent().flat_game_board[get_parent().xy_to_flat(x, y)]
+			if obj and ((is_evul() and obj.is_good()) or (obj.is_evul() and is_good())):
+				return get_parent().xy_to_flat(x, y)
+	return null
 
 func move_evul(idx, max_look_distance):
 	# Checks if there is a player within max_look_distance (not as the crow flies -
@@ -85,7 +99,8 @@ func move_evul(idx, max_look_distance):
 		var best_remaining_dist = null
 		for dest in destinations:
 			var remaining_dist = get_parent().calc_dist(dest, choosen_pos, max_look_distance)  # TODO: I think the max can be look-walk?
-			if remaining_dist > 0: # We don't want to step on the opponent.
+
+			if remaining_dist and remaining_dist > 0: # We don't want to step on the opponent.
 				if remaining_dist == 1: # This is the best case scenario.
 					return dest
 				else:
