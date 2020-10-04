@@ -58,7 +58,7 @@ func set_as_sniper():
 	for x in range(-3, 3+1):
 		for y in range(-3, 3+1):
 			var diff = abs(x) + abs(y)
-			if diff > 1:
+			if diff > 1 and diff <= 3:
 				attack_coordinates.append(Vector2(x, y))
 
 func set_as_basic_b():

@@ -510,11 +510,11 @@ func remove_green_tiles():
 func place_attack_tiles(x,y, attackable_tiles):
 	active_greens = []
 	for vec in attackable_tiles:
-		if(flat_game_board[xy_to_flat(vec[0],vec[1])] != null and flat_game_board[xy_to_flat(vec[0],vec[1])].is_evul()):
+		if(flat_game_board[xy_to_flat(vec[0] + x, vec[1]+y)] != null and flat_game_board[xy_to_flat(vec[0]+x, vec[1]+y)].is_evul()):
 			var attack_icon = preload("res://Attack.tscn")
 			var attackable = attack_icon.instance()
 			self.add_child(attackable)
-			attackable.set_coordinates(vec)
+			attackable.set_coordinates(vec + Vector2(x, y))
 			active_greens.append(attackable)
 	if(active_greens != []):
 		var cancel_icon = preload("res://Cancel.tscn")
