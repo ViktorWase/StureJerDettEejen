@@ -20,6 +20,8 @@ enum game_turn_states {
 	choose_character,
 	select_tile,
 	character_moving,
+	select_attack,
+	character_attacking,
 	end_turn
 }
 
@@ -72,15 +74,18 @@ func _ready():
 	update_bitmask_region(Vector2(0, 0), Vector2(X, Y))
 	
 	for character in get_tree().get_nodes_in_group("Characters"):
-		print(character)
 		var charX = floor(character.position.x / 32)
 		var charY = floor(character.position.y / 32)
 		var i = xy_to_flat(charX, charY)
-		print(i)
-		print(charX)
-		print(charY)
 		flat_game_board[i] = character
 		character.set_coordinates(Vector2(charX, charY))
+	
+	for enemy in get_tree().get_nodes_in_group("Enemies"):
+		var charX = floor(enemy.position.x / 32)
+		var charY = floor(enemy.position.y / 32)
+		var i = xy_to_flat(charX, charY)
+		flat_game_board[i] = enemy
+		enemy.set_coordinates(Vector2(charX, charY))
 
 #	var evulfella = load("res://Character.tscn").instance()
 #	evulfella.set_evul()
@@ -232,6 +237,33 @@ func _input(event):
 						obj.on_click(xy_to_flat(map_pos[0], map_pos[1]))
 						game_turn_state = game_turn_states.select_tile
 					
+					game_turn_states.select_attack:
+						var green = find_green(map_pos[0], map_pos[1])
+						if (!green):
+							# wait until we click a green or we cancel
+							return
+						
+						# fallback, should not be needed?
+						if (!obj or !obj.is_evul()):
+							# cancel, next turn
+							remove_green_tiles()
+							game_turn_state = game_turn_states.choose_character
+							return
+						
+						# attack!
+						print("attack")
+						var i = xy_to_flat(map_pos[0], map_pos[1])
+						flat_game_board[i] = null
+						obj.queue_free()
+						
+						remove_green_tiles()
+						
+						# TODO: attacking animation
+						# game_turn_state = game_turn_states.character_attacking
+						
+						# TODO: next state
+						game_turn_state = game_turn_states.choose_character
+					
 					game_turn_states.select_tile:
 						var green = find_green(map_pos[0], map_pos[1])
 						if (green):
@@ -259,9 +291,15 @@ func _process(delta):
 			match(game_turn_state):
 				game_turn_states.character_moving:
 					if (active_character.has_reached_destination()):
-						game_turn_state = game_turn_states.choose_character
-						print("is done")
-						#game_turn_state = game_turn_states.end_turn # TODO: gå till nästa dude
+						# TODO: kolla om man kan attackera
+						# if (can attack)
+						if (true):
+							# TODO: fixa nya place green tiles som visar var man kan attackera
+							place_green_tiles(active_character.cx, active_character.cy)
+							game_turn_state = game_turn_states.select_attack
+						else:
+							# TODO: select next turn
+							game_turn_state = game_turn_states.select_character
 
 func find_green(x, y):
 	for green in active_greens:
