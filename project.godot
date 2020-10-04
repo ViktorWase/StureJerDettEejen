@@ -19,6 +19,10 @@ config/name="Sture Jer Dett Eejen"
 run/main_scene="res://GameStart.tscn"
 config/icon="res://icon.jpg"
 
+[autoload]
+
+Global="*res://Global.tscn"
+
 [input]
 
 ui_left_click={

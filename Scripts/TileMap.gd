@@ -107,6 +107,15 @@ func _ready():
 	GUI.get_node("End Turn").hide()
 	GUI.get_node("WinningScreen").hide()
 	GUI.get_node("DeathScreen").hide()
+	
+	GUI.connect("end_turn_pressed", self, "_on_end_turn_pressed")
+	GUI.connect("restart_pressed", self, "_on_restart_pressed")
+
+func _on_end_turn_pressed():
+	player_ends_their_turn()
+
+func _on_restart_pressed():
+	get_tree().reload_current_scene()
 
 func get_number_of_turns_till_reset():
 	if number_of_turns_till_apocalypse <= 0:
@@ -273,12 +282,7 @@ func _input(event):
 	if event.is_action_pressed("ui_left_click"):
 		var map_pos = world_to_map(event.position - position)
 		var obj = get_obj_from_tile(map_pos[0], map_pos[1])
-		var end_turn_button = [Vector2(-10,-4),Vector2(-10,-3),Vector2(-9,-4),Vector2(-9,-3)]
-		print(map_pos)
-		if map_pos in end_turn_button:
-			player_ends_their_turn()
-			print("ending turn")
-			# TODO: game did not end here
+		
 		match(game_state):
 			game_states.player_turn:
 				
@@ -382,6 +386,11 @@ func end_of_player_turn():
 			character.queue_free()
 		$Rocket.go_to_space()
 		game_state = game_states.winning
+		
+		# wait a few seconds before changing level
+		yield(get_tree().create_timer(4.0), "timeout")
+		
+		Global.load_next_level()
 
 func _on_reached_goal():
 	print("callback hoolabandoola")

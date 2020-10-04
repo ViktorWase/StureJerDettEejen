@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Scripts/TileMap.gd" type="Script" id=1]
 [ext_resource path="res://LevelBuildingBlocks/Character.tscn" type="PackedScene" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://LevelBuildingBlocks/LavaBackground.tscn" type="PackedScene" id=5]
 [ext_resource path="res://LevelBuildingBlocks/Rocket.tscn" type="PackedScene" id=6]
 [ext_resource path="res://LevelBuildingBlocks/GUI.tscn" type="PackedScene" id=7]
+[ext_resource path="res://LevelBuildingBlocks/Powerups/Wings.tscn" type="PackedScene" id=8]
 
 [node name="Node2D" type="Node2D"]
 
@@ -54,6 +55,12 @@ frame = 1
 
 [node name="Enemy5" parent="TileMap" instance=ExtResource( 3 )]
 position = Vector2( 141.413, 269.292 )
+
+[node name="Wings" parent="TileMap" instance=ExtResource( 8 )]
+position = Vector2( 172.861, 142.489 )
+
+[node name="Wings2" parent="TileMap" instance=ExtResource( 8 )]
+position = Vector2( 172.861, 178.279 )
 
 [node name="Rocket" parent="TileMap" instance=ExtResource( 6 )]
 position = Vector2( 302.335, 266.7 )
