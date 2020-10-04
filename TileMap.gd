@@ -106,9 +106,11 @@ func get_next_enemy():
 	while idx < SIZE:
 		if flat_game_board[idx] != null:
 			var character = flat_game_board[idx]
-			if character.is_evul():
+			if character.is_evul() and !character.has_moved_current_turn:
+				character.has_moved_current_turn = true
 				idx += 1
 				return character
+		idx += 1
 	
 	current_enemy_idx = null
 	return null
@@ -195,7 +197,6 @@ func get_movement(startX, startY, endX, endY):
 	var endIdx = xy_to_flat(endX, endY)
 	if(flat_map[endIdx] == 0):
 		push_error("MOVING TO TERRAIN THAT IS NOT ALLOWED!")
-	# TODO: ADD SOME SORT OF A* ALGO, cause this is stooopid and weird and stuff.
 
 	var path = Curve2D.new()
 	# TODO: SPAGETTI CODE!
@@ -223,6 +224,22 @@ func get_obj_from_tile(x, y):
 		print([x, y])
 		return flat_game_board[xy_to_flat(x, y)]
 
+func any_player_moves_left():
+	for p in flat_game_board:
+		if(p and p.is_good() and !p.has_moved_current_turn):
+			return true
+	return false
+
+func reset_movement_of_good_chars():
+	for p in flat_game_board:
+		if(p and p.is_good()):
+			p.has_moved_current_turn = false
+
+func reset_movement_of_evul_chars():
+	for p in flat_game_board:
+		if(p and p.is_evul()):
+			p.has_moved_current_turn = false
+
 func _input(event):
 	if event.is_action_pressed("ui_left_click"):
 		var map_pos = world_to_map(event.position - position)
@@ -232,7 +249,12 @@ func _input(event):
 			game_states.player_turn:
 				match(game_turn_state):
 					game_turn_states.choose_character:
-						if (!obj or !obj.is_good()):
+						if !any_player_moves_left():
+							reset_movement_of_good_chars()
+							game_state = game_states.enemy_turn
+							game_turn_state = game_turn_states.choose_character
+							return
+						if (!obj or !obj.is_good() or obj.has_moved_current_turn):
 							return
 						active_character = obj
 						obj.on_click(xy_to_flat(map_pos[0], map_pos[1]))
@@ -244,6 +266,7 @@ func _input(event):
 							# wait until we click a green or we cancel
 							return
 						
+						print("HAS MOVED THIS TURN")
 						# fallback, should not be needed?
 						if (!obj or !obj.is_evul()):
 							# cancel, next turn
@@ -251,11 +274,12 @@ func _input(event):
 							reset_game_board()
 							#game_turn_state = game_turn_states.choose_character
 							return
-						
+
 						# attack!
 						print("attack")
 						var i = xy_to_flat(map_pos[0], map_pos[1])
 						flat_game_board[i] = null
+
 						obj.queue_free()
 						
 						remove_green_tiles()
@@ -295,15 +319,59 @@ func _process(delta):
 			match(game_turn_state):
 				game_turn_states.character_moving:
 					if (active_character.has_reached_destination()):
+						active_character.has_moved_current_turn = true
+
 						# TODO: kolla om man kan attackera
 						# if (can attack)
 						if (true):
 							# TODO: fixa nya place green tiles som visar var man kan attackera
-							place_green_tiles(active_character.cx, active_character.cy)
+							place_attack_tiles(active_character.cx, active_character.cy)
 							game_turn_state = game_turn_states.select_attack
 						else:
 							# TODO: select next turn
-							game_turn_state = game_turn_states.select_character
+							game_turn_state = game_turn_states.choose_character
+				game_turn_states.choose_character:
+					if !any_player_moves_left():
+						reset_movement_of_good_chars()
+						game_state = game_states.enemy_turn
+						game_turn_state = game_turn_states.choose_character
+		game_states.enemy_turn:
+			match(game_turn_state):
+				game_turn_states.choose_character:
+					var enemy = get_next_enemy()
+					active_character = enemy
+					if !enemy:
+						game_state = game_states.player_turn
+						game_turn_state = game_turn_states.choose_character
+						reset_movement_of_evul_chars()
+					else:
+						game_turn_state = game_turn_states.character_moving
+						
+						# TODO: Move in to a function
+						var max_look_distance = 5 # TODO: Should be enemy-dependant
+						var destination = active_character.move_evul(xy_to_flat(active_character.cx, active_character.cy), max_look_distance)
+						if (destination):
+							var path = get_movement(active_character.cx, active_character.cy, destination[0], destination[1])
+							active_character.move_along_path(path)
+
+							# move enemy to new position
+							flat_game_board[xy_to_flat(active_character.cx, active_character.cy)] = null
+							flat_game_board[xy_to_flat(destination[0], destination[1])] = active_character
+							active_character.set_coordinates_only(Vector2(destination[0], destination[1]))
+						else:
+							# Enemy takes no action
+							game_turn_state = game_turn_states.choose_character
+				game_turn_states.character_moving:
+					if(active_character.has_reached_destination()):
+						game_turn_state = game_turn_states.select_attack
+				game_turn_states.select_attack:
+					# Find someone to attack.
+					var idx_of_victim = active_character.find_idx_of_victim()
+					if idx_of_victim:
+						flat_game_board[idx_of_victim].queue_free()
+						flat_game_board[idx_of_victim] = null
+					game_turn_state = game_turn_states.choose_character
+
 				
 				game_turn_states.end_turn:
 					for character in resetting_characters:
@@ -348,6 +416,15 @@ func remove_green_tiles():
 	for tile in get_tree().get_nodes_in_group("green tiles"):
 		tile.queue_free()
 	active_greens = []
+	
+func place_attack_tiles(x,y):
+	var attackable_tiles = [Vector2(x+1,y),Vector2(x-1,y),Vector2(x,y+1),Vector2(x,y-1)]
+	for vec in attackable_tiles:
+		if(flat_game_board[xy_to_flat(vec[0],vec[1])] != null and flat_game_board[xy_to_flat(vec[0],vec[1])].is_evul()):
+			var attack_icon = preload("res://Attack.tscn")
+			var attackable = attack_icon.instance()
+			self.add_child(attackable)
+			attackable.set_coordinates(vec)
 
 func reset_game_board():
 	game_turn_state = game_turn_states.end_turn
