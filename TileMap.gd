@@ -70,13 +70,17 @@ func _ready():
 
 	# This is were the level is created.
 	update_bitmask_region(Vector2(0, 0), Vector2(X, Y))
-
-	var maindude = load("res://Character.tscn").instance()
-	maindude.set_good()
-	self.add_child(maindude)
-	# TODO: create function
-	flat_game_board[0] = maindude
-	maindude.set_coordinates(Vector2(0, 0))
+	
+	for character in get_tree().get_nodes_in_group("Characters"):
+		print(character)
+		var charX = floor(character.position.x / 32)
+		var charY = floor(character.position.y / 32)
+		var i = xy_to_flat(charX, charY)
+		print(i)
+		print(charX)
+		print(charY)
+		flat_game_board[i] = character
+		character.set_coordinates(Vector2(charX, charY))
 
 #	var evulfella = load("res://Character.tscn").instance()
 #	evulfella.set_evul()

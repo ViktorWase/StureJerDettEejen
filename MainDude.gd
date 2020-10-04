@@ -2,6 +2,8 @@ extends AnimatedSprite
 
 signal reached_waypoint
 
+export var is_good = true
+
 enum {
 	good,
 	neutral,
@@ -21,6 +23,10 @@ var cy : int
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	if (is_good):
+		set_good()
+	else:
+		set_evul()
 	play("idle")
 	return
 
