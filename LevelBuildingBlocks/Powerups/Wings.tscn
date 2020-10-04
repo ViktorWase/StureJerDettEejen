@@ -1,0 +1,32 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://MainDude.gd" type="Script" id=1]
+[ext_resource path="res://Assets/Wings.png" type="Texture" id=2]
+[ext_resource path="res://Assets/animated_character_m/elf_m_run_anim_f3.png" type="Texture" id=6]
+[ext_resource path="res://Assets/animated_character_m/elf_m_run_anim_f1.png" type="Texture" id=7]
+[ext_resource path="res://Assets/animated_character_m/elf_m_run_anim_f2.png" type="Texture" id=8]
+[ext_resource path="res://Assets/animated_character_m/elf_m_run_anim_f0.png" type="Texture" id=9]
+
+[sub_resource type="SpriteFrames" id=1]
+animations = [ {
+"frames": [ ExtResource( 2 ) ],
+"loop": true,
+"name": "idle",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 9 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 6 ) ],
+"loop": true,
+"name": "run",
+"speed": 10.0
+} ]
+
+[node name="Wings" type="AnimatedSprite" groups=[
+"Characters",
+]]
+scale = Vector2( 0.28, 0.28 )
+frames = SubResource( 1 )
+animation = "idle"
+playing = true
+offset = Vector2( 0, -6 )
+script = ExtResource( 1 )
+move_speed = 120
