@@ -18,6 +18,8 @@ var velocity
 export var move_speed = 20
 var is_done_moving
 var has_moved_current_turn
+var object_type = ''
+var can_walk_on_lava = false
 
 var cx : int
 var cy : int
@@ -62,6 +64,15 @@ func set_coordinates_only(coord):
 	cx = coord.x
 	cy = coord.y
 
+func on_pick_up(pickerupper):
+	if !is_neutral():
+		push_error("You are trying to pick up a person - it's not type of game, you know.")
+	match(object_type):
+		"plane":
+			pickerupper.can_walk_on_lava = true
+		_:
+			push_error("No object called " + object_type)
+
 func set_coordinates(coord):
 	set_coordinates_only(coord)
 
@@ -94,7 +105,7 @@ func move_evul(idx, max_look_distance):
 	# TODO: There is a lot of recalculation in this function. Might be worth fixing?
 	# TODO: Possibly move it randomly or in a pattern if no char is detected?
 
-	var possible_squares = get_parent().get_all_possible_movement_destinations(idx, max_look_distance)
+	var possible_squares = get_parent().get_all_possible_movement_destinations(idx, max_look_distance, can_walk_on_lava)
 	var positions_of_good_chars = get_parent().get_positions_of_good_chars_from_list_of_positions(possible_squares)
 	
 	if len(positions_of_good_chars) > 0:
@@ -103,7 +114,7 @@ func move_evul(idx, max_look_distance):
 		var closest_dist = max_look_distance + 10
 		var choosen_pos = null
 		for pos in positions_of_good_chars:
-			var dist = get_parent().calc_dist(from, pos, max_look_distance)
+			var dist = get_parent().calc_dist(from, pos, max_look_distance, can_walk_on_lava)
 			if dist != null and dist < closest_dist:
 				closest_dist = dist
 				choosen_pos = pos
@@ -111,11 +122,11 @@ func move_evul(idx, max_look_distance):
 			push_error("You've done messed up proper, algo boy.")
 		
 		# Move towards the closest good char.
-		var destinations = get_parent().get_all_possible_movement_destinations(idx, max_walk_distance)
+		var destinations = get_parent().get_all_possible_movement_destinations(idx, max_walk_distance, can_walk_on_lava)
 		var best_dest = null
 		var best_remaining_dist = null
 		for dest in destinations:
-			var remaining_dist = get_parent().calc_dist(dest, choosen_pos, max_look_distance)  # TODO: I think the max can be look-walk?
+			var remaining_dist = get_parent().calc_dist(dest, choosen_pos, max_look_distance, can_walk_on_lava)  # TODO: I think the max can be look-walk?
 
 			if remaining_dist and remaining_dist > 0: # We don't want to step on the opponent.
 				if remaining_dist == 1: # This is the best case scenario.

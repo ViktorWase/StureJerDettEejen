@@ -90,10 +90,12 @@ func _ready():
 		flat_game_board[i] = enemy
 		enemy.set_start_coordinates(Vector2(charX, charY))
 
-#	var evulfella = load("res://Character.tscn").instance()
-#	evulfella.set_evul()
-#	self.add_child(evulfella)
-#	flat_game_board[3] = evulfella
+	var plane = load("res://Character.tscn").instance()  # TODO: The plane really looks like a dude.
+	plane.object_type = 'plane'
+	flat_game_board[xy_to_flat(9, 2)] = plane
+	self.add_child(plane)
+	plane.set_neutral()
+	plane.set_start_coordinates(Vector2(9, 2))
 
 func get_number_of_turns_till_reset():
 	if number_of_turns_till_apocalypse <= 0:
@@ -177,13 +179,13 @@ func get_all_possible_movement_destinations(idx, max_movement, the_lava_is_floor
 			destinations.append(pos)
 	return destinations
 
-func calc_dist(from, to, max_steps):
+func calc_dist(from, to, max_steps, the_lava_is_floor):
 	for i in range(X*Y):
 		number_of_steps_to[i] = null
 
 	# Calculate all positions that can be reached. 
 	var idx = xy_to_flat(from[0], from[1])
-	get_all_possible_movement_destinations(idx, max_steps)
+	get_all_possible_movement_destinations(idx, max_steps, the_lava_is_floor)
 	var dist = number_of_steps_to[xy_to_flat(to[0], to[1])]
 	return dist
 
@@ -207,7 +209,6 @@ func get_movement(startX, startY, endX, endY):
 		push_error("MOVING TO TERRAIN THAT IS NOT ALLOWED!")
 
 	var path = Curve2D.new()
-	# TODO: SPAGETTI CODE!
 	if startX != endX:
 		for x in range(startX, endX + (1 if startX < endX else -1), 1 if startX < endX else -1):
 			var world_pos = map_to_world_center(Vector2(x, startY))
@@ -258,13 +259,6 @@ func _input(event):
 				print(game_turn_state)
 				match(game_turn_state):
 					game_turn_states.choose_character:
-						# TODO: behövs nog inte här
-#						if !any_player_moves_left():
-#							reset_movement_of_good_chars()
-#							game_state = game_states.enemy_turn
-#							game_turn_state = game_turn_states.choose_character
-#							return
-						print(obj)
 						if (!obj or !obj.is_good() or obj.has_moved_current_turn):
 							return
 						active_character = obj
@@ -277,7 +271,6 @@ func _input(event):
 							# wait until we click a green or we cancel
 							return
 						
-						print("HAS MOVED THIS TURN")
 						# fallback, should not be needed?
 						if (!obj or !obj.is_evul()):
 							# cancel, next turn
@@ -305,7 +298,14 @@ func _input(event):
 							var path = get_movement(active_character.cx, active_character.cy, green.cx, green.cy)
 							active_character.move_along_path(path)
 							
-							# move character to new position
+							# Move character to new position
+							# Check of there is an pickupable object on that position
+							if flat_game_board[xy_to_flat(green.cx, green.cy)]:
+								var objed_to_be_used = flat_game_board[xy_to_flat(green.cx, green.cy)]
+								objed_to_be_used.on_pick_up(active_character)
+								flat_game_board[xy_to_flat(green.cx, green.cy)].queue_free()
+								flat_game_board[xy_to_flat(green.cx, green.cy)] = null
+
 							flat_game_board[xy_to_flat(active_character.cx, active_character.cy)] = null
 							flat_game_board[xy_to_flat(green.cx, green.cy)] = active_character
 							active_character.set_coordinates_only(Vector2(green.cx, green.cy))
@@ -410,7 +410,9 @@ func find_green(x, y):
 	return null
 
 func place_green_tiles(x,y):
-	var greens = get_all_possible_movement_destinations(xy_to_flat(x,y), 3)
+	var relevant_char = flat_game_board[xy_to_flat(x, y)]
+	var can_relevant_person_walk_on_lava = relevant_char and relevant_char.can_walk_on_lava
+	var greens = get_all_possible_movement_destinations(xy_to_flat(x,y), 3, can_relevant_person_walk_on_lava)
 
 	# Remove the one corresponding to the current position
 	for i in range(len(greens)):
