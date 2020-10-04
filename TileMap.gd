@@ -12,6 +12,7 @@ var current_enemy_idx = null
 var active_character
 var resetting_characters = []
 var number_of_turns_till_apocalypse = 12
+var GUI
 
 enum game_states {
 	player_turn,
@@ -34,6 +35,10 @@ var game_turn_state = game_turn_states.choose_character
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	# get reference to GUI node
+	GUI = get_tree().get_root().get_node("Node2D").get_node("GUI")
+	
+	print(GUI)
 	
 	# This is the list that contains all the THINGS that are on the board.
 	# Note that there can only be one THING per tile. So an object and a player
@@ -113,8 +118,9 @@ func _ready():
 	plane2.set_neutral()
 	plane2.set_start_coordinates(Vector2(5, 5))
 	
-	get_tree().get_root().get_node("Node2D").find_node("WinningScreen").hide()
-	get_tree().get_root().get_node("Node2D").find_node("DeathScreen").hide()
+	GUI.get_node("End Turn").hide()
+	GUI.get_node("WinningScreen").hide()
+	GUI.get_node("DeathScreen").hide()
 
 #	#var armor = load("res://Shield.tscn").instance()  # TODO: The armor really looks like a dude.
 #	#armor.object_type = 'armor'
@@ -293,6 +299,7 @@ func _input(event):
 		if map_pos in end_turn_button:
 			player_ends_their_turn()
 			print("ending turn")
+			# TODO: game did not end here
 		match(game_state):
 			game_states.player_turn:
 				
@@ -390,7 +397,7 @@ func end_of_player_turn():
 
 	# check winning condition
 	if ($Rocket.is_character_nearby()):
-		get_tree().get_root().get_node("Node2D").find_node("WinningScreen").show()
+		GUI.get_node("WinningScreen").show()
 		for character in $Rocket.get_nearby_characters():
 			flat_game_board[xy_to_flat(character.cx, character.cy)] = null
 			character.queue_free()
@@ -402,17 +409,22 @@ func _on_reached_goal():
 
 func _process(delta):
 	if should_be_able_to_end_player_turn():
-		get_tree().get_root().get_node("Node2D").find_node("End Turn").show()
+		GUI.get_node("End Turn").show()
+
 	if number_of_turns_till_apocalypse > 8:
-		$"Loop Counter/LoopIcon3".frame = get_number_of_turns_till_reset()
+		GUI.get_node("Loop Counter/LoopIcon3").frame = get_number_of_turns_till_reset()
+		GUI.get_node("Loop Counter/LoopIcon3").material.set_shader_param("tint", Vector3(1,1,0))
 	elif number_of_turns_till_apocalypse > 4:
-		$"Loop Counter/LoopIcon3".frame = 4
-		$"Loop Counter/LoopIcon2".frame = get_number_of_turns_till_reset()
+		GUI.get_node("Loop Counter/LoopIcon3").frame = 4
+		GUI.get_node("Loop Counter/LoopIcon2").frame = get_number_of_turns_till_reset()
+		GUI.get_node("Loop Counter/LoopIcon2").material.set_shader_param("tint", Vector3(1,1,0))
 	elif number_of_turns_till_apocalypse > 0:
-		$"Loop Counter/LoopIcon2".frame = 4
-		$"Loop Counter/LoopIcon1".frame = get_number_of_turns_till_reset()
+		GUI.get_node("Loop Counter/LoopIcon2").frame = 4
+		GUI.get_node("Loop Counter/LoopIcon1").frame = get_number_of_turns_till_reset()
+		GUI.get_node("Loop Counter/LoopIcon1").material.set_shader_param("tint", Vector3(1,1,0))
 	else:
-		$"Loop Counter/LoopIcon1".frame = 4
+		GUI.get_node("Loop Counter/LoopIcon1").frame = 4
+	
 	match(game_state):
 		game_states.player_turn:
 			match(game_turn_state):
@@ -436,7 +448,7 @@ func _process(delta):
 						# end of player turn
 						end_of_player_turn()
 		game_states.enemy_turn:
-			get_tree().get_root().get_node("Node2D").find_node("End Turn").hide()
+			GUI.get_node("End Turn").hide()
 			match(game_turn_state):
 				game_turn_states.choose_character:
 					var enemy = get_next_enemy()

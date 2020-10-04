@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://TileMap.gd" type="Script" id=1]
 [ext_resource path="res://Character.tscn" type="PackedScene" id=2]
@@ -6,15 +6,7 @@
 [ext_resource path="res://Assets/terrain_pixel_tilemap.tres" type="TileSet" id=4]
 [ext_resource path="res://LavaBackground.tscn" type="PackedScene" id=5]
 [ext_resource path="res://Rocket.tscn" type="PackedScene" id=6]
-[ext_resource path="res://Assets/PressStart2P-Regular.ttf" type="DynamicFontData" id=7]
-[ext_resource path="res://Assets/End_turn.png" type="Texture" id=8]
-[ext_resource path="res://LoopIcon.tscn" type="PackedScene" id=9]
-
-[sub_resource type="DynamicFont" id=1]
-size = 36
-outline_size = 3
-outline_color = Color( 0, 0, 0, 1 )
-font_data = ExtResource( 7 )
+[ext_resource path="res://GUI.tscn" type="PackedScene" id=7]
 
 [node name="Node2D" type="Node2D"]
 
@@ -67,52 +59,4 @@ position = Vector2( 141.413, 269.292 )
 position = Vector2( 302.335, 266.7 )
 thrustSpeed = 94
 
-[node name="Loop Counter" type="Node2D" parent="TileMap"]
-position = Vector2( 575.755, -47.406 )
-
-[node name="LoopIcon1" parent="TileMap/Loop Counter" instance=ExtResource( 9 )]
-
-[node name="LoopIcon2" parent="TileMap/Loop Counter" instance=ExtResource( 9 )]
-position = Vector2( 0, 64 )
-
-[node name="LoopIcon3" parent="TileMap/Loop Counter" instance=ExtResource( 9 )]
-position = Vector2( 0, 128 )
-
-[node name="End Turn" type="Node2D" parent="."]
-visible = false
-position = Vector2( 16, 16 )
-
-[node name="Sprite" type="Sprite" parent="End Turn"]
-position = Vector2( 32, 32 )
-texture = ExtResource( 8 )
-
-[node name="WinningScreen" type="Node2D" parent="."]
-visible = false
-
-[node name="WinningText" type="RichTextLabel" parent="WinningScreen"]
-margin_left = 362.789
-margin_top = 67.105
-margin_right = 687.789
-margin_bottom = 112.105
-custom_fonts/normal_font = SubResource( 1 )
-text = "You Won!"
-scroll_active = false
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="DeathScreen" type="Node2D" parent="."]
-visible = false
-
-[node name="DeathText" type="RichTextLabel" parent="DeathScreen"]
-margin_left = 362.789
-margin_top = 67.105
-margin_right = 687.789
-margin_bottom = 112.105
-custom_fonts/normal_font = SubResource( 1 )
-custom_colors/default_color = Color( 0.858824, 0.12549, 0.0705882, 1 )
-text = "You lost"
-scroll_active = false
-__meta__ = {
-"_edit_use_anchors_": false
-}
+[node name="GUI" parent="." instance=ExtResource( 7 )]
