@@ -220,10 +220,8 @@ func get_obj_from_tile(x, y):
 	# Returns null if there is nothing there, otherwise it
 	# returns the thing that is in the tile.
 	if x < 0 or x >= X or y < 0 or y >= Y:
-		print("YOU CLICKED OUTSIDE THE MAP! NOT ALLOWED")
 		return null
 	else:
-		print([x, y])
 		return flat_game_board[xy_to_flat(x, y)]
 
 func any_player_moves_left():
