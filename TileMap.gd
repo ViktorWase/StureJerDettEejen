@@ -81,7 +81,7 @@ func _ready():
 		var charX = floor(character.position.x / 32)
 		var charY = floor(character.position.y / 32)
 		var i = xy_to_flat(charX, charY)
-		character.set_as_runner()
+		character.set_as_sniper()
 		flat_game_board[i] = character
 		character.set_start_coordinates(Vector2(charX, charY))
 	
@@ -115,7 +115,6 @@ func _ready():
 	self.add_child(armor)
 	armor.set_neutral()
 	armor.set_start_coordinates(Vector2(9, 3))
-
 
 func get_number_of_turns_till_reset():
 	if number_of_turns_till_apocalypse <= 0:
@@ -282,10 +281,9 @@ func _input(event):
 	if event.is_action_pressed("ui_left_click"):
 		var map_pos = world_to_map(event.position - position)
 		var obj = get_obj_from_tile(map_pos[0], map_pos[1])
-		
+
 		match(game_state):
 			game_states.player_turn:
-				print(game_turn_state)
 				match(game_turn_state):
 					game_turn_states.choose_character:
 						if (!obj or !obj.is_good() or obj.has_moved_current_turn):
@@ -397,7 +395,7 @@ func _process(delta):
 
 						# TODO: kolla om man kan attackera
 						# if (can attack)
-						if (place_attack_tiles(active_character.cx, active_character.cy)):
+						if (place_attack_tiles(active_character.cx, active_character.cy, active_character.get_attack_coordinates())):
 							# TODO: fixa nya place green tiles som visar var man kan attackera
 							game_turn_state = game_turn_states.select_attack
 						else:
@@ -474,10 +472,10 @@ func find_green(x, y):
 			return green
 	return null
 
-func place_green_tiles(x,y):
+func place_green_tiles(x,y, max_movement):
 	var relevant_char = flat_game_board[xy_to_flat(x, y)]
 	var can_relevant_person_walk_on_lava = relevant_char and relevant_char.can_walk_on_lava
-	var greens = get_all_possible_movement_destinations(xy_to_flat(x,y), 3, can_relevant_person_walk_on_lava)
+	var greens = get_all_possible_movement_destinations(xy_to_flat(x,y), max_movement, can_relevant_person_walk_on_lava)
 
 	# Remove the one corresponding to the current position
 	for i in range(len(greens)):
@@ -499,9 +497,8 @@ func remove_green_tiles():
 		tile.queue_free()
 	active_greens = []
 	
-func place_attack_tiles(x,y):
+func place_attack_tiles(x,y, attackable_tiles):
 	active_greens = []
-	var attackable_tiles = [Vector2(x+1,y),Vector2(x-1,y),Vector2(x,y+1),Vector2(x,y-1)]
 	for vec in attackable_tiles:
 		if(flat_game_board[xy_to_flat(vec[0],vec[1])] != null and flat_game_board[xy_to_flat(vec[0],vec[1])].is_evul()):
 			var attack_icon = preload("res://Attack.tscn")

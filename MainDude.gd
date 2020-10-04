@@ -22,6 +22,7 @@ var is_done_moving
 var has_moved_current_turn
 var object_type = ''
 var can_walk_on_lava = false
+var attack_coordinates = []
 
 var max_hp = 1
 var current_hp = 1
@@ -41,16 +42,31 @@ func _ready():
 	has_moved_current_turn = false
 	return
 
+func get_attack_coordinates():
+	return attack_coordinates
+
 # TODO: Change sprite in these functions
 func set_as_runner():
 	set_as_basic_b()
 	max_walk_distance = 3
+
+func set_as_sniper():
+	set_as_basic_b()
+	max_walk_distance = 1
 	
+	attack_coordinates = []
+	for x in range(-3, 3+1):
+		for y in range(-3, 3+1):
+			var diff = abs(x) + abs(y)
+			if diff > 1:
+				attack_coordinates.append(Vector2(x, y))
+
 func set_as_basic_b():
 	max_walk_distance = 2
 	max_hp = 1
 	current_hp = 1
 	damage = 1
+	attack_coordinates = [Vector2(0, 1), Vector2(1, 0), Vector2(-1, 0), Vector2(0, -1)]
 	
 func set_as_heavy_unit():
 	set_as_basic_b()
@@ -187,7 +203,7 @@ func on_click(idx):
 	print("YOU CLICKED THE MAIN DUDE")
 	var x = self.get_parent().flat_to_xy(idx)[0]
 	var y = self.get_parent().flat_to_xy(idx)[1]
-	self.get_parent().place_green_tiles(x,y)
+	self.get_parent().place_green_tiles(x, y, max_walk_distance)
 
 func move_along_path(path : Curve2D):
 	waypoints = path.get_baked_points()
