@@ -105,6 +105,14 @@ func _ready():
 	plane.set_neutral()
 	plane.set_start_coordinates(Vector2(9, 2))
 
+	var armor = load("res://Character.tscn").instance()  # TODO: The armor really looks like a dude.
+	armor.object_type = 'armor'
+	flat_game_board[xy_to_flat(9, 3)] = armor
+	self.add_child(armor)
+	armor.set_neutral()
+	armor.set_start_coordinates(Vector2(9, 3))
+
+
 func get_number_of_turns_till_reset():
 	if number_of_turns_till_apocalypse <= 0:
 		return 0
@@ -287,10 +295,14 @@ func _input(event):
 
 						# attack!
 						print("attack")
-						var i = xy_to_flat(map_pos[0], map_pos[1])
-						flat_game_board[i] = null
+						var idx_of_victim = xy_to_flat(map_pos[0], map_pos[1])
+						if !flat_game_board[idx_of_victim]:
+							push_error("You are attacking nothing!")
+						var is_dead = flat_game_board[idx_of_victim].is_attacked()
 
-						obj.queue_free()
+						if is_dead:
+							flat_game_board[idx_of_victim] = null
+							obj.queue_free()
 						remove_green_tiles()
 						
 						# TODO: next state
@@ -308,7 +320,8 @@ func _input(event):
 							# Check of there is an pickupable object on that position
 							if flat_game_board[xy_to_flat(green.cx, green.cy)]:
 								var objed_to_be_used = flat_game_board[xy_to_flat(green.cx, green.cy)]
-								objed_to_be_used.on_pick_up(active_character)
+								objed_to_be_used.on_pick_up([active_character])
+								print("CHAR HP: ", active_character.current_hp)
 								flat_game_board[xy_to_flat(green.cx, green.cy)].queue_free()
 								flat_game_board[xy_to_flat(green.cx, green.cy)] = null
 
@@ -411,8 +424,11 @@ func _process(delta):
 					# Find someone to attack.
 					var idx_of_victim = active_character.find_idx_of_victim()
 					if idx_of_victim:
-						flat_game_board[idx_of_victim].queue_free()
-						flat_game_board[idx_of_victim] = null
+						var victim = flat_game_board[idx_of_victim]
+						var is_dead = victim.is_attacked()
+						if is_dead:
+							flat_game_board[idx_of_victim].queue_free()
+							flat_game_board[idx_of_victim] = null
 					game_turn_state = game_turn_states.choose_character
 
 				

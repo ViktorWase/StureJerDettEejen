@@ -22,6 +22,9 @@ var has_moved_current_turn
 var object_type = ''
 var can_walk_on_lava = false
 
+var max_hp = 1
+var current_hp = 1
+
 var cx : int
 var cy : int
 
@@ -36,6 +39,11 @@ func _ready():
 	play("idle")
 	has_moved_current_turn = false
 	return
+
+func is_attacked(damage=1):
+	current_hp -= damage
+	var is_dead = current_hp <= 0
+	return is_dead
 
 func is_evul():
 	return alignment == evul
@@ -72,13 +80,22 @@ func set_coordinates_only(coord):
 	cy = coord.y
 
 func on_pick_up(pickerupper):
+	print("What")
 	if !is_neutral():
 		push_error("You are trying to pick up a person - it's not type of game, you know.")
+		print("the")
+	print("Fuck")
 	match(object_type):
 		"plane":
-			pickerupper.can_walk_on_lava = true
+			print("Picking up plane")
+			pickerupper[0].can_walk_on_lava = true
+		"armor":
+			print("Picking up armor")
+			pickerupper[0].max_hp += 1
+			pickerupper[0].current_hp += 1
 		_:
 			push_error("No object called " + object_type)
+	print("IS HAPPENING!")
 
 func set_coordinates(coord):
 	set_coordinates_only(coord)
