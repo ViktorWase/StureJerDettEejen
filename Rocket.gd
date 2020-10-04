@@ -1,6 +1,9 @@
 extends Node2D
 
 var alignment
+export var thrustSpeed = 40
+var thrustVelocity = 0
+var is_going_to_space = false
 
 # from MainDude
 var cx : int
@@ -66,3 +69,22 @@ func is_character_nearby():
 			if (obj and obj.is_good()):
 				return true
 	return false
+
+func get_nearby_characters():
+	var tilemap = get_parent()
+	var characters = []
+	for y in range(3):
+		for x in range(3):
+			var obj = tilemap.get_obj_from_tile(cx+x, cy+y)
+			if (obj and obj.is_good()):
+				characters.append(obj)
+	return characters
+
+func go_to_space():
+	is_going_to_space = true
+	$fire.show()
+
+func _physics_process(delta):
+	if (is_going_to_space):
+		thrustVelocity += thrustSpeed*delta
+		position += Vector2.UP*thrustVelocity*delta

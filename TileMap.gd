@@ -346,8 +346,8 @@ func _input(event):
 
 func end_of_enemy_turn():
 	number_of_turns_till_apocalypse -= 1
+	get_tree().get_root().get_node("Node2D").find_node("DeathScreen").show()
 	if number_of_turns_till_apocalypse <= 0:
-		get_tree().get_root().get_node("Node2D").find_node("DeathScreen").show()
 		game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
 		return
 
@@ -372,6 +372,10 @@ func end_of_player_turn():
 	# check winning condition
 	if ($Rocket.is_character_nearby()):
 		get_tree().get_root().get_node("Node2D").find_node("WinningScreen").show()
+		for character in $Rocket.get_nearby_characters():
+			flat_game_board[xy_to_flat(character.cx, character.cy)] = null
+			character.queue_free()
+		$Rocket.go_to_space()
 		game_state = game_states.winning
 
 func _on_reached_goal():
