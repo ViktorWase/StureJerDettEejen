@@ -65,7 +65,7 @@ func is_character_nearby():
 	var has_character = false
 	for y in range(3):
 		for x in range(3):
-			var obj = tilemap.get_obj_from_tile(cx+x, cy+y)
+			var obj = tilemap.get_obj_from_tile(cx+x-1, cy+y-1)
 			if (obj and obj.is_good()):
 				return true
 	return false
@@ -75,7 +75,7 @@ func get_nearby_characters():
 	var characters = []
 	for y in range(3):
 		for x in range(3):
-			var obj = tilemap.get_obj_from_tile(cx+x, cy+y)
+			var obj = tilemap.get_obj_from_tile(cx+x-1, cy+y-1)
 			if (obj and obj.is_good()):
 				characters.append(obj)
 	return characters
