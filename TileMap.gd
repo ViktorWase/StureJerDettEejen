@@ -247,13 +247,16 @@ func _input(event):
 		
 		match(game_state):
 			game_states.player_turn:
+				print(game_turn_state)
 				match(game_turn_state):
 					game_turn_states.choose_character:
-						if !any_player_moves_left():
-							reset_movement_of_good_chars()
-							game_state = game_states.enemy_turn
-							game_turn_state = game_turn_states.choose_character
-							return
+						# TODO: behövs nog inte här
+#						if !any_player_moves_left():
+#							reset_movement_of_good_chars()
+#							game_state = game_states.enemy_turn
+#							game_turn_state = game_turn_states.choose_character
+#							return
+						print(obj)
 						if (!obj or !obj.is_good() or obj.has_moved_current_turn):
 							return
 						active_character = obj
@@ -281,17 +284,11 @@ func _input(event):
 						flat_game_board[i] = null
 
 						obj.queue_free()
-						
 						remove_green_tiles()
 						
-						# TODO: attacking animation
-						# game_turn_state = game_turn_states.character_attacking
-						
 						# TODO: next state
-						#game_turn_state = game_turn_states.choose_character
+						game_turn_state = game_turn_states.choose_character
 						
-						reset_game_board()
-					
 					game_turn_states.select_tile:
 						var green = find_green(map_pos[0], map_pos[1])
 						if (green):
@@ -323,9 +320,8 @@ func _process(delta):
 
 						# TODO: kolla om man kan attackera
 						# if (can attack)
-						if (true):
+						if (place_attack_tiles(active_character.cx, active_character.cy)):
 							# TODO: fixa nya place green tiles som visar var man kan attackera
-							place_attack_tiles(active_character.cx, active_character.cy)
 							game_turn_state = game_turn_states.select_attack
 						else:
 							# TODO: select next turn
@@ -341,6 +337,7 @@ func _process(delta):
 					var enemy = get_next_enemy()
 					active_character = enemy
 					if !enemy:
+						# end of turn
 						game_state = game_states.player_turn
 						game_turn_state = game_turn_states.choose_character
 						reset_movement_of_evul_chars()
@@ -418,6 +415,7 @@ func remove_green_tiles():
 	active_greens = []
 	
 func place_attack_tiles(x,y):
+	active_greens = []
 	var attackable_tiles = [Vector2(x+1,y),Vector2(x-1,y),Vector2(x,y+1),Vector2(x,y-1)]
 	for vec in attackable_tiles:
 		if(flat_game_board[xy_to_flat(vec[0],vec[1])] != null and flat_game_board[xy_to_flat(vec[0],vec[1])].is_evul()):
@@ -425,6 +423,9 @@ func place_attack_tiles(x,y):
 			var attackable = attack_icon.instance()
 			self.add_child(attackable)
 			attackable.set_coordinates(vec)
+			active_greens.append(attackable)
+	
+	return !active_greens.empty()
 
 func reset_game_board():
 	game_turn_state = game_turn_states.end_turn
