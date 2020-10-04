@@ -405,8 +405,6 @@ func _process(delta):
 		$"Loop Counter/LoopIcon2".frame = 4
 		$"Loop Counter/LoopIcon1".frame = get_number_of_turns_till_reset()
 	else:
-#		$"Loop Counter/LoopIcon3".frame = 4
-#		$"Loop Counter/LoopIcon2".frame = 4
 		$"Loop Counter/LoopIcon1".frame = 4
 	match(game_state):
 		game_states.player_turn:
