@@ -153,6 +153,12 @@ func flat_to_xy(idx):
 	var y = int(idx) / Y
 	return Vector2(x, y)
 
+func are_all_good_guys_dead():
+	for p in flat_game_board:
+		if p and p.is_good():
+			return false
+	return true
+
 func get_all_possible_movement_destinations_rec_func(idx, current_number_of_steps, max_movement, the_lava_is_floor):
 	idx = int(idx)
 	if number_of_steps_to[idx] == null:
@@ -294,7 +300,7 @@ func _input(event):
 							return
 							
 						print("HAS MOVED THIS TURN")
-
+						"""
 						# fallback, should not be needed?
 						if (!obj or !obj.is_evul()):
 							# cancel, next turn
@@ -302,6 +308,7 @@ func _input(event):
 							reset_game_board()
 							#game_turn_state = game_turn_states.choose_character
 							return
+						"""
 
 						# attack!
 						print("attack")
@@ -346,7 +353,7 @@ func _input(event):
 
 func end_of_enemy_turn():
 	number_of_turns_till_apocalypse -= 1
-	if number_of_turns_till_apocalypse <= 0:
+	if number_of_turns_till_apocalypse <= 0 or are_all_good_guys_dead():
 		get_tree().get_root().get_node("Node2D").find_node("DeathScreen").show()
 		game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
 		return
@@ -368,7 +375,7 @@ func player_ends_their_turn():
 
 func end_of_player_turn():
 	reset_movement_of_good_chars()
-	
+
 	# check winning condition
 	if ($Rocket.is_character_nearby()):
 		get_tree().get_root().get_node("Node2D").find_node("WinningScreen").show()
@@ -446,21 +453,21 @@ func _process(delta):
 							flat_game_board[idx_of_victim] = null
 					game_turn_state = game_turn_states.choose_character
 
-				
 				game_turn_states.end_turn:
 					for character in resetting_characters:
 						if (character.has_reached_destination()):
 							resetting_characters.erase(character)
 							active_character = null
 							break
-					
+
 					if (resetting_characters.empty()):
 						for character in get_tree().get_nodes_in_group("Characters"):
 							character.reset_graphics()
 						for enemy in get_tree().get_nodes_in_group("Enemies"):
 							enemy.reset_graphics()
-						
+
 						game_turn_state = game_turn_states.choose_character
+						game_state = game_states.player_turn
 
 func find_green(x, y):
 	for green in active_greens:
@@ -514,6 +521,7 @@ func place_attack_tiles(x,y):
 
 func reset_game_board():
 	game_turn_state = game_turn_states.end_turn
+	game_state = game_states.enemy_turn
 	resetting_characters = []
 	
 	for character in get_tree().get_nodes_in_group("Characters"):
