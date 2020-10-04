@@ -12,7 +12,8 @@ enum {
 	undefined
 }
 var alignment = undefined
-var max_walk_distance = 3
+var max_walk_distance = 2
+var damage = 1
 var waypoints
 var waypoint_index
 var velocity
@@ -40,7 +41,24 @@ func _ready():
 	has_moved_current_turn = false
 	return
 
-func is_attacked(damage=1):
+# TODO: Change sprite in these functions
+func set_as_runner():
+	set_as_basic_b()
+	max_walk_distance = 3
+	
+func set_as_basic_b():
+	max_walk_distance = 2
+	max_hp = 1
+	current_hp = 1
+	damage = 1
+	
+func set_as_heavy_unit():
+	set_as_basic_b()
+	damage = 2
+	max_hp = 2
+	current_hp = max_hp
+
+func is_attacked(damage):
 	current_hp -= damage
 	var is_dead = current_hp <= 0
 	return is_dead

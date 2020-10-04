@@ -81,6 +81,7 @@ func _ready():
 		var charX = floor(character.position.x / 32)
 		var charY = floor(character.position.y / 32)
 		var i = xy_to_flat(charX, charY)
+		character.set_as_runner()
 		flat_game_board[i] = character
 		character.set_start_coordinates(Vector2(charX, charY))
 	
@@ -304,23 +305,13 @@ func _input(event):
 							game_turn_state = game_turn_states.choose_character
 							return
 							
-						print("HAS MOVED THIS TURN")
-						"""
-						# fallback, should not be needed?
-						if (!obj or !obj.is_evul()):
-							# cancel, next turn
-							remove_green_tiles()
-							reset_game_board()
-							#game_turn_state = game_turn_states.choose_character
-							return
-						"""
 
 						# attack!
 						print("attack")
 						var idx_of_victim = xy_to_flat(map_pos[0], map_pos[1])
 						if !flat_game_board[idx_of_victim]:
 							push_error("You are attacking nothing!")
-						var is_dead = flat_game_board[idx_of_victim].is_attacked()
+						var is_dead = flat_game_board[idx_of_victim].is_attacked(active_character.damage)
 
 						if is_dead:
 							flat_game_board[idx_of_victim] = null
@@ -455,7 +446,7 @@ func _process(delta):
 					var idx_of_victim = active_character.find_idx_of_victim()
 					if idx_of_victim:
 						var victim = flat_game_board[idx_of_victim]
-						var is_dead = victim.is_attacked()
+						var is_dead = victim.is_attacked(active_character.damage)
 						if is_dead:
 							flat_game_board[idx_of_victim].queue_free()
 							flat_game_board[idx_of_victim] = null
