@@ -282,9 +282,14 @@ func _input(event):
 	if event.is_action_pressed("ui_left_click"):
 		var map_pos = world_to_map(event.position - position)
 		var obj = get_obj_from_tile(map_pos[0], map_pos[1])
-		
+		var end_turn_button = [Vector2(-10,-4),Vector2(-10,-3),Vector2(-9,-4),Vector2(-9,-3)]
+		print(map_pos)
+		if map_pos in end_turn_button:
+			player_ends_their_turn()
+			print("ending turn")
 		match(game_state):
 			game_states.player_turn:
+				get_tree().get_root().get_node("Node2D").find_node("End Turn").show()
 				print(game_turn_state)
 				match(game_turn_state):
 					game_turn_states.choose_character:
@@ -411,6 +416,7 @@ func _process(delta):
 						# end of player turn
 						end_of_player_turn()
 		game_states.enemy_turn:
+			get_tree().get_root().get_node("Node2D").find_node("End Turn").hide()
 			match(game_turn_state):
 				game_turn_states.choose_character:
 					var enemy = get_next_enemy()
