@@ -282,7 +282,12 @@ func _input(event):
 						if (!green):
 							# wait until we click a green or we cancel
 							return
-						
+							
+						if (green in get_tree().get_nodes_in_group("cancel")):
+							remove_green_tiles()
+							game_turn_state = game_turn_states.choose_character
+							return
+							
 						print("HAS MOVED THIS TURN")
 						# fallback, should not be needed?
 						if (!obj or !obj.is_evul()):
@@ -452,10 +457,6 @@ func remove_green_tiles():
 func place_attack_tiles(x,y):
 	active_greens = []
 	var attackable_tiles = [Vector2(x+1,y),Vector2(x-1,y),Vector2(x,y+1),Vector2(x,y-1)]
-	var cancel_icon = preload("res://Cancel.tscn")
-	var cancel = cancel_icon.instance()
-	self.add_child(cancel)
-	cancel.set_coordinates(Vector2(x+1,y+1))
 	for vec in attackable_tiles:
 		if(flat_game_board[xy_to_flat(vec[0],vec[1])] != null and flat_game_board[xy_to_flat(vec[0],vec[1])].is_evul()):
 			var attack_icon = preload("res://Attack.tscn")
@@ -463,6 +464,12 @@ func place_attack_tiles(x,y):
 			self.add_child(attackable)
 			attackable.set_coordinates(vec)
 			active_greens.append(attackable)
+	if(active_greens != []):
+		var cancel_icon = preload("res://Cancel.tscn")
+		var cancel = cancel_icon.instance()
+		self.add_child(cancel)
+		cancel.set_coordinates(Vector2(x+1,y+1))
+		active_greens.append(cancel)
 	
 	return !active_greens.empty()
 
