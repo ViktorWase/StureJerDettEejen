@@ -8,6 +8,7 @@ enum {
 	good,
 	neutral,
 	evul,
+	blocking,
 	undefined
 }
 var alignment = undefined
@@ -45,6 +46,9 @@ func is_good():
 func is_neutral():
 	return alignment == neutral
 
+func is_blocking():
+	return alignment == blocking
+
 func set_good():
 	alignment = good
 
@@ -53,6 +57,9 @@ func set_evul():
 	
 func set_neutral():
 	alignment = neutral
+
+func set_blocking():
+	alignment = blocking
 
 func set_start_coordinates(coord : Vector2):
 	startCoords = coord.floor()
@@ -195,3 +202,9 @@ func _physics_process(delta):
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
+
+func darken_character():
+	modulate = Color(0.25,0.25,0.25,1.0)
+	
+func reset_darkened_character():
+	modulate = Color(1.0,1.0,1.0,1.0)

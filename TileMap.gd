@@ -16,7 +16,8 @@ var number_of_turns_till_apocalypse = 12
 enum game_states {
 	player_turn,
 	enemy_turn,
-	DEATH_DESTRUCTION_AND_THE_APOCALYPSE
+	DEATH_DESTRUCTION_AND_THE_APOCALYPSE,
+	winning
 }
 
 enum game_turn_states {
@@ -89,6 +90,13 @@ func _ready():
 		var i = xy_to_flat(charX, charY)
 		flat_game_board[i] = enemy
 		enemy.set_start_coordinates(Vector2(charX, charY))
+	
+	var rocket = $Rocket
+	var charX = floor(rocket.position.x / 32)
+	var charY = floor(rocket.position.y / 32)
+	var i = xy_to_flat(charX, charY)
+	flat_game_board[i] = rocket
+	rocket.set_coordinates(Vector2(charX, charY))
 
 	var plane = load("res://Character.tscn").instance()  # TODO: The plane really looks like a dude.
 	plane.object_type = 'plane'
@@ -227,10 +235,8 @@ func get_obj_from_tile(x, y):
 	# Returns null if there is nothing there, otherwise it
 	# returns the thing that is in the tile.
 	if x < 0 or x >= X or y < 0 or y >= Y:
-		print("YOU CLICKED OUTSIDE THE MAP! NOT ALLOWED")
 		return null
 	else:
-		print([x, y])
 		return flat_game_board[xy_to_flat(x, y)]
 
 func any_player_moves_left():
@@ -315,14 +321,23 @@ func _input(event):
 							game_turn_state = game_turn_states.choose_character
 							remove_green_tiles()
 
-func end_of_turn():
+func end_of_enemy_turn():
 	number_of_turns_till_apocalypse -= 1
 	if number_of_turns_till_apocalypse <= 0:
 		game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
+		return
+
 	print("TURNS LEFT ", get_number_of_turns_till_reset())
 	if get_number_of_turns_till_reset() == 0:
 		reset_game_board()
-		
+
+func end_of_player_turn():
+	reset_movement_of_good_chars()
+	
+	# check winning condition
+	if ($Rocket.is_character_nearby()):
+		print("YOU WON")
+		game_state = game_states.winning
 
 func _on_reached_goal():
 	print("callback hoolabandoola")
@@ -345,9 +360,11 @@ func _process(delta):
 							game_turn_state = game_turn_states.choose_character
 				game_turn_states.choose_character:
 					if !any_player_moves_left():
-						reset_movement_of_good_chars()
 						game_state = game_states.enemy_turn
 						game_turn_state = game_turn_states.choose_character
+						
+						# end of player turn
+						end_of_player_turn()
 		game_states.enemy_turn:
 			match(game_turn_state):
 				game_turn_states.choose_character:
@@ -358,7 +375,7 @@ func _process(delta):
 						game_state = game_states.player_turn
 						game_turn_state = game_turn_states.choose_character
 						reset_movement_of_evul_chars()
-						end_of_turn()
+						end_of_enemy_turn()
 					else:
 						game_turn_state = game_turn_states.character_moving
 						
@@ -437,6 +454,10 @@ func remove_green_tiles():
 func place_attack_tiles(x,y):
 	active_greens = []
 	var attackable_tiles = [Vector2(x+1,y),Vector2(x-1,y),Vector2(x,y+1),Vector2(x,y-1)]
+	var cancel_icon = preload("res://Cancel.tscn")
+	var cancel = cancel_icon.instance()
+	self.add_child(cancel)
+	cancel.set_coordinates(Vector2(x+1,y+1))
 	for vec in attackable_tiles:
 		if(flat_game_board[xy_to_flat(vec[0],vec[1])] != null and flat_game_board[xy_to_flat(vec[0],vec[1])].is_evul()):
 			var attack_icon = preload("res://Attack.tscn")
