@@ -99,7 +99,7 @@ func _ready():
 	flat_game_board[i] = rocket
 	rocket.set_coordinates(Vector2(charX, charY))
 
-	var plane = load("res://Character.tscn").instance()  # TODO: The plane really looks like a dude.
+	var plane = load("res://Wings.tscn").instance()  # TODO: The plane really looks like a dude.
 	plane.object_type = 'plane'
 	flat_game_board[xy_to_flat(9, 2)] = plane
 	self.add_child(plane)
@@ -109,7 +109,7 @@ func _ready():
 	get_tree().get_root().get_node("Node2D").find_node("WinningScreen").hide()
 	get_tree().get_root().get_node("Node2D").find_node("DeathScreen").hide()
 
-	var armor = load("res://Character.tscn").instance()  # TODO: The armor really looks like a dude.
+	var armor = load("res://Shield.tscn").instance()  # TODO: The armor really looks like a dude.
 	armor.object_type = 'armor'
 	flat_game_board[xy_to_flat(9, 3)] = armor
 	self.add_child(armor)
