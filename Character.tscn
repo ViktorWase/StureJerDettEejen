@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://MainDude.gd" type="Script" id=1]
 [ext_resource path="res://Assets/animated_character_m/elf_m_idle_anim_f0.png" type="Texture" id=2]
@@ -9,6 +9,8 @@
 [ext_resource path="res://Assets/animated_character_m/elf_m_run_anim_f1.png" type="Texture" id=7]
 [ext_resource path="res://Assets/animated_character_m/elf_m_run_anim_f2.png" type="Texture" id=8]
 [ext_resource path="res://Assets/animated_character_m/elf_m_run_anim_f0.png" type="Texture" id=9]
+[ext_resource path="res://Wings_equipped.tscn" type="PackedScene" id=10]
+[ext_resource path="res://Shield_equipped.tscn" type="PackedScene" id=11]
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
@@ -29,8 +31,14 @@ animations = [ {
 scale = Vector2( 2, 2 )
 frames = SubResource( 1 )
 animation = "idle"
-frame = 3
+frame = 2
 playing = true
 offset = Vector2( 0, -6 )
 script = ExtResource( 1 )
 move_speed = 120
+
+[node name="Wings_equipped" parent="." instance=ExtResource( 10 )]
+visible = false
+
+[node name="Shield_equipped" parent="." instance=ExtResource( 11 )]
+visible = false

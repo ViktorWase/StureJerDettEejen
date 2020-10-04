@@ -123,10 +123,12 @@ func on_pick_up(pickerupper):
 		"plane":
 			print("Picking up plane")
 			pickerupper[0].can_walk_on_lava = true
+			pickerupper[0].get_node("Wings_equipped").show()
 		"armor":
 			print("Picking up armor")
 			pickerupper[0].max_hp += 1
 			pickerupper[0].current_hp += 1
+			pickerupper[0].get_node("Shield_equipped").show()
 		_:
 			push_error("No object called " + object_type)
 	print("IS HAPPENING!")
@@ -257,7 +259,7 @@ func _physics_process(delta):
 #	pass
 
 func darken_character():
-	modulate = Color(0.25,0.25,0.25,1.0)
+	modulate = Color(0.35,0.35,0.35,1.0)
 	
 func reset_darkened_character():
 	modulate = Color(1.0,1.0,1.0,1.0)
