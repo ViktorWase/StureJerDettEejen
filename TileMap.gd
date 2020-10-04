@@ -282,8 +282,15 @@ func _input(event):
 		var map_pos = world_to_map(event.position - position)
 		var obj = get_obj_from_tile(map_pos[0], map_pos[1])
 
+		var end_turn_button = [Vector2(-10,-4),Vector2(-10,-3),Vector2(-9,-4),Vector2(-9,-3)]
+		print(map_pos)
+		if map_pos in end_turn_button:
+			player_ends_their_turn()
+			print("ending turn")
 		match(game_state):
 			game_states.player_turn:
+				get_tree().get_root().get_node("Node2D").find_node("End Turn").show()
+				print(game_turn_state)
 				match(game_turn_state):
 					game_turn_states.choose_character:
 						if (!obj or !obj.is_good() or obj.has_moved_current_turn):
@@ -362,7 +369,7 @@ func end_of_enemy_turn():
 func should_be_able_to_end_player_turn():
 	# Sometimes the player can end their turn. Other times, they cannot.
 	# For exmaple, when it's the enemy's turn, or when a character is moving.
-	return game_state == game_states.player_turn and game_turn_state == game_turn_states.choosing_character
+	return game_state == game_states.player_turn and game_turn_state == game_turn_states.choose_character
 
 func player_ends_their_turn():
 	if should_be_able_to_end_player_turn():
@@ -411,6 +418,7 @@ func _process(delta):
 						# end of player turn
 						end_of_player_turn()
 		game_states.enemy_turn:
+			get_tree().get_root().get_node("Node2D").find_node("End Turn").hide()
 			match(game_turn_state):
 				game_turn_states.choose_character:
 					var enemy = get_next_enemy()
