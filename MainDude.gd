@@ -35,12 +35,18 @@ func is_evul():
 
 func is_good():
 	return alignment == good
+	
+func is_neutral():
+	return alignment == neutral
 
 func set_good():
 	alignment = good
 
 func set_evul():
 	alignment = evul
+	
+func set_neutral():
+	alignment = neutral
 
 func set_coordinates_only(coord):
 	# kolla om vi får ett fel, hälsningar Intrud
