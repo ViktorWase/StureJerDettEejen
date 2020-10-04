@@ -367,6 +367,8 @@ func should_be_able_to_end_player_turn():
 func player_ends_their_turn():
 	if should_be_able_to_end_player_turn():
 		end_of_player_turn()
+		game_state = game_states.enemy_turn
+		game_turn_state = game_turn_states.choose_character
 	else:
 		push_warning("Stop trying to end player turn when it's not allowed!")
 
