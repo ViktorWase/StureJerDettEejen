@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Assets/rocket_fire.png" type="Texture" id=1]
+[ext_resource path="res://Assets/rocket_ship.png" type="Texture" id=2]
+[ext_resource path="res://Rocket.gd" type="Script" id=3]
+
+[node name="Rocket" type="Node2D"]
+script = ExtResource( 3 )
+
+[node name="ship" type="Sprite" parent="."]
+position = Vector2( -0.449768, 6.40462 )
+texture = ExtResource( 2 )
+
+[node name="fire" type="Sprite" parent="."]
+visible = false
+position = Vector2( -0.287777, 3.89379 )
+texture = ExtResource( 1 )
