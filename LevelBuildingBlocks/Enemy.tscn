@@ -16,7 +16,7 @@ animations = [ {
 "speed": 5.0
 } ]
 
-[node name="AnimatedSprite" type="AnimatedSprite" groups=[
+[node name="Enemy" type="AnimatedSprite" groups=[
 "Enemies",
 ]]
 scale = Vector2( 2, 2 )
