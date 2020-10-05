@@ -102,6 +102,7 @@ func get_nearby_characters():
 func go_to_space():
 	is_going_to_space = true
 	$fire.show()
+	$RocketSound.play()
 
 func show_help_text():
 	$HelpText.show()

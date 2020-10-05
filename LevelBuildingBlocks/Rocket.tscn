@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Assets/rocket_fire.png" type="Texture" id=1]
 [ext_resource path="res://Assets/rocket_ship.png" type="Texture" id=2]
 [ext_resource path="res://Scripts/Rocket.gd" type="Script" id=3]
 [ext_resource path="res://Assets/font_small.tres" type="DynamicFont" id=4]
 [ext_resource path="res://Assets/label_long.png" type="Texture" id=5]
+[ext_resource path="res://Assets/sounds/rocket.ogg" type="AudioStream" id=6]
 
 [sub_resource type="Animation" id=1]
 resource_name = "point"
@@ -83,3 +84,6 @@ __meta__ = {
 [node name="AnimationPlayer" type="AnimationPlayer" parent="HelpText/Arrow"]
 autoplay = "point"
 anims/point = SubResource( 1 )
+
+[node name="RocketSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource( 6 )

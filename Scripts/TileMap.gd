@@ -413,6 +413,7 @@ func end_of_enemy_turn():
 		GUI.get_node("End Turn").hide()
 		GUI.get_node("TurnInfo").text = ""
 		GUI.get_node("DeathScreen").show()
+		$DeathSound.play()
 		game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
 		return
 	

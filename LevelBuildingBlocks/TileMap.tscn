@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Assets/music/sture at it again jingle.ogg" type="AudioStream" id=1]
 [ext_resource path="res://Assets/sounds/warp.ogg" type="AudioStream" id=2]
+[ext_resource path="res://Assets/sounds/death.ogg" type="AudioStream" id=3]
 [ext_resource path="res://Scripts/TileMap.gd" type="Script" id=6]
 [ext_resource path="res://Assets/terrain_pixel_tilemap.tres" type="TileSet" id=11]
 
@@ -21,3 +22,6 @@ volume_db = 0.8
 [node name="WarpSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 2 )
 volume_db = -4.467
+
+[node name="DeathSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 3 )
