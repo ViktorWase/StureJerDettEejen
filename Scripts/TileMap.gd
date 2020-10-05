@@ -364,6 +364,7 @@ func _input(event):
 							
 						if (green in get_tree().get_nodes_in_group("cancel")):
 							remove_green_tiles()
+							active_character.darken_character()
 							game_turn_state = game_turn_states.choose_character
 							return
 							
