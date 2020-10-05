@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=2]
+[gd_scene load_steps=23 format=2]
 
 [ext_resource path="res://LevelBuildingBlocks/TileMap.tscn" type="PackedScene" id=1]
 [ext_resource path="res://LevelBuildingBlocks/Character.tscn" type="PackedScene" id=2]
@@ -35,16 +35,6 @@ void fragment(){
 shader = SubResource( 1 )
 shader_param/time = null
 
-[sub_resource type="GDScript" id=3]
-script/source = "extends TextureRect
-
-var time = 0
-
-func _process(delta):
-	material.set_shader_param(\"time\", time)
-	time += delta
-"
-
 [sub_resource type="SpriteFrames" id=4]
 animations = [ {
 "frames": [ ExtResource( 17 ), ExtResource( 18 ), ExtResource( 16 ), ExtResource( 20 ) ],
@@ -70,7 +60,6 @@ animations = [ {
 
 [node name="LavaBackground" parent="." instance=ExtResource( 5 )]
 material = SubResource( 2 )
-script = SubResource( 3 )
 
 [node name="TileMap" parent="." instance=ExtResource( 1 )]
 

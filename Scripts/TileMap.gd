@@ -12,6 +12,9 @@ var current_enemy_idx = null
 var active_character
 var resetting_characters = []
 var number_of_turns_till_apocalypse = 12
+
+var end_counter # used to insert a time padding when resetting the board
+
 var GUI
 
 enum game_states {
@@ -35,10 +38,8 @@ var game_turn_state
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	# get reference to GUI node
+	# get reference to GUI and Lava node
 	GUI = get_tree().get_root().get_node("Node2D").get_node("GUI")
-	
-	print(GUI)
 	
 	# This is the list that contains all the THINGS that are on the board.
 	# Note that there can only be one THING per tile. So an object and a player
@@ -515,17 +516,21 @@ func _process(delta):
 					game_turn_state = game_turn_states.choose_character
 
 				game_turn_states.end_turn:
+					end_counter -= delta
+					
 					for character in resetting_characters:
 						if (character.has_reached_destination()):
 							resetting_characters.erase(character)
 							active_character = null
 							break
 
-					if (resetting_characters.empty()):
+					if (resetting_characters.empty() and end_counter <= 0):
 						for character in get_tree().get_nodes_in_group("Characters"):
 							character.reset_graphics()
 						for enemy in get_tree().get_nodes_in_group("Enemies"):
 							enemy.reset_graphics()
+						
+						GUI.hide_ripples_effect()
 
 						# player turn!
 						set_player_turn()
@@ -583,6 +588,7 @@ func reset_game_board():
 	game_turn_state = game_turn_states.end_turn
 	game_state = game_states.enemy_turn
 	resetting_characters = []
+	end_counter = 1.4 # least number of seconds to wait before continuing
 	
 	for character in get_tree().get_nodes_in_group("Characters"):
 		# reference character
@@ -603,3 +609,4 @@ func reset_game_board():
 		resetting_characters.append(enemy)
 	
 	GUI.get_node("TurnInfo").text = ""
+	GUI.show_ripples_effect()

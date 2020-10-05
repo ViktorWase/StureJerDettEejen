@@ -1,6 +1,7 @@
 [gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Assets/lava.png" type="Texture" id=1]
+[ext_resource path="res://Scripts/LavaBackground.gd" type="Script" id=2]
 
 [sub_resource type="Shader" id=1]
 code = "shader_type canvas_item;
@@ -18,23 +19,13 @@ void fragment(){
 shader = SubResource( 1 )
 shader_param/time = null
 
-[sub_resource type="GDScript" id=3]
-script/source = "extends TextureRect
-
-var time = 0
-
-func _process(delta):
-	material.set_shader_param(\"time\", time)
-	time += delta
-"
-
 [node name="LavaBackground" type="TextureRect"]
 material = SubResource( 2 )
-margin_right = 1023.0
-margin_bottom = 599.0
+margin_right = 1024.0
+margin_bottom = 600.0
 texture = ExtResource( 1 )
 stretch_mode = 2
-script = SubResource( 3 )
+script = ExtResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
