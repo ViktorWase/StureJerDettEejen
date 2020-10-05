@@ -37,6 +37,7 @@ var is_done_moving
 var has_moved_current_turn
 var can_walk_on_lava = false
 var attack_coordinates = []
+var target_pickup
 
 var max_hp = 1
 var current_hp = 1
@@ -258,6 +259,13 @@ func _physics_process(delta):
 			is_done_moving = true
 			# TODO
 			# set_coordinates()
+			
+			if (target_pickup):
+				target_pickup.on_pick_up([self])
+				print("CHAR HP: ", current_hp)
+				target_pickup.queue_free()
+				target_pickup = null
+			
 			return
 		target = waypoints[waypoint_index]
 	velocity = (target - position).normalized() * move_speed
@@ -269,6 +277,9 @@ func _physics_process(delta):
 		
 	#velocity = move_and_slide(velocity)
 	position += velocity*delta
+
+func set_target_pickup(pickup):
+	target_pickup = pickup
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

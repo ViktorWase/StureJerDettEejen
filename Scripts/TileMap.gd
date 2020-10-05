@@ -388,10 +388,7 @@ func _input(event):
 							# Check of there is an pickupable object on that position
 							if flat_game_board[xy_to_flat(green.cx, green.cy)]:
 								var objed_to_be_used = flat_game_board[xy_to_flat(green.cx, green.cy)]
-								objed_to_be_used.on_pick_up([active_character])
-								print("CHAR HP: ", active_character.current_hp)
-								flat_game_board[xy_to_flat(green.cx, green.cy)].queue_free()
-								flat_game_board[xy_to_flat(green.cx, green.cy)] = null
+								active_character.set_target_pickup(objed_to_be_used)
 
 							flat_game_board[xy_to_flat(active_character.cx, active_character.cy)] = null
 							flat_game_board[xy_to_flat(green.cx, green.cy)] = active_character
