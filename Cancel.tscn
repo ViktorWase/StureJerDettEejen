@@ -1,11 +1,12 @@
 [gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Scripts/Attack.gd" type="Script" id=1]
-[ext_resource path="res://Assets/pngegg.png" type="Texture" id=2]
+[ext_resource path="res://Assets/Abort.png" type="Texture" id=2]
 
 [node name="Cancel" type="Sprite" groups=[
 "cancel",
 ]]
-scale = Vector2( 0.02, 0.02 )
+position = Vector2( -16, -16 )
+scale = Vector2( 0.75, 0.75 )
 texture = ExtResource( 2 )
 script = ExtResource( 1 )
