@@ -510,6 +510,8 @@ func _process(delta):
 							flat_game_board[xy_to_flat(active_character.cx, active_character.cy)] = null
 							flat_game_board[xy_to_flat(destination[0], destination[1])] = active_character
 							active_character.set_coordinates_only(Vector2(destination[0], destination[1]))
+							
+							active_character.play_foot_sound()
 						else:
 							# Enemy takes no action
 							game_turn_state = game_turn_states.choose_character
@@ -525,6 +527,9 @@ func _process(delta):
 						if is_dead:
 							flat_game_board[idx_of_victim].queue_free()
 							flat_game_board[idx_of_victim] = null
+						
+						active_character.play_attack_sound()
+					
 					game_turn_state = game_turn_states.choose_character
 
 				game_turn_states.end_turn:
