@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/sture at it again 1.ogg-006222ec593aa61bcacaff8a069f2015.oggstr"
+
+[deps]
+
+source_file="res://Assets/music/sture at it again 1.ogg"
+dest_files=[ "res://.import/sture at it again 1.ogg-006222ec593aa61bcacaff8a069f2015.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

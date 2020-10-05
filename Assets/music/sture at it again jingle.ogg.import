@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/sture at it again jingle.ogg-34a22924803e76b03be6d121c1d4bd39.oggstr"
+
+[deps]
+
+source_file="res://Assets/music/sture at it again jingle.ogg"
+dest_files=[ "res://.import/sture at it again jingle.ogg-34a22924803e76b03be6d121c1d4bd39.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0

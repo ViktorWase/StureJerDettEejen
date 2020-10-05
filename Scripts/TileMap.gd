@@ -117,6 +117,7 @@ func _ready():
 	set_player_turn()
 	
 	$Rocket.show_help_text()
+	$GameStartJingle.play()
 
 func _on_end_turn_pressed():
 	$Rocket.hide_help_text()
