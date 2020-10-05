@@ -1,11 +1,10 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://Assets/Green tile.png" type="Texture" id=1]
+[ext_resource path="res://Assets/Green_tile.png" type="Texture" id=1]
 [ext_resource path="res://Scripts/Green.gd" type="Script" id=2]
 
-
 [node name="Green" type="Sprite"]
-modulate = Color( 1, 1, 1, 0.262745 )
-scale = Vector2( 0.031, 0.031 )
+modulate = Color( 1, 1, 1, 0.588235 )
+scale = Vector2( 0.1, 0.1 )
 texture = ExtResource( 1 )
 script = ExtResource( 2 )
