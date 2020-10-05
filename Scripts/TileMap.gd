@@ -112,6 +112,8 @@ func _ready():
 	
 	GUI.connect("end_turn_pressed", self, "_on_end_turn_pressed")
 	GUI.connect("restart_pressed", self, "_on_restart_pressed")
+	
+	reset_loop_icons()
 
 	# player starts
 	set_player_turn()
@@ -154,6 +156,14 @@ func get_number_of_turns_till_reset():
 		return 0
 	else:
 		return number_of_turns_till_apocalypse % 4
+
+func reset_loop_icons():
+	GUI.get_node("Loop Counter/LoopIcon1").frame = 0
+	GUI.get_node("Loop Counter/LoopIcon1").material.set_shader_param("tint", Vector3(0,0,0))
+	GUI.get_node("Loop Counter/LoopIcon2").frame = 0
+	GUI.get_node("Loop Counter/LoopIcon2").material.set_shader_param("tint", Vector3(0,0,0))
+	GUI.get_node("Loop Counter/LoopIcon3").frame = 0
+	GUI.get_node("Loop Counter/LoopIcon3").material.set_shader_param("tint", Vector3(0,0,0))
 
 func update_loop_icons():
 	if number_of_turns_till_apocalypse > 8:
