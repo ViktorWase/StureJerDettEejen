@@ -366,6 +366,8 @@ func _input(event):
 							obj.queue_free()
 							
 						remove_green_tiles()
+						active_character.darken_character()
+						
 						# set next player turn
 						set_player_turn()
 						
@@ -391,7 +393,6 @@ func _input(event):
 							active_character.set_coordinates_only(Vector2(green.cx, green.cy))
 							
 							remove_green_tiles()
-							active_character.darken_character()
 						else:
 							remove_green_tiles()
 							# set next player turn
@@ -431,6 +432,9 @@ func player_ends_their_turn():
 
 func end_of_player_turn():
 	reset_movement_of_good_chars()
+	
+	if (active_character):
+		active_character.darken_character()
 
 	# check winning condition
 	if ($Rocket.is_character_nearby()):
@@ -469,6 +473,7 @@ func _process(delta):
 							GUI.get_node("End Turn").hide()
 							game_turn_state = game_turn_states.select_attack
 						else:
+							active_character.darken_character()
 							# set next player turn
 							set_player_turn()
 				game_turn_states.choose_character:
@@ -521,7 +526,6 @@ func _process(delta):
 					for character in resetting_characters:
 						if (character.has_reached_destination()):
 							resetting_characters.erase(character)
-							active_character = null
 							break
 
 					if (resetting_characters.empty() and end_counter <= 0):
@@ -591,8 +595,6 @@ func reset_game_board():
 	end_counter = 1.4 # least number of seconds to wait before continuing
 	
 	for character in get_tree().get_nodes_in_group("Characters"):
-		# reference character
-		active_character = character
 		character.move_to_start_coordinates()
 		flat_game_board[xy_to_flat(character.cx, character.cy)] = null
 		flat_game_board[xy_to_flat(character.startCoords.x, character.startCoords.y)] = character

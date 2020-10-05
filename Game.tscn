@@ -35,7 +35,7 @@ void fragment(){
 shader = SubResource( 1 )
 shader_param/time = null
 
-[sub_resource type="SpriteFrames" id=4]
+[sub_resource type="SpriteFrames" id=3]
 animations = [ {
 "frames": [ ExtResource( 17 ), ExtResource( 18 ), ExtResource( 16 ), ExtResource( 20 ) ],
 "loop": true,
@@ -48,7 +48,7 @@ animations = [ {
 "speed": 10.0
 } ]
 
-[sub_resource type="SpriteFrames" id=5]
+[sub_resource type="SpriteFrames" id=4]
 animations = [ {
 "frames": [ ExtResource( 10 ), ExtResource( 9 ), ExtResource( 12 ), ExtResource( 11 ) ],
 "loop": true,
@@ -65,21 +65,21 @@ material = SubResource( 2 )
 
 [node name="Character1" parent="TileMap" instance=ExtResource( 2 )]
 position = Vector2( 15.3956, 16.7132 )
-frames = SubResource( 4 )
+frames = SubResource( 3 )
 
 [node name="Character2" parent="TileMap" instance=ExtResource( 2 )]
 position = Vector2( 207.239, 80.506 )
-frames = SubResource( 4 )
+frames = SubResource( 3 )
 frame = 1
 
 [node name="Character3" parent="TileMap" instance=ExtResource( 2 )]
 position = Vector2( 110.386, 141.039 )
-frames = SubResource( 4 )
+frames = SubResource( 3 )
 frame = 2
 
 [node name="Enemy1" parent="TileMap" instance=ExtResource( 3 )]
 position = Vector2( 112.714, 48.3768 )
-frames = SubResource( 5 )
+frames = SubResource( 4 )
 frame = 1
 
 [node name="Rocket" parent="TileMap" instance=ExtResource( 6 )]
