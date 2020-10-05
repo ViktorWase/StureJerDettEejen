@@ -20,7 +20,7 @@ enum Alignment {
 enum PickupType {
 	NA,
 	wings,
-	sheild
+	shield
 }
 
 export(PickupType) var pickup_type = PickupType.NA

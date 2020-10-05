@@ -1,8 +1,12 @@
 extends Node
 
 var levels = [
+	"easy1",
+	"easy2",
 	"Level_1",
-	"Level_2"
+	"middle_armor",
+	"Level_2",
+	"battlefield"
 ]
 var level_index = -1
 
