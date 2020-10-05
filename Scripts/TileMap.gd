@@ -30,8 +30,8 @@ enum game_turn_states {
 	end_turn
 }
 
-var game_state = game_states.player_turn
-var game_turn_state = game_turn_states.choose_character
+var game_state
+var game_turn_state
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -104,6 +104,7 @@ func _ready():
 	flat_game_board[i] = rocket
 	rocket.set_coordinates(Vector2(charX, charY))
 	
+	GUI.get_node("TurnInfo").text = ""
 	GUI.get_node("End Turn").hide()
 	GUI.get_node("WinningScreen").hide()
 	GUI.get_node("DeathScreen").hide()
@@ -111,17 +112,56 @@ func _ready():
 	GUI.connect("end_turn_pressed", self, "_on_end_turn_pressed")
 	GUI.connect("restart_pressed", self, "_on_restart_pressed")
 
+	# player starts
+	set_player_turn()
+
 func _on_end_turn_pressed():
 	player_ends_their_turn()
 
 func _on_restart_pressed():
 	get_tree().reload_current_scene()
 
+func set_player_turn():
+	game_state = game_states.player_turn
+	game_turn_state = game_turn_states.choose_character
+	
+	GUI.get_node("TurnInfo").text = "Player turn"
+	
+#	if should_be_able_to_end_player_turn():
+	GUI.get_node("End Turn").show()
+
+	update_loop_icons()
+
+func set_enemy_turn():
+	game_state = game_states.enemy_turn
+	game_turn_state = game_turn_states.choose_character
+	
+	GUI.get_node("TurnInfo").text = "Enemy turn"
+	
+	GUI.get_node("End Turn").hide()
+	
+	update_loop_icons()
+
 func get_number_of_turns_till_reset():
 	if number_of_turns_till_apocalypse <= 0:
 		return 0
 	else:
 		return number_of_turns_till_apocalypse % 4
+
+func update_loop_icons():
+	if number_of_turns_till_apocalypse > 8:
+		GUI.get_node("Loop Counter/LoopIcon3").frame = get_number_of_turns_till_reset()
+		GUI.get_node("Loop Counter/LoopIcon3").material.set_shader_param("tint", Vector3(1,1,0))
+	elif number_of_turns_till_apocalypse > 4:
+		GUI.get_node("Loop Counter/LoopIcon3").frame = 4
+		GUI.get_node("Loop Counter/LoopIcon2").frame = get_number_of_turns_till_reset()
+		GUI.get_node("Loop Counter/LoopIcon2").material.set_shader_param("tint", Vector3(1,1,0))
+	elif number_of_turns_till_apocalypse > 0:
+		GUI.get_node("Loop Counter/LoopIcon2").frame = 4
+		GUI.get_node("Loop Counter/LoopIcon1").frame = get_number_of_turns_till_reset()
+		GUI.get_node("Loop Counter/LoopIcon1").material.set_shader_param("tint", Vector3(1,1,0))
+	else:
+		GUI.get_node("Loop Counter/LoopIcon1").frame = 4
 
 func get_next_enemy():
 	# Returns the next enemy, or if all the enemies have been returned
@@ -317,10 +357,10 @@ func _input(event):
 						if is_dead:
 							flat_game_board[idx_of_victim] = null
 							obj.queue_free()
+							
 						remove_green_tiles()
-						
-						# TODO: next state
-						game_turn_state = game_turn_states.choose_character
+						# set next player turn
+						set_player_turn()
 						
 					game_turn_states.select_tile:
 						var green = find_green(map_pos[0], map_pos[1])
@@ -346,21 +386,30 @@ func _input(event):
 							remove_green_tiles()
 							active_character.darken_character()
 						else:
-							game_turn_state = game_turn_states.choose_character
 							remove_green_tiles()
+							# set next player turn
+							set_player_turn()
 
 func end_of_enemy_turn():
+	reset_movement_of_evul_chars()
+
 	number_of_turns_till_apocalypse -= 1
 	if number_of_turns_till_apocalypse <= 0 or are_all_good_guys_dead():
-		get_tree().get_root().get_node("Node2D").find_node("DeathScreen").show()
+		GUI.get_node("End Turn").hide()
+		GUI.get_node("TurnInfo").text = ""
+		GUI.get_node("DeathScreen").show()
 		game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
 		return
+	
+	for character in get_tree().get_nodes_in_group("Characters"):
+		character.reset_darkened_character()
 
 	print("TURNS LEFT ", get_number_of_turns_till_reset())
 	if get_number_of_turns_till_reset() == 0:
 		reset_game_board()
-	for character in get_tree().get_nodes_in_group("Characters"):
-		character.reset_darkened_character()
+	else:
+		# players turn!
+		set_player_turn()
 
 func should_be_able_to_end_player_turn():
 	# Sometimes the player can end their turn. Other times, they cannot.
@@ -370,8 +419,6 @@ func should_be_able_to_end_player_turn():
 func player_ends_their_turn():
 	if should_be_able_to_end_player_turn():
 		end_of_player_turn()
-		game_state = game_states.enemy_turn
-		game_turn_state = game_turn_states.choose_character
 	else:
 		push_warning("Stop trying to end player turn when it's not allowed!")
 
@@ -380,6 +427,9 @@ func end_of_player_turn():
 
 	# check winning condition
 	if ($Rocket.is_character_nearby()):
+		print("winning")
+		GUI.get_node("End Turn").hide()
+		GUI.get_node("TurnInfo").text = ""
 		GUI.get_node("WinningScreen").show()
 		for character in $Rocket.get_nearby_characters():
 			flat_game_board[xy_to_flat(character.cx, character.cy)] = null
@@ -391,28 +441,14 @@ func end_of_player_turn():
 		yield(get_tree().create_timer(4.0), "timeout")
 		
 		Global.load_next_level()
+	else:
+		# enemies turn!
+		set_enemy_turn()
 
 func _on_reached_goal():
 	print("callback hoolabandoola")
 
 func _process(delta):
-	if should_be_able_to_end_player_turn():
-		GUI.get_node("End Turn").show()
-
-	if number_of_turns_till_apocalypse > 8:
-		GUI.get_node("Loop Counter/LoopIcon3").frame = get_number_of_turns_till_reset()
-		GUI.get_node("Loop Counter/LoopIcon3").material.set_shader_param("tint", Vector3(1,1,0))
-	elif number_of_turns_till_apocalypse > 4:
-		GUI.get_node("Loop Counter/LoopIcon3").frame = 4
-		GUI.get_node("Loop Counter/LoopIcon2").frame = get_number_of_turns_till_reset()
-		GUI.get_node("Loop Counter/LoopIcon2").material.set_shader_param("tint", Vector3(1,1,0))
-	elif number_of_turns_till_apocalypse > 0:
-		GUI.get_node("Loop Counter/LoopIcon2").frame = 4
-		GUI.get_node("Loop Counter/LoopIcon1").frame = get_number_of_turns_till_reset()
-		GUI.get_node("Loop Counter/LoopIcon1").material.set_shader_param("tint", Vector3(1,1,0))
-	else:
-		GUI.get_node("Loop Counter/LoopIcon1").frame = 4
-	
 	match(game_state):
 		game_states.player_turn:
 			match(game_turn_state):
@@ -423,16 +459,13 @@ func _process(delta):
 						# TODO: kolla om man kan attackera
 						# if (can attack)
 						if (place_attack_tiles(active_character.cx, active_character.cy, active_character.get_attack_coordinates())):
-							# TODO: fixa nya place green tiles som visar var man kan attackera
+							GUI.get_node("End Turn").hide()
 							game_turn_state = game_turn_states.select_attack
 						else:
-							# TODO: select next turn
-							game_turn_state = game_turn_states.choose_character
+							# set next player turn
+							set_player_turn()
 				game_turn_states.choose_character:
 					if !any_player_moves_left():
-						game_state = game_states.enemy_turn
-						game_turn_state = game_turn_states.choose_character
-						
 						# end of player turn
 						end_of_player_turn()
 		game_states.enemy_turn:
@@ -443,9 +476,6 @@ func _process(delta):
 					active_character = enemy
 					if !enemy:
 						# end of turn
-						game_state = game_states.player_turn
-						game_turn_state = game_turn_states.choose_character
-						reset_movement_of_evul_chars()
 						end_of_enemy_turn()
 					else:
 						game_turn_state = game_turn_states.character_moving
@@ -491,8 +521,8 @@ func _process(delta):
 						for enemy in get_tree().get_nodes_in_group("Enemies"):
 							enemy.reset_graphics()
 
-						game_turn_state = game_turn_states.choose_character
-						game_state = game_states.player_turn
+						# player turn!
+						set_player_turn()
 
 func find_green(x, y):
 	for green in active_greens:
@@ -565,3 +595,5 @@ func reset_game_board():
 		enemy.set_coordinates_only(enemy.startCoords)
 		
 		resetting_characters.append(enemy)
+	
+	GUI.get_node("TurnInfo").text = ""
