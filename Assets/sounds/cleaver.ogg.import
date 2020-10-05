@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/cleaver.ogg-3acc3493de4cb8c8d4797c8e2205bc77.oggstr"
+
+[deps]
+
+source_file="res://Assets/sounds/cleaver.ogg"
+dest_files=[ "res://.import/cleaver.ogg-3acc3493de4cb8c8d4797c8e2205bc77.oggstr" ]
+
+[params]
+
+loop=false
+loop_offset=0

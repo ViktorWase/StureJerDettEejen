@@ -18,6 +18,9 @@ func show_ripples_effect():
 func hide_ripples_effect():
 	$Ripples.hide()
 
+func play_menu_sound():
+	$MenuSound.play()
+
 func _on_Button_pressed():
 	emit_signal("end_turn_pressed")
 

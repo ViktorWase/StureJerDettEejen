@@ -258,6 +258,12 @@ func _physics_process(delta):
 #func _process(delta):
 #	pass
 
+func play_attack_sound():
+	$AttackSound.play()
+
+func play_foot_sound():
+	$FootSound.play()
+
 func darken_character():
 	modulate = Color(0.35,0.35,0.35,1.0)
 	

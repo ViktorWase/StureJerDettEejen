@@ -121,6 +121,7 @@ func _ready():
 
 func _on_end_turn_pressed():
 	$Rocket.hide_help_text()
+	GUI.play_menu_sound()
 	
 	player_ends_their_turn()
 
@@ -341,6 +342,8 @@ func _input(event):
 						obj.on_click(xy_to_flat(map_pos[0], map_pos[1]))
 						game_turn_state = game_turn_states.select_tile
 						
+						GUI.play_menu_sound()
+						
 						$Rocket.hide_help_text()
 					
 					game_turn_states.select_attack:
@@ -368,6 +371,7 @@ func _input(event):
 							
 						remove_green_tiles()
 						active_character.darken_character()
+						active_character.play_attack_sound()
 						
 						# set next player turn
 						set_player_turn()
@@ -392,6 +396,8 @@ func _input(event):
 							flat_game_board[xy_to_flat(active_character.cx, active_character.cy)] = null
 							flat_game_board[xy_to_flat(green.cx, green.cy)] = active_character
 							active_character.set_coordinates_only(Vector2(green.cx, green.cy))
+							
+							active_character.play_foot_sound()
 							
 							remove_green_tiles()
 						else:
@@ -613,3 +619,4 @@ func reset_game_board():
 	
 	GUI.get_node("TurnInfo").text = ""
 	GUI.show_ripples_effect()
+	$WarpSound.play()
