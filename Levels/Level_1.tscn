@@ -1,21 +1,26 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://LevelBuildingBlocks/GUI.tscn" type="PackedScene" id=1]
 [ext_resource path="res://LevelBuildingBlocks/LavaBackground.tscn" type="PackedScene" id=2]
 [ext_resource path="res://LevelBuildingBlocks/TileMap.tscn" type="PackedScene" id=3]
 [ext_resource path="res://LevelBuildingBlocks/Rocket.tscn" type="PackedScene" id=4]
 [ext_resource path="res://LevelBuildingBlocks/Character.tscn" type="PackedScene" id=5]
+[ext_resource path="res://LevelBuildingBlocks/Powerups/Wings.tscn" type="PackedScene" id=6]
 
 [node name="Node2D" type="Node2D"]
 
 [node name="LavaBackground" parent="." instance=ExtResource( 2 )]
 
 [node name="TileMap" parent="." instance=ExtResource( 3 )]
+tile_data = PoolIntArray( 0, 0, 131072, 1, 0, 131073, 2, 0, 131073, 3, 0, 131073, 4, 0, 131074, 65536, 0, 196608, 65537, 0, 196609, 65538, 0, 196609, 65539, 0, 196609, 65540, 0, 196610, 131072, 0, 196608, 131073, 0, 196609, 131074, 0, 196609, 131075, 0, 196609, 131076, 0, 196610, 131078, 0, 131072, 131079, 0, 131073, 131080, 0, 131073, 131081, 0, 131073, 131082, 0, 131074, 196608, 0, 196608, 196609, 0, 196609, 196610, 0, 196609, 196611, 0, 196609, 196612, 0, 196610, 196614, 0, 196608, 196615, 0, 196609, 196616, 0, 196609, 196617, 0, 196609, 196618, 0, 196610, 262144, 0, 196608, 262145, 0, 196609, 262146, 0, 196609, 262147, 0, 196609, 262148, 0, 196610, 262150, 0, 196608, 262151, 0, 196609, 262152, 0, 196609, 262153, 0, 196609, 262154, 0, 196610, 327680, 0, 196608, 327681, 0, 196609, 327682, 0, 196609, 327683, 0, 196609, 327684, 0, 196610, 327686, 0, 196608, 327687, 0, 196609, 327688, 0, 196609, 327689, 0, 196609, 327690, 0, 196610, 393216, 0, 196608, 393217, 0, 196609, 393218, 0, 196609, 393219, 0, 196609, 393220, 0, 196610, 393222, 0, 196608, 393223, 0, 196609, 393224, 0, 196609, 393225, 0, 196609, 393226, 0, 196610, 458752, 0, 196608, 458753, 0, 196609, 458754, 0, 196609, 458755, 0, 196609, 458756, 0, 196610, 458758, 0, 262144, 458759, 0, 262145, 458760, 0, 262145, 458761, 0, 262145, 458762, 0, 262146, 524288, 0, 196608, 524289, 0, 196609, 524290, 0, 196609, 524291, 0, 196609, 524292, 0, 196610, 589824, 0, 262144, 589825, 0, 262145, 589826, 0, 262145, 589827, 0, 262145, 589828, 0, 262146, 1114151, 0, 0 )
 
 [node name="Character" parent="TileMap" instance=ExtResource( 5 )]
 position = Vector2( 112.861, 146.7 )
 
 [node name="Rocket" parent="TileMap" instance=ExtResource( 4 )]
 position = Vector2( 239.177, 143.542 )
+
+[node name="Wings" parent="TileMap" instance=ExtResource( 6 )]
+position = Vector2( 79.1771, 240.384 )
 
 [node name="GUI" parent="." instance=ExtResource( 1 )]
