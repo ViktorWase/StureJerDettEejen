@@ -114,8 +114,12 @@ func _ready():
 
 	# player starts
 	set_player_turn()
+	
+	$Rocket.show_help_text()
 
 func _on_end_turn_pressed():
+	$Rocket.hide_help_text()
+	
 	player_ends_their_turn()
 
 func _on_restart_pressed():
@@ -334,6 +338,8 @@ func _input(event):
 						active_character = obj
 						obj.on_click(xy_to_flat(map_pos[0], map_pos[1]))
 						game_turn_state = game_turn_states.select_tile
+						
+						$Rocket.hide_help_text()
 					
 					game_turn_states.select_attack:
 						var green = find_green(map_pos[0], map_pos[1])

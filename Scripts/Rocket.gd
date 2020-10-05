@@ -2,6 +2,7 @@ extends Node2D
 
 var alignment
 export var thrustSpeed = 40
+export var displayLeft = false
 var thrustVelocity = 0
 var is_going_to_space = false
 
@@ -58,6 +59,13 @@ func set_coordinates(coord):
 func _ready():
 	set_blocking()
 	
+	if (displayLeft):
+		$HelpText/Arrow/LabelLeft.show()
+		$HelpText/Arrow/LabelRight.hide()
+	else:
+		$HelpText/Arrow/LabelLeft.hide()
+		$HelpText/Arrow/LabelRight.show()
+	
 	$fire.hide()
 
 func calculate_score():
@@ -94,6 +102,12 @@ func get_nearby_characters():
 func go_to_space():
 	is_going_to_space = true
 	$fire.show()
+
+func show_help_text():
+	$HelpText.show()
+
+func hide_help_text():
+	$HelpText.hide()
 
 func _physics_process(delta):
 	if (is_going_to_space):
