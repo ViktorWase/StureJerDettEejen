@@ -523,6 +523,7 @@ func _process(delta):
 					# Find someone to attack.
 					var idx_of_victim = active_character.find_idx_of_victim()
 					if idx_of_victim:
+						print("FOUDN VICTIM")
 						var victim = flat_game_board[idx_of_victim]
 						var is_dead = victim.is_attacked(active_character.damage)
 						if is_dead:

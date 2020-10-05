@@ -7,7 +7,6 @@
 [ext_resource path="res://Assets/animated_character_m/elf_m_run_anim_f2.png" type="Texture" id=8]
 [ext_resource path="res://Assets/animated_character_m/elf_m_run_anim_f0.png" type="Texture" id=9]
 
-
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
 "frames": [ ExtResource( 2 ) ],
@@ -30,4 +29,6 @@ animation = "idle"
 playing = true
 offset = Vector2( 0, -6 )
 script = ExtResource( 1 )
+pickup_type = 2
+type = 1
 move_speed = 120

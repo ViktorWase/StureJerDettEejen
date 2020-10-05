@@ -23,7 +23,7 @@ scale = Vector2( 2, 2 )
 frames = SubResource( 1 )
 offset = Vector2( 0, -6 )
 script = ExtResource( 2 )
-is_good = false
+type = 2
 move_speed = 120
 
 [node name="AttackSound" type="AudioStreamPlayer2D" parent="."]

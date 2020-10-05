@@ -2,8 +2,6 @@ extends AnimatedSprite
 
 signal reached_waypoint
 
-export var is_good = true
-
 enum {
 	good,
 	neutral,
@@ -11,7 +9,24 @@ enum {
 	blocking,
 	undefined
 }
+
+enum Alignment {
+	good,
+	neutral,
+	evul,
+	blocking
+}
+
+enum PickupType {
+	NA,
+	wings,
+	sheild
+}
+
+export(PickupType) var pickup_type = PickupType.NA
+export(Alignment) var type = Alignment.good
 var alignment = undefined
+
 var max_walk_distance = 2
 var damage = 1
 var waypoints
@@ -20,7 +35,6 @@ var velocity
 export var move_speed = 20
 var is_done_moving
 var has_moved_current_turn
-var object_type = ''
 var can_walk_on_lava = false
 var attack_coordinates = []
 
@@ -34,13 +48,18 @@ var startCoords : Vector2
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	if (is_good):
-		set_good()
-	else:
-		set_evul()
+	match(type):
+		Alignment.good:
+			set_good()
+		Alignment.evul:
+			set_evul()
+		Alignment.neutral:
+			set_neutral()
+		Alignment.blocking:
+			set_blocking()
+
 	play("idle")
 	has_moved_current_turn = false
-	return
 
 func get_attack_coordinates():
 	return attack_coordinates
@@ -114,24 +133,21 @@ func set_coordinates_only(coord):
 	cy = coord.y
 
 func on_pick_up(pickerupper):
-	print("What")
 	if !is_neutral():
 		push_error("You are trying to pick up a person - it's not type of game, you know.")
-		print("the")
-	print("Fuck")
-	match(object_type):
-		"plane":
-			print("Picking up plane")
+
+	match(pickup_type):
+		PickupType.wings:
+			print("Picking up wings")
 			pickerupper[0].can_walk_on_lava = true
 			pickerupper[0].get_node("Wings_equipped").show()
-		"armor":
+		PickupType.shield:
 			print("Picking up armor")
 			pickerupper[0].max_hp += 1
 			pickerupper[0].current_hp += 1
 			pickerupper[0].get_node("Shield_equipped").show()
 		_:
-			push_error("No object called " + object_type)
-	print("IS HAPPENING!")
+			push_error("No object called " + pickup_type)
 
 func set_coordinates(coord):
 	set_coordinates_only(coord)
