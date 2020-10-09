@@ -1,4 +1,4 @@
-extends AnimatedSprite
+extends Node2D
 
 signal reached_waypoint
 
@@ -16,7 +16,7 @@ var damage = 1
 var waypoints
 var waypoint_index
 var velocity
-export var move_speed = 20
+export var move_speed = 120
 var is_done_moving
 var has_moved_current_turn
 var can_walk_on_lava = false
@@ -33,8 +33,6 @@ var startCoords : Vector2
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-
-	play("idle")
 	has_moved_current_turn = false
 
 func get_attack_coordinates():
@@ -70,6 +68,12 @@ func can_stand_on(other_character):
 	# The power-up class has a function with the same name that return true
 	return false
 
+func play_idle():
+	push_error("Play idle in abstract base class, you doofus.")
+
+func play_run():
+	push_error("Play run in abstract base class, you doofus.")
+
 func set_start_coordinates(coord : Vector2):
 	startCoords = coord.floor()
 	set_coordinates(startCoords)
@@ -87,7 +91,7 @@ func set_coordinates(coord):
 	position.y = tilemap.map_to_world(coord)[1] + 16
 
 func reset_graphics():
-	play("idle")
+	play_idle()
 	scale.x = abs(scale.x)
 
 func find_idx_of_victim():
@@ -111,8 +115,8 @@ func move_along_path(path : Curve2D):
 	waypoints = path.get_baked_points()
 	waypoint_index = 0
 	is_done_moving = false
-	
-	play("run")
+
+	play_run()
 
 func move_to_start_coordinates():
 	waypoints = [get_parent().map_to_world(startCoords) + Vector2.ONE*16]
@@ -134,7 +138,7 @@ func _physics_process(delta):
 	if position.distance_to(target) < 1:
 		waypoint_index += 1
 		if (waypoint_index >= len(waypoints)):
-			play("idle")
+			play_idle()
 			waypoints = null
 			print("end")
 			is_done_moving = true

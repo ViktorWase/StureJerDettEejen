@@ -2,6 +2,10 @@ extends "res://Character.gd"
 
 func _ready():
 	set_evul()
+	add_to_group("Enemies")
+
+func play_idle():
+	$AnimatedSprite.play("idle")
 
 func move_evul(idx, max_look_distance):
 	# Checks if there is a player within max_look_distance (not as the crow flies -
