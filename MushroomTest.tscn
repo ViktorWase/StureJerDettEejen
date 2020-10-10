@@ -1,0 +1,107 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Assets/moss_background.png" type="Texture" id=1]
+[ext_resource path="res://Assets/mushroom_sprite.png" type="Texture" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Camera2D
+
+func _input(event):
+	if event is InputEventMouseButton:
+		if not event.is_pressed():
+			return
+		
+		var zoom_pos = 0
+		if event.button_index == BUTTON_WHEEL_UP:
+			zoom_pos = -1
+		if event.button_index == BUTTON_WHEEL_DOWN:
+			zoom_pos = 1
+		
+		if zoom.x == 1 and zoom_pos > 0:
+			return
+		if zoom.x <= 0.1 and zoom_pos < 0:
+			return
+		
+		zoom = zoom + Vector2.ONE*zoom_pos*0.1
+"
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 512, 300 )
+current = true
+script = SubResource( 1 )
+
+[node name="moss_background" type="Sprite" parent="."]
+position = Vector2( 512, 300 )
+scale = Vector2( 0.254252, 0.254252 )
+texture = ExtResource( 1 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 4096, 2400 )
+
+[node name="shrooms" type="Node2D" parent="."]
+
+[node name="mushroom_sprite" type="Sprite" parent="shrooms"]
+position = Vector2( 448, 320 )
+scale = Vector2( 0.257114, 0.257114 )
+texture = ExtResource( 2 )
+
+[node name="mushroom_sprite2" type="Sprite" parent="shrooms"]
+position = Vector2( 576, 320 )
+scale = Vector2( 0.257, 0.257 )
+texture = ExtResource( 2 )
+
+[node name="mushroom_sprite3" type="Sprite" parent="shrooms"]
+position = Vector2( 544, 384 )
+scale = Vector2( 0.257, 0.257 )
+texture = ExtResource( 2 )
+
+[node name="mushroom_sprite4" type="Sprite" parent="shrooms"]
+position = Vector2( 512, 288 )
+scale = Vector2( 0.257, 0.257 )
+texture = ExtResource( 2 )
+
+[node name="mushroom_sprite5" type="Sprite" parent="shrooms"]
+position = Vector2( 320, 384 )
+scale = Vector2( 0.257, 0.257 )
+texture = ExtResource( 2 )
+
+[node name="mushroom_sprite6" type="Sprite" parent="shrooms"]
+position = Vector2( 800, 448 )
+scale = Vector2( 0.257, 0.257 )
+texture = ExtResource( 2 )
+
+[node name="mushroom_sprite7" type="Sprite" parent="shrooms"]
+position = Vector2( 768, 224 )
+scale = Vector2( 0.257, 0.257 )
+texture = ExtResource( 2 )
+
+[node name="mushroom_sprite8" type="Sprite" parent="shrooms"]
+position = Vector2( 384, 224 )
+scale = Vector2( 0.257, 0.257 )
+texture = ExtResource( 2 )
+
+[node name="mushroom_sprite9" type="Sprite" parent="shrooms"]
+position = Vector2( 384, 480 )
+scale = Vector2( 0.257, 0.257 )
+texture = ExtResource( 2 )
+
+[node name="mushroom_sprite10" type="Sprite" parent="shrooms"]
+position = Vector2( 192, 224 )
+scale = Vector2( 0.257, 0.257 )
+texture = ExtResource( 2 )
+
+[node name="mushroom_sprite11" type="Sprite" parent="shrooms"]
+position = Vector2( 640, 128 )
+scale = Vector2( 0.257, 0.257 )
+texture = ExtResource( 2 )
+
+[node name="mushroom_sprite12" type="Sprite" parent="shrooms"]
+position = Vector2( 672, 512 )
+scale = Vector2( 0.257, 0.257 )
+texture = ExtResource( 2 )
+
+[node name="mushroom_sprite13" type="Sprite" parent="shrooms"]
+position = Vector2( 448, 160 )
+scale = Vector2( 0.257, 0.257 )
+texture = ExtResource( 2 )
