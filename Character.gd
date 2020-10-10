@@ -9,8 +9,7 @@ enum Alignment {
 	undefined
 }
 
-export(Alignment) var alignment = Alignment.undefined
-
+var alignment = Alignment.undefined
 var max_walk_distance = 2
 var damage = 1
 var waypoints

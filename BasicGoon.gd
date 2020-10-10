@@ -1,4 +1,4 @@
-extends "res://Enemy.gd"
+extends "res://EvulCharacter.gd"
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -7,5 +7,5 @@ func _ready():
 	can_walk_on_lava = false
 	attack_coordinates = [[0, 1], [1, 0], [-1, 0], [0, -1]]
 
-	max_hp = 2
-	current_hp = 2
+	max_hp = 1
+	current_hp = 1
