@@ -31,6 +31,10 @@ ui_left_click={
  ]
 }
 
+[layer_names]
+
+3d_physics/layer_2="Ground"
+
 [rendering]
 
 quality/driver/driver_name="GLES2"

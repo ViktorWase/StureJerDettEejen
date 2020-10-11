@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/elf_m_idle_anim_f0.png-c80e00096254f00009913ea82d57096a.s3tc.stex"
-path.etc="res://.import/elf_m_idle_anim_f0.png-c80e00096254f00009913ea82d57096a.etc.stex"
+path.s3tc="res://.import/grid-white-64x64.png-531178470f59ba63560d226fa45be0be.s3tc.stex"
+path.etc="res://.import/grid-white-64x64.png-531178470f59ba63560d226fa45be0be.etc.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Assets/animated_character_m/elf_m_idle_anim_f0.png"
-dest_files=[ "res://.import/elf_m_idle_anim_f0.png-c80e00096254f00009913ea82d57096a.s3tc.stex", "res://.import/elf_m_idle_anim_f0.png-c80e00096254f00009913ea82d57096a.etc.stex" ]
+source_file="res://Assets/grid-white-64x64.png"
+dest_files=[ "res://.import/grid-white-64x64.png-531178470f59ba63560d226fa45be0be.s3tc.stex", "res://.import/grid-white-64x64.png-531178470f59ba63560d226fa45be0be.etc.stex" ]
 
 [params]
 
@@ -22,7 +22,7 @@ compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
 flags/repeat=true
-flags/filter=false
+flags/filter=true
 flags/mipmaps=true
 flags/anisotropic=false
 flags/srgb=2
