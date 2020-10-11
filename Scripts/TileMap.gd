@@ -5,6 +5,13 @@ var flat_map
 var number_of_steps_to
 var active_greens = []
 
+# variables for the map
+var width
+var height
+var offsetX
+var offsetY
+var tileSize = 32
+
 var X = 10
 var Y = 10
 var SIZE = X * Y
@@ -57,16 +64,23 @@ func _ready():
 	
 	# Read data from scene
 	var cells = get_used_cells()
+	var minX = 0
 	var maxX = 0
+	var minY = 0
 	var maxY = 0
 	for cell in cells:
-		if (cell.x > maxX):
-			maxX = cell.x
-		if (cell.y > maxY):
-			maxY = cell.x
-	X = int(maxX)
-	Y = int(maxY)
+		minX = min(minX, cell.x)
+		maxX = max(maxX, cell.x)
+		minY = min(minY, cell.y)
+		maxY = max(maxY, cell.y)
+	X = int(maxX - minX) + 1 # TODO: wtf, nånstans kollar vi ett index för mycket neråt/åt höger
+	Y = X # TODO: int(maxY - minY)
 	SIZE = X * Y
+	
+	offsetX = 0 # TODO: minX
+	offsetY = 0 # TODO: minY
+	width = X
+	height = Y
 
 	#var idx = 0
 	for y in range(Y):  # TODO: Y is too small, and also it's set somewhere else I think.
@@ -119,7 +133,9 @@ func _ready():
 	set_player_turn()
 	
 	$Rocket.show_help_text()
-	$GameStartJingle.play()
+	#$GameStartJingle.play()
+	
+	emit_signal("ready", self)
 
 func _on_end_turn_pressed():
 	$Rocket.hide_help_text()
