@@ -6,15 +6,33 @@ extends Node
 
 var sizex : int = -1
 var sizey : int = -1
-var binary_mask = []
 
-func setup(_binary_mask, _sizex, _sizey):
+# These 2 variables are flat binary lists. That means that a tile
+# is walkable if binary_mask[x + y * sizex] is true.
+# The permanet_binary_mask is set at the start and never changed; it
+# represents the map layout.
+# The binary_mask is changed every turn. It is false if the permanent
+# mask is false, or if an opponent is standing on the corresponding tile.
+var binary_mask = []
+var permanent_binary_mask = []
+
+var number_of_steps_to  # TODO: Move to Character.
+
+func setup(flat_map, _sizex, _sizey):
 	# Copy size of the board
 	sizex = _sizex
 	sizey = _sizey
 	
+	for i in range(sizex*sizey):
+		number_of_steps_to.append(null)
+	
 	# The binary mask is one 1 a tile is walkable, and 0 otherwise.
-	binary_mask = [] + _binary_mask  # Bit of a hack, but it copies the data.
+	for idx in range(len(permanent_binary_mask)):
+		if flat_map[idx] == 0:  # Yes, 0 means that there is land.
+			permanent_binary_mask.append(true)
+		else:
+			permanent_binary_mask.append(false)
+	binary_mask = [] + permanent_binary_mask
 	assert(len(binary_mask) == sizex * sizey)
 
 func get_all_possible_movements_from_length(move_length):
@@ -65,30 +83,74 @@ func get_random_moves(chars, flat_board):
 	
 	return all_chosen_moves
 
+# TODO: This code is taken from TileMap. It shouldn't be there and it shouldn't be here. It should be in
+# Character, but that file is currently under reconstruction. Will move there later.
+func get_all_possible_movement_destinations_rec_func(idx, current_number_of_steps, max_movement, the_lava_is_floor):
+	idx = int(idx)
+	if number_of_steps_to[idx] == null:
+		number_of_steps_to[idx] = current_number_of_steps
+	else:
+		number_of_steps_to[idx] = min(number_of_steps_to[idx], current_number_of_steps)
+
+	if current_number_of_steps >= max_movement:
+		return
+
+	# Up
+	var idx_up = idx + sizex
+	if idx_up < sizex*sizey and (binary_mask[idx_up] or the_lava_is_floor) and (number_of_steps_to[idx_up]==null or number_of_steps_to[idx_up] > current_number_of_steps):
+		get_all_possible_movement_destinations_rec_func(idx_up, current_number_of_steps+1, max_movement, the_lava_is_floor)
+
+	# Down
+	var idx_down = idx - sizex
+	if idx_down >= 0 and (binary_mask[idx_down] or the_lava_is_floor) and (number_of_steps_to[idx_down]==null or number_of_steps_to[idx_down] > current_number_of_steps):
+		get_all_possible_movement_destinations_rec_func(idx_down, current_number_of_steps+1, max_movement, the_lava_is_floor)
+
+	# Left
+	var idx_left = idx - 1
+	if int(idx_left/sizex) == int(idx/sizex) and idx_left>0 and (binary_mask[idx_left] or the_lava_is_floor) and (number_of_steps_to[idx_left]==null or number_of_steps_to[idx_left] > current_number_of_steps):
+		get_all_possible_movement_destinations_rec_func(idx_left, current_number_of_steps+1, max_movement, the_lava_is_floor)
+
+	# Right
+	var idx_right = idx + 1
+	if int(idx_right/sizex) == int(idx/sizex) and idx_right<sizex*sizey and (binary_mask[idx_right] or the_lava_is_floor) and (number_of_steps_to[idx_right]==null or number_of_steps_to[idx_right] > current_number_of_steps):
+		get_all_possible_movement_destinations_rec_func(idx_right, current_number_of_steps+1, max_movement, the_lava_is_floor)
+
+func get_all_possible_movement_destinations(idx, max_movement, the_lava_is_floor=false):
+	for i in range(sizex*sizey):
+		number_of_steps_to[i] = null
+
+	# Calculate all positions that can be reached. 
+	get_all_possible_movement_destinations_rec_func(idx, 0, max_movement, the_lava_is_floor)
+
+	# Convert to a more readable data format. 
+	var destinations = []
+	for idx in range(sizex*sizey):
+		if number_of_steps_to[idx] != null:
+			var x = idx % sizex
+			var y = int(idx / sizex)
+			var pos = [x, y]
+			destinations.append(pos)
+	return destinations
+
+
 func get_all_possible_movements_of_character(character_dict, flat_board):
 	var character = character_dict["character"]
 	var x_pos = character_dict["x"]
 	var y_pos = character_dict["y"]
-	var all_moves = get_all_possible_movements_from_length(character.max_walk_distance)
+	var idx = x_pos + sizex * y_pos
+	var all_moves = get_all_possible_movement_destinations(idx, character.max_walk_distance, character.can_walk_on_lava)
 	for i in range(len(all_moves)):
 		assert(len(all_moves[i]) == 2)  # The x- and y-coordinates.
 		all_moves[i] = [all_moves[i][0] + x_pos, all_moves[i][1] + y_pos]
 
-	# Remove all moves that end up on a good guy or on a non-walkable tile.
-	# Note that we keep moves that end up on other bad guys since that fellow
-	# might have moved before this fellow moves.
-	# TODO: Most of this should probably be up in get_all_possible_movements_from_length?
-	var idx = 0
-	while idx < len(all_moves):
+	# TODO: Remove at a later point. It's just for debugging.
+	for i in range(len(all_moves)):
 		var move = all_moves[idx]
 		var move_idx = move[0] + move[1] * sizex
-		var is_forbidden = move[0] < 0 or move[0] >= sizex
-		is_forbidden = is_forbidden or move[0] < 1 or move[1] >= sizey
-		is_forbidden = is_forbidden or !binary_mask[move_idx] or (flat_board[idx] and flat_board[idx].is_good())
-		if is_forbidden:
-			all_moves.remove(idx)
-		else:
-			idx += 1
+		assert(move[0] >= 0 and move[0] < sizex and move[1] >= 0 and move[1] < sizey)
+		assert(binary_mask[move_idx])
+		assert(permanent_binary_mask[move_idx])
+		assert(flat_board[idx]==null or flat_board[idx].is_evul())  # These are filtered later
 	
 	return all_moves
 
@@ -109,10 +171,20 @@ func extract_bad_guys(flat_board):
 			bad_guys.append({"character": flat_board[i], "x": i % sizex, "y": int(i / sizex)})
 	return bad_guys
 
+func update_binary_mask(flat_board):
+	for y in range(sizey):
+		for x in range(sizex):
+			var idx = x + y * sizey
+			if not permanent_binary_mask[idx] or (flat_board[idx] and flat_board[idx].is_good()):
+				binary_mask[idx] = false
+			else:
+				binary_mask[idx] = true
+
 func get_moves(flat_board):
 	# IMPORTANT: flat_board is read only. Don't change anything in it.
 	assert(len(flat_board) == sizex * sizey)
 	var bad_guys = extract_bad_guys(flat_board)
+	update_binary_mask(flat_board)
 	
 	for bad_guy in bad_guys:
 		var movements = get_all_possible_movements_of_character(bad_guy, flat_board)
