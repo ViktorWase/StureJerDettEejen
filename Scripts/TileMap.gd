@@ -12,6 +12,8 @@ var current_enemy_idx = null
 var active_character
 var resetting_characters = []
 var number_of_turns_till_apocalypse = 12
+var planned_enemy_movements = []
+var planned_enemy_movements_counter = 0
 
 var end_counter # used to insert a time padding when resetting the board
 
@@ -120,6 +122,8 @@ func _ready():
 	
 	$Rocket.show_help_text()
 	$GameStartJingle.play()
+	
+	$AI.setup(flat_map, X, Y)
 
 func _on_end_turn_pressed():
 	$Rocket.hide_help_text()
@@ -180,7 +184,7 @@ func update_loop_icons():
 	else:
 		GUI.get_node("Loop Counter/LoopIcon1").frame = 4
 
-func get_next_enemy():
+func get_next_enemy(): # TODO: Remove. It should not be needed anymore.
 	# Returns the next enemy, or if all the enemies have been returned
 	# then null is returned.
 	var start_idx
@@ -247,7 +251,7 @@ func get_all_possible_movement_destinations_rec_func(idx, current_number_of_step
 	if idx_right/X == idx/X and idx_right<SIZE and (flat_map[idx_right] or the_lava_is_floor) and (number_of_steps_to[idx_right]==null or number_of_steps_to[idx_right] > current_number_of_steps):
 		get_all_possible_movement_destinations_rec_func(idx_right, current_number_of_steps+1, max_movement, the_lava_is_floor)
 
-func get_all_possible_movement_destinations(idx, max_movement, the_lava_is_floor=false):
+func get_all_possible_movement_destinations(idx, max_movement, the_lava_is_floor=false):  # TODO: Remove.
 	for i in range(X*Y):
 		number_of_steps_to[i] = null
 
@@ -469,6 +473,8 @@ func end_of_player_turn():
 		
 		Global.load_next_level()
 	else:
+		planned_enemy_movements = $AI.get_moves(flat_game_board)
+		planned_enemy_movements_counter = 0
 		# enemies turn!
 		set_enemy_turn()
 
@@ -476,6 +482,7 @@ func _on_reached_goal():
 	print("callback hoolabandoola")
 
 func _process(delta):
+	print(game_state)
 	match(game_state):
 		game_states.player_turn:
 			match(game_turn_state):
@@ -500,7 +507,9 @@ func _process(delta):
 			GUI.get_node("End Turn").hide()
 			match(game_turn_state):
 				game_turn_states.choose_character:
-					var enemy = get_next_enemy()
+					var enemy = null
+					if planned_enemy_movements_counter == len(planned_enemy_movements):
+						enemy = planned_enemy_movements[planned_enemy_movements_counter]["character"] #get_next_enemy()
 					active_character = enemy
 					if !enemy:
 						# end of turn
@@ -509,28 +518,26 @@ func _process(delta):
 						game_turn_state = game_turn_states.character_moving
 						
 						# TODO: Move in to a function
-						var max_look_distance = 5 # TODO: Should be enemy-dependant
-						var destination = active_character.move_evul(xy_to_flat(active_character.cx, active_character.cy), max_look_distance)
-						if (destination):
-							var path = get_movement(active_character.cx, active_character.cy, destination[0], destination[1])
-							active_character.move_along_path(path)
-
-							# move enemy to new position
-							flat_game_board[xy_to_flat(active_character.cx, active_character.cy)] = null
-							flat_game_board[xy_to_flat(destination[0], destination[1])] = active_character
-							active_character.set_coordinates_only(Vector2(destination[0], destination[1]))
-							
-							active_character.play_foot_sound()
-						else:
-							# Enemy takes no action
-							game_turn_state = game_turn_states.choose_character
+						#var max_look_distance = 5 # TODO: Should be enemy-dependant
+						var destination = planned_enemy_movements[planned_enemy_movements_counter]["new_pos"]#active_character.move_evul(xy_to_flat(active_character.cx, active_character.cy), max_look_distance)
+						assert(len(destination) == 2)
+						var path = get_movement(active_character.cx, active_character.cy, destination[0], destination[1])
+						active_character.move_along_path(path)
+						# move enemy to new position
+						flat_game_board[xy_to_flat(active_character.cx, active_character.cy)] = null
+						flat_game_board[xy_to_flat(destination[0], destination[1])] = active_character
+						active_character.set_coordinates_only(Vector2(destination[0], destination[1]))
+						
+						active_character.play_foot_sound()
 				game_turn_states.character_moving:
 					if(active_character.has_reached_destination()):
 						game_turn_state = game_turn_states.select_attack
 				game_turn_states.select_attack:
 					# Find someone to attack.
-					var idx_of_victim = active_character.find_idx_of_victim()
-					if idx_of_victim:
+					#var idx_of_victim = active_character.find_idx_of_victim()
+					var attacked_pos = planned_enemy_movements[planned_enemy_movements_counter]["attacked_pos"]
+					if attacked_pos:
+						var idx_of_victim = xy_to_flat(attacked_pos[0], attacked_pos[1])
 						print("FOUDN VICTIM")
 						var victim = flat_game_board[idx_of_victim]
 						var is_dead = victim.is_attacked(active_character.damage)
