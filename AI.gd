@@ -62,7 +62,7 @@ func get_random_moves(chars, flat_board):
 	
 	# TODO: Shuffle the chars?
 	for character in chars:
-		var r = randi()%len(character["movements"])
+		var r = randi() % len(character["movements"])
 		var chosen_move = character["movements"][r]  # TODO: Sometimes it chooses to move to the exact same spot, which should be treated the same as doing nothing.
 		var old_x = character["x"]
 		var old_y = character["y"]
@@ -132,7 +132,6 @@ func get_all_possible_movement_destinations(idx, max_movement, the_lava_is_floor
 			destinations.append(pos)
 	return destinations
 
-
 func get_all_possible_movements_of_character(character_dict, flat_board):
 	var character = character_dict["character"]
 	var x_pos = character_dict["x"]
@@ -180,6 +179,85 @@ func update_binary_mask(flat_board):
 			else:
 				binary_mask[idx] = true
 
+func heuristic(flat_board):
+	return 1.0
+
+func update_state_vec(state_vec, moves_per_char):
+	assert(len(state_vec) == len(moves_per_char))
+	for i in range(len(state_vec)):
+		state_vec[i] += 1
+		if state_vec[i] == moves_per_char[i]:
+			state_vec[i] = 0
+		else:
+			return
+
+func update_moves_on_flat_board_and_calc_heuristic(state_vec, bad_guys, flat_board_orig):
+	# Creates a (copy of) flat_board using the moves in state_vec.
+	var flat_board = get_flat_board_deep_copy(flat_board_orig)
+	
+	for i in range(len(state_vec)):
+		var chosen_move = bad_guys[i]["movements"][state_vec[i]]
+		var old_x = bad_guys[i]["x"]
+		var old_y = bad_guys[i]["y"]
+		
+		var new_x = old_x + chosen_move[0]
+		var new_y = old_y + chosen_move[1]
+		var old_idx = old_x + old_y * sizex
+		var new_idx = new_x + new_y * sizex
+		
+		assert(flat_board[old_idx] != null)
+		if flat_board[old_idx] != null:
+			# This means that an other character is blocking the destination,
+			# which is an issue.
+			# TODO: Reorder the characters, and se if that solves the issue?
+			return -INF
+		var obj = flat_board[old_idx]
+		flat_board[new_idx] = obj
+		flat_board[old_idx] = null
+		# TODO: Attack!
+	
+	return heuristic(flat_board)
+
+func consider_all_moves(bad_guys, flat_board):
+	# TODO: Does not consider attacks. Fix?
+	# TODO: I guess the order should matter to, but I don't wanna right now.
+	# TODO: This just looks one step ahead, which is a bit stooopid.
+	var state_vec = []
+	var moves_per_char = []
+	for i in range(len(bad_guys)):
+		state_vec.append(0)
+		moves_per_char.append(len(bad_guys[i]["movements"]))
+	
+	# Go thru all moves that can be made and check what the heuristic thinks.
+	# Return the one that the heuristisk function thinks is best.
+	var best_state = []
+	var best_state_val = -INF
+	while not state_vec[-1] == moves_per_char[-1]:
+		var val = update_moves_on_flat_board_and_calc_heuristic(state_vec, bad_guys, flat_board)
+		if val > best_state_val:
+			best_state_val = val
+			best_state = [] + state_vec
+		update_state_vec(state_vec, moves_per_char)
+	
+	return convert_state_vec_to_interface(best_state, bad_guys)
+
+func convert_state_vec_to_interface(state_vec, bad_guys):
+	var all_chosen_moves = []
+	for i in range(len(state_vec)):
+		var r = state_vec[i]
+		var chosen_move = bad_guys[i]["movements"][state_vec[i]]
+		var old_x = bad_guys[i]["x"]
+		var old_y = bad_guys[i]["y"]
+		
+		var new_x = old_x + chosen_move[0]
+		var new_y = old_y + chosen_move[1]
+		
+		var new_move = {"old_pos": [old_x, old_y], "new_pos": [new_x, new_y], "attacked_pos": null}
+		all_chosen_moves.append(new_move)
+	
+	return all_chosen_moves
+
+
 func get_moves(flat_board):
 	# IMPORTANT: flat_board is read only. Don't change anything in it.
 	assert(len(flat_board) == sizex * sizey)
@@ -190,4 +268,5 @@ func get_moves(flat_board):
 		var movements = get_all_possible_movements_of_character(bad_guy, flat_board)
 		bad_guy["movements"] = movements
 	
-	return get_random_moves(bad_guys, flat_board)
+	return consider_all_moves(bad_guys, flat_board)
+	# return get_random_moves(bad_guys, flat_board)
