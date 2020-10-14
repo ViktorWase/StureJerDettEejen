@@ -1,11 +1,12 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://LevelBuildingBlocks/TileMap.tscn" type="PackedScene" id=1]
 [ext_resource path="res://LevelBuildingBlocks/Rocket.tscn" type="PackedScene" id=2]
-[ext_resource path="res://LevelBuildingBlocks/Character.tscn" type="PackedScene" id=3]
-[ext_resource path="res://LevelBuildingBlocks/Enemy.tscn" type="PackedScene" id=4]
+[ext_resource path="res://BasicGoon.tscn" type="PackedScene" id=3]
+[ext_resource path="res://BasicTroop.tscn" type="PackedScene" id=4]
 [ext_resource path="res://LevelBuildingBlocks/LavaBackground.tscn" type="PackedScene" id=5]
 [ext_resource path="res://LevelBuildingBlocks/GUI.tscn" type="PackedScene" id=6]
+[ext_resource path="res://AI.gd" type="Script" id=7]
 
 [node name="Node2D" type="Node2D"]
 
@@ -17,13 +18,23 @@ tile_data = PoolIntArray( -65532, 0, 131072, -65531, 0, 131073, -65530, 0, 13107
 [node name="Rocket" parent="TileMap" instance=ExtResource( 2 )]
 position = Vector2( 143.388, 80.3838 )
 
-[node name="Character" parent="TileMap" instance=ExtResource( 3 )]
-position = Vector2( 16.0192, 208.805 )
+[node name="AI" type="Node2D" parent="TileMap"]
+script = ExtResource( 7 )
 
-[node name="Enemy" parent="TileMap" instance=ExtResource( 4 )]
-position = Vector2( 41.2823, 81.4365 )
+[node name="BasicGoon" parent="TileMap" groups=[
+"BadGuys",
+] instance=ExtResource( 3 )]
+position = Vector2( 40, 70 )
 
-[node name="Enemy2" parent="TileMap" instance=ExtResource( 4 )]
-position = Vector2( 240.23, 175.121 )
+[node name="BasicGoon2" parent="TileMap" groups=[
+"BadGuys",
+] instance=ExtResource( 3 )]
+position = Vector2( 239, 163 )
+
+[node name="BasicTroop" parent="TileMap" groups=[
+"GoodGuys",
+] instance=ExtResource( 4 )]
+position = Vector2( 18, 198 )
+scale = Vector2( 2, 2 )
 
 [node name="GUI" parent="." instance=ExtResource( 6 )]
