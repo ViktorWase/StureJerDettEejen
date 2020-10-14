@@ -5,6 +5,19 @@ var tile
 func _ready():
 	tile = get_parent().get_node("tile")
 
+func _input(event):
+	if event is InputEventMouseButton:
+		if not event.is_pressed():
+			return
+		
+		var zoom_pos = 0
+		if event.button_index == BUTTON_WHEEL_UP:
+			zoom_pos = -1
+		if event.button_index == BUTTON_WHEEL_DOWN:
+			zoom_pos = 1
+		
+		transform.origin += transform.basis.z*zoom_pos*2
+
 func _physics_process(delta):
 	var mouse = get_viewport().get_mouse_position()
 

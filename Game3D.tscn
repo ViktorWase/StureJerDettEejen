@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=2]
+[gd_scene load_steps=32 format=2]
 
 [ext_resource path="res://Assets/moss_background.png" type="Texture" id=1]
 [ext_resource path="res://Assets/mushroom_digital_128x128.png" type="Texture" id=2]
@@ -8,20 +8,28 @@
 [ext_resource path="res://Assets/animated_character_m/elf_m_idle_anim_f0.png" type="Texture" id=6]
 [ext_resource path="res://Assets/animated_character_m/elf_m_idle_anim_f2.png" type="Texture" id=7]
 [ext_resource path="res://Scripts/Camera3D.tres.gd" type="Script" id=8]
+[ext_resource path="res://Assets/TrunkLightGreenTree.material" type="Material" id=9]
+[ext_resource path="res://Assets/TreeLightGreen.material" type="Material" id=10]
+[ext_resource path="res://Assets/DarkGreenTree_mergedObject.mesh" type="ArrayMesh" id=11]
+[ext_resource path="res://Assets/animated_mushroom/shroom-idle-01.png" type="Texture" id=12]
+[ext_resource path="res://Assets/animated_mushroom/shroom-idle-02.png" type="Texture" id=13]
+[ext_resource path="res://Assets/animated_mushroom/shroom-idle-04.png" type="Texture" id=14]
+[ext_resource path="res://Assets/animated_mushroom/shroom-idle-03.png" type="Texture" id=15]
+[ext_resource path="res://Assets/moss_background_height.png" type="Texture" id=16]
 
-[sub_resource type="VisualShaderNodeTexture" id=14]
+[sub_resource type="VisualShaderNodeTexture" id=1]
 texture = ExtResource( 3 )
 
-[sub_resource type="VisualShaderNodeInput" id=15]
+[sub_resource type="VisualShaderNodeInput" id=2]
 input_name = "uv"
 
-[sub_resource type="VisualShaderNodeVectorOp" id=16]
+[sub_resource type="VisualShaderNodeVectorOp" id=3]
 operator = 2
 
-[sub_resource type="VisualShaderNodeVec3Constant" id=17]
+[sub_resource type="VisualShaderNodeVec3Constant" id=4]
 constant = Vector3( 40, 20, 0 )
 
-[sub_resource type="VisualShader" id=18]
+[sub_resource type="VisualShader" id=5]
 code = "shader_type spatial;
 uniform sampler2D tex_frg_2;
 
@@ -60,47 +68,58 @@ void light() {
 "
 graph_offset = Vector2( -195, 106.7 )
 nodes/fragment/0/position = Vector2( 880, 100 )
-nodes/fragment/2/node = SubResource( 14 )
+nodes/fragment/2/node = SubResource( 1 )
 nodes/fragment/2/position = Vector2( 580, 100 )
-nodes/fragment/3/node = SubResource( 15 )
+nodes/fragment/3/node = SubResource( 2 )
 nodes/fragment/3/position = Vector2( -20, 100 )
-nodes/fragment/4/node = SubResource( 16 )
+nodes/fragment/4/node = SubResource( 3 )
 nodes/fragment/4/position = Vector2( 320, 100 )
-nodes/fragment/5/node = SubResource( 17 )
+nodes/fragment/5/node = SubResource( 4 )
 nodes/fragment/5/position = Vector2( -80, 280 )
 nodes/fragment/connections = PoolIntArray( 2, 0, 0, 0, 2, 1, 0, 1, 5, 0, 4, 1, 3, 0, 4, 0, 4, 0, 2, 0 )
 
-[sub_resource type="ShaderMaterial" id=19]
-shader = SubResource( 18 )
+[sub_resource type="ShaderMaterial" id=6]
+shader = SubResource( 5 )
 
-[sub_resource type="PlaneMesh" id=1]
-material = SubResource( 19 )
+[sub_resource type="PlaneMesh" id=7]
+material = SubResource( 6 )
 
-[sub_resource type="SpatialMaterial" id=2]
-flags_unshaded = true
-albedo_texture = ExtResource( 1 )
-uv1_scale = Vector3( 10, 5, 1 )
+[sub_resource type="SpatialMaterial" id=8]
+detail_enabled = true
+detail_blend_mode = 0
+detail_uv_layer = 0
+detail_albedo = ExtResource( 1 )
+detail_normal = ExtResource( 16 )
+uv1_scale = Vector3( 10, 10, 1 )
 
-[sub_resource type="BoxShape" id=13]
+[sub_resource type="BoxShape" id=9]
 
-[sub_resource type="SpatialMaterial" id=20]
+[sub_resource type="SpatialMaterial" id=10]
 albedo_color = Color( 0.00392157, 0.996078, 0.92549, 1 )
 
-[sub_resource type="PlaneMesh" id=21]
-material = SubResource( 20 )
+[sub_resource type="PlaneMesh" id=11]
+material = SubResource( 10 )
 size = Vector2( 1, 1 )
 
-[sub_resource type="PlaneMesh" id=3]
+[sub_resource type="PlaneMesh" id=12]
 size = Vector2( 3, 3 )
 
-[sub_resource type="SpatialMaterial" id=4]
+[sub_resource type="SpatialMaterial" id=13]
 flags_transparent = true
 flags_unshaded = true
 albedo_texture = ExtResource( 2 )
 
-[sub_resource type="SpriteFrames" id=22]
+[sub_resource type="SpriteFrames" id=14]
 animations = [ {
 "frames": [ ExtResource( 6 ), ExtResource( 4 ), ExtResource( 7 ), ExtResource( 5 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
+
+[sub_resource type="SpriteFrames" id=15]
+animations = [ {
+"frames": [ ExtResource( 12 ), ExtResource( 13 ), ExtResource( 15 ), ExtResource( 14 ) ],
 "loop": true,
 "name": "default",
 "speed": 5.0
@@ -109,47 +128,48 @@ animations = [ {
 [node name="Spatial" type="Spatial"]
 
 [node name="Camera" type="Camera" parent="."]
-transform = Transform( 1, 0, 0, 0, 0.475471, 0.879732, 0, -0.879732, 0.475471, 0, 12.1538, 9.72162 )
+transform = Transform( 1, 0, 0, 0, 0.642172, 0.76656, 0, -0.76656, 0.642172, 0, 36.8811, 32.0942 )
+fov = 19.7
+far = 500.0
 script = ExtResource( 8 )
 
 [node name="moss" type="MeshInstance" parent="."]
-transform = Transform( 20, 0, 0, 0, 1, 0, 0, 0, 10, 0, 0, 0 )
-mesh = SubResource( 1 )
-material/0 = SubResource( 2 )
+transform = Transform( 30, 0, 0, 0, 1, 0, 0, 0, 30, 0, 0, 0 )
+mesh = SubResource( 7 )
+material/0 = SubResource( 8 )
 
 [node name="gridarea" type="Area" parent="."]
 transform = Transform( 20, 0, 0, 0, 1, 0, 0, 0, 10, 0, 0.01, 0 )
 collision_layer = 2
 
 [node name="grid" type="MeshInstance" parent="gridarea"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 layers = 2
-mesh = SubResource( 1 )
+mesh = SubResource( 7 )
 material/0 = null
 
 [node name="CollisionShape" type="CollisionShape" parent="gridarea"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0 )
-shape = SubResource( 13 )
+shape = SubResource( 9 )
 
 [node name="tile" type="MeshInstance" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01, 0 )
-mesh = SubResource( 21 )
+mesh = SubResource( 11 )
 material/0 = null
 
 [node name="shroom" type="MeshInstance" parent="."]
 transform = Transform( 1, 0, 0, 0, 0.567183, -0.823592, 0, 0.823592, 0.567183, 0.514386, 0.428, 0.580681 )
-mesh = SubResource( 3 )
-material/0 = SubResource( 4 )
+mesh = SubResource( 12 )
+material/0 = SubResource( 13 )
 
 [node name="shroom2" type="MeshInstance" parent="."]
 transform = Transform( 1, 0, 0, 0, 0.485649, -0.874154, 0, 0.874154, 0.485649, -1.46415, 0.428, -0.394989 )
-mesh = SubResource( 3 )
-material/0 = SubResource( 4 )
+mesh = SubResource( 12 )
+material/0 = SubResource( 13 )
 
 [node name="shroom3" type="MeshInstance" parent="."]
 transform = Transform( 1, 0, 0, 0, 0.65235, -0.757918, 0, 0.757918, 0.65235, 3.46077, 0.428, 3.58889 )
-mesh = SubResource( 3 )
-material/0 = SubResource( 4 )
+mesh = SubResource( 12 )
+material/0 = SubResource( 13 )
 
 [node name="homan" type="Spatial" parent="."]
 transform = Transform( 1, 0, 0, 0, 0.721893, 0.692005, 0, -0.692005, 0.721893, -1.5, 0, 3 )
@@ -157,7 +177,8 @@ transform = Transform( 1, 0, 0, 0, 0.721893, 0.692005, 0, -0.692005, 0.721893, -
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="homan"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.945757, -4.76837e-07 )
 pixel_size = 0.0665
-frames = SubResource( 22 )
+frames = SubResource( 14 )
+frame = 3
 playing = true
 
 [node name="homan2" type="Spatial" parent="."]
@@ -166,7 +187,8 @@ transform = Transform( 1, 0, 0, 0, 0.721893, 0.692005, 0, -0.692005, 0.721893, 3
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="homan2"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.945757, -4.76837e-07 )
 pixel_size = 0.0665
-frames = SubResource( 22 )
+frames = SubResource( 14 )
+frame = 3
 playing = true
 
 [node name="homan3" type="Spatial" parent="."]
@@ -175,6 +197,46 @@ transform = Transform( 1, 0, 0, 0, 0.721893, 0.692005, 0, -0.692005, 0.721893, -
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="homan3"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.945757, -4.76837e-07 )
 pixel_size = 0.0665
-frames = SubResource( 22 )
-frame = 3
+frames = SubResource( 14 )
+frame = 2
 playing = true
+
+[node name="DarkGreenTree_mergedObject" type="MeshInstance" parent="."]
+transform = Transform( -0.000576063, 0, -1, 0, 1, 0, 1, 0, -0.000576063, 20.7806, 3.10381, -5.71673 )
+mesh = ExtResource( 11 )
+material/0 = ExtResource( 9 )
+material/1 = ExtResource( 10 )
+
+[node name="DarkGreenTree_mergedObject2" type="MeshInstance" parent="."]
+transform = Transform( 0.999072, 0, -0.0430789, 0, 1, 0, 0.0430789, 0, 0.999072, -11.6365, 3.10381, 3.13422 )
+mesh = ExtResource( 11 )
+material/0 = ExtResource( 9 )
+material/1 = ExtResource( 10 )
+
+[node name="Spatial" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.846649, 0.532152, 0, -0.532152, 0.846649, 0.550333, 0, 4.00792 )
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="Spatial"]
+transform = Transform( 0.779252, 0, 0, 0, 0.779252, 0, 0, 0, 0.779252, -0.134057, 1.24346, 0 )
+frames = SubResource( 15 )
+frame = 1
+playing = true
+
+[node name="Spatial2" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.846649, 0.532152, 0, -0.532152, 0.846649, -3.45995, 0, 1.88113 )
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="Spatial2"]
+transform = Transform( 0.779252, 0, 0, 0, 0.779252, 0, 0, 0, 0.779252, -0.134057, 1.24346, 0 )
+frames = SubResource( 15 )
+playing = true
+
+[node name="Spatial3" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.846649, 0.532152, 0, -0.532152, 0.846649, 9.56405, 0, -2.0212 )
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="Spatial3"]
+transform = Transform( 0.779252, 0, 0, 0, 0.779252, 0, 0, 0, 0.779252, -0.134057, 1.24346, 0 )
+frames = SubResource( 15 )
+playing = true
+
+[node name="SpotLight" type="SpotLight" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.365868, 0.930667, 0, -0.930667, 0.365868, 0, 12.5778, 7.16826 )

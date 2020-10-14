@@ -89,8 +89,9 @@ func _ready():
 		var charX = floor(character.position.x / 32)
 		var charY = floor(character.position.y / 32)
 		var i = xy_to_flat(charX, charY)
-		character.set_as_basic_b()
+		#character.set_as_basic_b()
 		flat_game_board[i] = character
+		character.play_idle()
 		character.set_start_coordinates(Vector2(charX, charY))
 	
 	for enemy in get_tree().get_nodes_in_group("Enemies"):
@@ -98,6 +99,7 @@ func _ready():
 		var charY = floor(enemy.position.y / 32)
 		var i = xy_to_flat(charX, charY)
 		flat_game_board[i] = enemy
+		enemy.play_idle()
 		enemy.set_start_coordinates(Vector2(charX, charY))
 	
 	var rocket = $Rocket
@@ -361,6 +363,8 @@ func _input(event):
 						$Rocket.hide_help_text()
 					
 					game_turn_states.select_attack:
+						if active_character == null:
+							push_error("The active char is null in select attack")
 						var green = find_green(map_pos[0], map_pos[1])
 						if (!green):
 							# wait until we click a green or we cancel
@@ -372,15 +376,15 @@ func _input(event):
 							game_turn_state = game_turn_states.choose_character
 							return
 							
-
 						# attack!
 						print("attack")
 						var idx_of_victim = xy_to_flat(map_pos[0], map_pos[1])
 						if !flat_game_board[idx_of_victim]:
 							push_error("You are attacking nothing!")
 						var is_dead = flat_game_board[idx_of_victim].is_attacked(active_character.damage)
-
 						if is_dead:
+							if obj == active_character:
+								push_error("The character managed to kill himself. This is frowned apon.")
 							flat_game_board[idx_of_victim] = null
 							obj.queue_free()
 							
@@ -394,6 +398,8 @@ func _input(event):
 					game_turn_states.select_tile:
 						var green = find_green(map_pos[0], map_pos[1])
 						if (green):
+							if active_character == null:
+								push_error("There are green tiles, but the character is null. Would you like to explain how that happened?")
 							game_turn_state = game_turn_states.character_moving
 							# TODO: get move path
 							var path = get_movement(active_character.cx, active_character.cy, green.cx, green.cy)
