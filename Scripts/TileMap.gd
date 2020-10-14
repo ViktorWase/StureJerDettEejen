@@ -85,16 +85,17 @@ func _ready():
 	# This is were the level is created.
 	update_bitmask_region(Vector2(0, 0), Vector2(X, Y))
 	
-	for character in get_tree().get_nodes_in_group("Characters"):
+	for character in get_tree().get_nodes_in_group("GoodGuys"):
 		var charX = floor(character.position.x / 32)
 		var charY = floor(character.position.y / 32)
 		var i = xy_to_flat(charX, charY)
 		#character.set_as_basic_b()
 		flat_game_board[i] = character
+		
 		character.play_idle()
 		character.set_start_coordinates(Vector2(charX, charY))
 	
-	for enemy in get_tree().get_nodes_in_group("Enemies"):
+	for enemy in get_tree().get_nodes_in_group("BadGuys"):
 		var charX = floor(enemy.position.x / 32)
 		var charY = floor(enemy.position.y / 32)
 		var i = xy_to_flat(charX, charY)
@@ -349,7 +350,6 @@ func _input(event):
 		match(game_state):
 			game_states.player_turn:
 				
-				print(game_turn_state)
 				match(game_turn_state):
 					game_turn_states.choose_character:
 						if (!obj or !obj.is_good() or obj.has_moved_current_turn):
@@ -435,7 +435,7 @@ func end_of_enemy_turn():
 		game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
 		return
 	
-	for character in get_tree().get_nodes_in_group("Characters"):
+	for character in get_tree().get_nodes_in_group("GoodGuys"):
 		character.reset_darkened_character()
 
 	print("TURNS LEFT ", get_number_of_turns_till_reset())
@@ -488,7 +488,6 @@ func _on_reached_goal():
 	print("callback hoolabandoola")
 
 func _process(delta):
-	print(game_state)
 	match(game_state):
 		game_states.player_turn:
 			match(game_turn_state):
@@ -514,8 +513,11 @@ func _process(delta):
 			match(game_turn_state):
 				game_turn_states.choose_character:
 					var enemy = null
-					if planned_enemy_movements_counter == len(planned_enemy_movements):
-						enemy = planned_enemy_movements[planned_enemy_movements_counter]["character"] #get_next_enemy()
+					if planned_enemy_movements_counter != len(planned_enemy_movements):
+						var current_enemy_pos = planned_enemy_movements[planned_enemy_movements_counter]["old_pos"]
+						var current_idx = current_enemy_pos[0] + current_enemy_pos[1] * X
+						assert(flat_game_board[current_idx] != null)
+						enemy = flat_game_board[current_idx]
 					active_character = enemy
 					if !enemy:
 						# end of turn
@@ -554,6 +556,7 @@ func _process(delta):
 						active_character.play_attack_sound()
 					
 					game_turn_state = game_turn_states.choose_character
+					planned_enemy_movements_counter += 1
 
 				game_turn_states.end_turn:
 					end_counter -= delta
@@ -564,9 +567,9 @@ func _process(delta):
 							break
 
 					if (resetting_characters.empty() and end_counter <= 0):
-						for character in get_tree().get_nodes_in_group("Characters"):
+						for character in get_tree().get_nodes_in_group("GoodGuys"):
 							character.reset_graphics()
-						for enemy in get_tree().get_nodes_in_group("Enemies"):
+						for enemy in get_tree().get_nodes_in_group("BadGuys"):
 							enemy.reset_graphics()
 						
 						GUI.hide_ripples_effect()
@@ -629,7 +632,7 @@ func reset_game_board():
 	resetting_characters = []
 	end_counter = 1.4 # least number of seconds to wait before continuing
 	
-	for character in get_tree().get_nodes_in_group("Characters"):
+	for character in get_tree().get_nodes_in_group("GoodGuys"):
 		character.move_to_start_coordinates()
 		flat_game_board[xy_to_flat(character.cx, character.cy)] = null
 		flat_game_board[xy_to_flat(character.startCoords.x, character.startCoords.y)] = character
@@ -637,7 +640,7 @@ func reset_game_board():
 		
 		resetting_characters.append(character)
 	
-	for enemy in get_tree().get_nodes_in_group("Enemies"):
+	for enemy in get_tree().get_nodes_in_group("BadGuys"):
 		enemy.move_to_start_coordinates()
 		flat_game_board[xy_to_flat(enemy.cx, enemy.cy)] = null
 		flat_game_board[xy_to_flat(enemy.startCoords.x, enemy.startCoords.y)] = enemy

@@ -16,7 +16,7 @@ var sizey : int = -1
 var binary_mask = []
 var permanent_binary_mask = []
 
-var number_of_steps_to  # TODO: Move to Character.
+var number_of_steps_to = [] # TODO: Move to Character.
 
 func setup(flat_map, _sizex, _sizey):
 	# Copy size of the board
@@ -27,8 +27,8 @@ func setup(flat_map, _sizex, _sizey):
 		number_of_steps_to.append(null)
 	
 	# The binary mask is one 1 a tile is walkable, and 0 otherwise.
-	for idx in range(len(permanent_binary_mask)):
-		if flat_map[idx] == 0:  # Yes, 0 means that there is land.
+	for idx in range(len(flat_map)):
+		if flat_map[idx] != 0:
 			permanent_binary_mask.append(true)
 		else:
 			permanent_binary_mask.append(false)
@@ -68,10 +68,10 @@ func get_random_moves(chars, flat_board):
 		var old_y = character["y"]
 		
 		# Check that the chosen tile actually is empty.
-		var new_x = old_x + chosen_move[0]
-		var new_y = old_y + chosen_move[1]
-		assert(new_x >=0 and new_x < sizex)
-		assert(new_y >=0 and new_y < sizey)
+		var new_x = chosen_move[0]
+		var new_y = chosen_move[1]
+		assert(new_x >= 0 and new_x < sizex)
+		assert(new_y >= 0 and new_y < sizey)
 		var new_idx = new_x * sizex + new_y
 		if flat_board_copy[new_idx] == null:
 			var old_idx = old_x * sizex + old_y
@@ -138,19 +138,19 @@ func get_all_possible_movements_of_character(character_dict, flat_board):
 	var y_pos = character_dict["y"]
 	var idx = x_pos + sizex * y_pos
 	var all_moves = get_all_possible_movement_destinations(idx, character.max_walk_distance, character.can_walk_on_lava)
+	
 	for i in range(len(all_moves)):
 		assert(len(all_moves[i]) == 2)  # The x- and y-coordinates.
-		all_moves[i] = [all_moves[i][0] + x_pos, all_moves[i][1] + y_pos]
+		#all_moves[i] = [all_moves[i][0] + x_pos, all_moves[i][1] + y_pos]
 
 	# TODO: Remove at a later point. It's just for debugging.
 	for i in range(len(all_moves)):
-		var move = all_moves[idx]
+		var move = all_moves[i]
 		var move_idx = move[0] + move[1] * sizex
 		assert(move[0] >= 0 and move[0] < sizex and move[1] >= 0 and move[1] < sizey)
 		assert(binary_mask[move_idx])
 		assert(permanent_binary_mask[move_idx])
-		assert(flat_board[idx]==null or flat_board[idx].is_evul())  # These are filtered later
-	
+		#assert(flat_board[move_idx]==null or flat_board[move_idx].is_evul())  # These are filtered later
 	return all_moves
 
 func get_flat_board_deep_copy(flat_board):
@@ -188,8 +188,11 @@ func update_state_vec(state_vec, moves_per_char):
 		state_vec[i] += 1
 		if state_vec[i] == moves_per_char[i]:
 			state_vec[i] = 0
+			if i == len(state_vec) - 1:
+				return true
 		else:
-			return
+			return false
+	return false
 
 func update_moves_on_flat_board_and_calc_heuristic(state_vec, bad_guys, flat_board_orig):
 	# Creates a (copy of) flat_board using the moves in state_vec.
@@ -206,7 +209,7 @@ func update_moves_on_flat_board_and_calc_heuristic(state_vec, bad_guys, flat_boa
 		var new_idx = new_x + new_y * sizex
 		
 		assert(flat_board[old_idx] != null)
-		if flat_board[old_idx] != null:
+		if flat_board[new_idx] != null:
 			# This means that an other character is blocking the destination,
 			# which is an issue.
 			# TODO: Reorder the characters, and se if that solves the issue?
@@ -232,13 +235,20 @@ func consider_all_moves(bad_guys, flat_board):
 	# Return the one that the heuristisk function thinks is best.
 	var best_state = []
 	var best_state_val = -INF
-	while not state_vec[-1] == moves_per_char[-1]:
-		var val = update_moves_on_flat_board_and_calc_heuristic(state_vec, bad_guys, flat_board)
-		if val > best_state_val:
-			best_state_val = val
-			best_state = [] + state_vec
-		update_state_vec(state_vec, moves_per_char)
-	
+	var debug_counter = 0
+	var is_done = false
+	if len(state_vec) > 0:
+		while not is_done:
+			debug_counter += 1
+			var val = update_moves_on_flat_board_and_calc_heuristic(state_vec, bad_guys, flat_board)
+			if val >= best_state_val:
+				best_state_val = val
+				best_state = [] + state_vec
+			is_done = update_state_vec(state_vec, moves_per_char)
+			if debug_counter > 10000:
+				push_error("consider_all_moves is stuck in a loop.")
+		assert(best_state_val >= 0.0)
+		
 	return convert_state_vec_to_interface(best_state, bad_guys)
 
 func convert_state_vec_to_interface(state_vec, bad_guys):
@@ -249,14 +259,13 @@ func convert_state_vec_to_interface(state_vec, bad_guys):
 		var old_x = bad_guys[i]["x"]
 		var old_y = bad_guys[i]["y"]
 		
-		var new_x = old_x + chosen_move[0]
-		var new_y = old_y + chosen_move[1]
+		var new_x = chosen_move[0]
+		var new_y = chosen_move[1]
 		
 		var new_move = {"old_pos": [old_x, old_y], "new_pos": [new_x, new_y], "attacked_pos": null}
 		all_chosen_moves.append(new_move)
 	
 	return all_chosen_moves
-
 
 func get_moves(flat_board):
 	# IMPORTANT: flat_board is read only. Don't change anything in it.
