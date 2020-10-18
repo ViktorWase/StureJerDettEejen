@@ -226,10 +226,10 @@ func heuristic(flat_board):
 		var closest_yet = INF
 		for good_idx in all_good_guys_idx:
 			var dist_sq = squareDistFromIdxs(idx, good_idx)
+			
 			if dist_sq < closest_yet:
 				closest_yet = dist_sq
-		sum_of_recip_of_closest_square_dists += 1.0 / closest_yet
-	print(" - ", sum_of_recip_of_closest_square_dists, len(all_good_guys_idx))
+		sum_of_recip_of_closest_square_dists += 1.0 / (closest_yet + 0.1)
 	
 	return total_number_of_hp_of_bad_guys - total_number_of_hp_of_good_guys + 0.1 * sum_of_recip_of_closest_square_dists
 
@@ -254,8 +254,10 @@ func update_moves_on_flat_board_and_calc_heuristic(state_vec, bad_guys, flat_boa
 		var old_x = bad_guys[i]["x"]
 		var old_y = bad_guys[i]["y"]
 		
-		var new_x = old_x + chosen_move[0]
-		var new_y = old_y + chosen_move[1]
+		# var new_x = old_x + chosen_move[0]
+		# var new_y = old_y + chosen_move[1]
+		var new_x = chosen_move[0]
+		var new_y = chosen_move[1]
 		var old_idx = old_x + old_y * sizex
 		var new_idx = new_x + new_y * sizex
 		
