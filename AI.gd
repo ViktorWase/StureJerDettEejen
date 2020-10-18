@@ -168,7 +168,8 @@ func make_shadow_copy(character):
 			"max_walk_distance": character.max_walk_distance,
 			"damage": character.damage,
 			"can_walk_on_lava": character.can_walk_on_lava,
-			"current_hp": character.current_hp
+			"current_hp": character.current_hp,
+			"attack_coordinates": character.get_attack_coordinates()
 		}
 	return shadow
 
@@ -245,7 +246,7 @@ func update_state_vec(state_vec, moves_per_char):
 			return false
 	return false
 
-func update_moves_on_flat_board_and_calc_heuristic(state_vec, bad_guys, flat_board_orig):
+func update_moves_on_flat_board_and_calc_heuristic(state_vec, bad_guys, flat_board_orig, attack_state):
 	# Creates a (copy of) flat_board using the moves in state_vec.
 	var flat_board = get_flat_board_deep_copy(flat_board_orig)
 	
@@ -265,12 +266,25 @@ func update_moves_on_flat_board_and_calc_heuristic(state_vec, bad_guys, flat_boa
 		if flat_board[new_idx] != null:
 			# This means that an other character is blocking the destination,
 			# which is an issue.
-			# TODO: Reorder the characters, and se if that solves the issue?
+			# TODO: Reorder the characters, and see if that solves the issue?
 			return -INF
 		var obj = flat_board[old_idx]
 		flat_board[new_idx] = obj
 		flat_board[old_idx] = null
+		
 		# TODO: Attack!
+		var attack_coordinates = [] + obj["attack_coordinates"]  # TODO: I don't think this copy is needed?
+		var has_attacked = false
+		for el in attack_coordinates:
+			var attacked_idx = el[0]+new_x + (el[1] + new_y) * sizex
+			if attacked_idx >= 0 and attacked_idx < sizex * sizey and flat_board[attacked_idx] != null and flat_board[attacked_idx]["is_good"] and flat_board[attacked_idx]["current_hp"] > 0:
+				flat_board[attacked_idx]["current_hp"] -= min(obj["damage"], flat_board[attacked_idx]["current_hp"])
+				assert(flat_board[attacked_idx]["current_hp"] >= 0)
+				attack_state.append(attacked_idx)
+				has_attacked = true
+				break
+		if not has_attacked:
+			attack_state.append(null)
 	
 	return heuristic(flat_board)
 
@@ -278,6 +292,7 @@ func consider_all_moves(bad_guys, flat_board):
 	# TODO: Does not consider attacks. Fix?
 	# TODO: I guess the order should matter to, but I don't wanna right now.
 	# TODO: This just looks one step ahead, which is a bit stooopid.
+	# TODO: Attack should be a part of the state.
 	var state_vec = []
 	var moves_per_char = []
 	for i in range(len(bad_guys)):
@@ -287,25 +302,29 @@ func consider_all_moves(bad_guys, flat_board):
 	# Go thru all moves that can be made and check what the heuristic thinks.
 	# Return the one that the heuristisk function thinks is best.
 	var best_state = []
+	var best_attack_state = []
 	var best_state_val = -INF
 	var debug_counter = 0
 	var is_done = false
 	if len(state_vec) > 0:
 		while not is_done:
+			var attack_state = []
 			debug_counter += 1
-			var val = update_moves_on_flat_board_and_calc_heuristic(state_vec, bad_guys, flat_board)
+			var val = update_moves_on_flat_board_and_calc_heuristic(state_vec, bad_guys, flat_board, attack_state)
 			if val >= best_state_val:
 				best_state_val = val
 				best_state = [] + state_vec
+				best_attack_state = [] + attack_state
 			is_done = update_state_vec(state_vec, moves_per_char)
 			if debug_counter > 10000:
 				push_error("consider_all_moves is stuck in a loop.")
 		assert(best_state_val >= 0.0)
 		
-	return convert_state_vec_to_interface(best_state, bad_guys)
+	return convert_state_vec_to_interface(best_state, bad_guys, best_attack_state)
 
-func convert_state_vec_to_interface(state_vec, bad_guys):
+func convert_state_vec_to_interface(state_vec, bad_guys, attack_state):
 	var all_chosen_moves = []
+	assert(len(state_vec) == len(attack_state))
 	for i in range(len(state_vec)):
 		var r = state_vec[i]
 		var chosen_move = bad_guys[i]["movements"][state_vec[i]]
@@ -315,7 +334,11 @@ func convert_state_vec_to_interface(state_vec, bad_guys):
 		var new_x = chosen_move[0]
 		var new_y = chosen_move[1]
 		
-		var new_move = {"old_pos": [old_x, old_y], "new_pos": [new_x, new_y], "attacked_pos": null}
+		var attack_pos = null
+		if attack_state[i]:
+			attack_pos = [attack_state[i] % sizex, int(attack_state[i] / sizex)]
+		
+		var new_move = {"old_pos": [old_x, old_y], "new_pos": [new_x, new_y], "attacked_pos": attack_pos}
 		all_chosen_moves.append(new_move)
 	
 	return all_chosen_moves
