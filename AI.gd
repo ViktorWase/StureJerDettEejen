@@ -153,13 +153,31 @@ func get_all_possible_movements_of_character(character_dict, flat_board):
 		#assert(flat_board[move_idx]==null or flat_board[move_idx].is_evul())  # These are filtered later
 	return all_moves
 
+func make_shadow_copy(character):
+	var shadow
+	var is_object = not character.is_good() and not character.is_evul()  # TODO: This is not correct.
+	if is_object:
+		shadow = {
+			"is_good": character.is_good(),
+			"is_evul": character.is_evul()
+		}
+	else:
+		shadow = {
+			"is_good": character.is_good(),
+			"is_evul": character.is_evul(),
+			"max_walk_distance": character.max_walk_distance,
+			"damage": character.damage,
+			"can_walk_on_lava": character.can_walk_on_lava,
+			"current_hp": character.current_hp
+		}
+	return shadow
+
 func get_flat_board_deep_copy(flat_board):
-	var copy = []
-	for el in flat_board:
-		if el == null:
-			copy.append(null)
-		else:
-			copy.append(el.duplicate())
+	var copy = [] + flat_board
+	for i in range(len(flat_board)):
+		if flat_board[i] != null:
+			copy[i] = make_shadow_copy(flat_board[i])
+			#copy[i] = flat_board[i].duplicate(4)
 	return copy
 
 func extract_bad_guys(flat_board):
@@ -179,8 +197,41 @@ func update_binary_mask(flat_board):
 			else:
 				binary_mask[idx] = true
 
+func squareDistFromIdxs(idx1, idx2):
+	var x1 = idx1 % sizex
+	var x2 = idx2 % sizex
+	
+	var y1 = int(idx1 / sizex)
+	var y2 = int(idx2 / sizex)
+	
+	return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)
+
 func heuristic(flat_board):
-	return 1.0
+	var total_number_of_hp_of_good_guys = 0
+	var total_number_of_hp_of_bad_guys = 0
+	var all_bad_guys_idx = []
+	var all_good_guys_idx = []
+	for i in range(sizex*sizey):
+		var el = flat_board[i]
+		if el != null:
+			if el["is_evul"]:
+				all_bad_guys_idx.append(i)
+				total_number_of_hp_of_bad_guys += el["current_hp"]
+				# TODO: Move closer to the good guys
+			if el["is_good"]:
+				total_number_of_hp_of_good_guys += el["current_hp"]
+				all_good_guys_idx.append(i)
+	var sum_of_recip_of_closest_square_dists = 0.0
+	for idx in all_bad_guys_idx:
+		var closest_yet = INF
+		for good_idx in all_good_guys_idx:
+			var dist_sq = squareDistFromIdxs(idx, good_idx)
+			if dist_sq < closest_yet:
+				closest_yet = dist_sq
+		sum_of_recip_of_closest_square_dists += 1.0 / closest_yet
+	print(" - ", sum_of_recip_of_closest_square_dists, len(all_good_guys_idx))
+	
+	return total_number_of_hp_of_bad_guys - total_number_of_hp_of_good_guys + 0.1 * sum_of_recip_of_closest_square_dists
 
 func update_state_vec(state_vec, moves_per_char):
 	assert(len(state_vec) == len(moves_per_char))

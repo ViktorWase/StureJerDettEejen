@@ -1,8 +1,10 @@
 extends "res://Character.gd"
 
-func _ready():
+func _init():
 	set_evul()
-	add_to_group("Enemies")
+
+func _ready():
+	add_to_group("Enemies")  # TODO: I think I renamed them? Same in GoodCharacter
 
 func play_idle():
 	$AnimatedSprite.play("idle")
