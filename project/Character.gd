@@ -11,6 +11,7 @@ enum Alignment {
 
 var alignment = Alignment.undefined
 var max_walk_distance = 2
+var max_watch_distance = 3
 var damage = 1
 var waypoints
 var waypoint_index

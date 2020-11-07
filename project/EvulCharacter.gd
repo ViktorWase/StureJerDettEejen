@@ -1,5 +1,27 @@
 extends "res://Character.gd"
 
+# This enum governs how the enemy behaves in battle.
+# Currently it supports simple patterns, but I reckon
+# I'll have to rewrite this as a proper class later to
+# get more nuanced behaviour.
+enum BattlePersonality {
+	undefined,
+	attackRandomlyOnlyIfItSeesAGoodGuy,
+	runAwayUnlessPushedIntoCorner,
+	planUsingAI
+}
+var personality = BattlePersonality.undefined
+
+func has_battle_personality():
+	# This is just for debugging. It should
+	# always be true.
+	return personality != BattlePersonality.undefined
+
+func has_planning_personality():
+	# If this is true, then the AI choose what they do.
+	# Otherwise they do whatever they want.
+	return personality == BattlePersonality.planUsingAI
+
 func _init():
 	set_evul()
 
@@ -7,9 +29,11 @@ func _ready():
 	add_to_group("Enemies")  # TODO: I think I renamed them? Same in GoodCharacter
 
 func play_idle():
+	assert(has_battle_personality())
 	$AnimatedSprite.play("idle")
 
 func move_evul(idx, max_look_distance):
+	assert(has_battle_personality())
 	# Checks if there is a player within max_look_distance (not as the crow flies -
 	# the terrain is taken in to account), if so the character moves in that
 	# general direction. Otherwise it stands still.
