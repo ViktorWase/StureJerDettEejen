@@ -5,6 +5,13 @@ var flat_map
 var number_of_steps_to
 var active_greens = []
 
+# variables for the map
+var width
+var height
+var offsetX
+var offsetY
+var tileSize = 32
+
 var X = 10
 var Y = 10
 var SIZE = X * Y
@@ -18,6 +25,7 @@ var planned_enemy_movements_counter = 0
 var end_counter # used to insert a time padding when resetting the board
 
 var GUI
+var Camera
 
 enum game_states {
 	player_turn,
@@ -40,8 +48,9 @@ var game_turn_state
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	# get reference to GUI and Lava node
+	# get reference to GUI and camera
 	GUI = get_tree().get_root().get_node("Node2D").get_node("GUI")
+	Camera = get_tree().get_root().get_node("Node2D").get_node("Camera")
 	
 	# This is the list that contains all the THINGS that are on the board.
 	# Note that there can only be one THING per tile. So an object and a player
@@ -59,20 +68,27 @@ func _ready():
 	
 	# Read data from scene
 	var cells = get_used_cells()
+	var minX = 0
 	var maxX = 0
+	var minY = 0
 	var maxY = 0
 	for cell in cells:
-		if (cell.x > maxX):
-			maxX = cell.x
-		if (cell.y > maxY):
-			maxY = cell.x
-	X = int(maxX)
-	Y = int(maxY)
+		minX = min(minX, cell.x)
+		maxX = max(maxX, cell.x)
+		minY = min(minY, cell.y)
+		maxY = max(maxY, cell.y)
+	X = int(maxX - minX) + 1 # TODO: wtf, nånstans kollar vi ett index för mycket neråt/åt höger
+	Y = X # TODO: int(maxY - minY)
 	SIZE = X * Y
+	
+	offsetX = 0 # TODO: minX
+	offsetY = 0 # TODO: minY
+	width = X
+	height = Y
 
 	#var idx = 0
-	for y in range(Y):  # TODO: Y is too small, and also it's set somewhere else I think.
-		for x in range(X):
+	for _y in range(Y):  # TODO: Y is too small, and also it's set somewhere else I think.
+		for _x in range(X):
 			flat_game_board.append(null)
 			number_of_steps_to.append(false)
 			flat_map.append(0)
@@ -127,6 +143,8 @@ func _ready():
 	$GameStartJingle.play()
 	
 	$AI.setup(flat_map, X, Y)
+
+	emit_signal("ready", self)
 
 func _on_end_turn_pressed():
 	$Rocket.hide_help_text()
@@ -344,7 +362,7 @@ func reset_movement_of_evul_chars():
 
 func _input(event):
 	if event.is_action_pressed("ui_left_click"):
-		var map_pos = world_to_map(event.position - position)
+		var map_pos = Camera.world_to_map(event)
 		var obj = get_obj_from_tile(map_pos[0], map_pos[1])
 		
 		match(game_state):

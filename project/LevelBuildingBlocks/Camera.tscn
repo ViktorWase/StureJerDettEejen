@@ -1,0 +1,48 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Scripts/Camera.gd" type="Script" id=1]
+[ext_resource path="res://Assets/lava.png" type="Texture" id=2]
+[ext_resource path="res://Scripts/LavaBackground.gd" type="Script" id=3]
+[ext_resource path="res://LevelBuildingBlocks/LavaBackground.tscn" type="PackedScene" id=4]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform float time;
+uniform vec2 offset;
+
+void fragment(){
+	vec2 uv = UV + offset;
+	vec2 v = uv;
+	v.x = mod(v.x + 0.12*(1.0 + cos(uv.x*1.312+time))/2.0, 1.0);
+	v.y = mod(v.y + 0.08*(1.0 + sin(uv.y*3.333+time*1.2))/2.0, 1.0);
+	COLOR = texture(TEXTURE, v);
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+shader_param/time = null
+shader_param/offset = null
+
+[node name="Camera" type="Camera2D"]
+position = Vector2( 512, 300 )
+script = ExtResource( 1 )
+cameraPanScale = 160
+
+[node name="LavaBackground" type="TextureRect" parent="." instance=ExtResource( 4 )]
+material = SubResource( 2 )
+margin_left = -512.0
+margin_top = -300.0
+margin_right = 512.0
+margin_bottom = 300.0
+texture = ExtResource( 2 )
+stretch_mode = 2
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ViewportDebug" type="Line2D" parent="."]
+visible = false
+position = Vector2( -512, -300 )
+points = PoolVector2Array( 50, 50, 974, 50, 974, 550, 50, 550, 50, 50 )

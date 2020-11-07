@@ -7,17 +7,20 @@
 code = "shader_type canvas_item;
 
 uniform float time;
+uniform vec2 offset;
 
 void fragment(){
-	vec2 v = UV;
-	v.x = mod(v.x + 0.12*(1.0 + cos(UV.x*1.312+time))/2.0, 1.0);
-	v.y = mod(v.y + 0.08*(1.0 + sin(UV.y*3.333+time*1.2))/2.0, 1.0);
+	vec2 uv = UV + offset;
+	vec2 v = uv;
+	v.x = mod(v.x + 0.12*(1.0 + cos(uv.x*1.312+time))/2.0, 1.0);
+	v.y = mod(v.y + 0.08*(1.0 + sin(uv.y*3.333+time*1.2))/2.0, 1.0);
 	COLOR = texture(TEXTURE, v);
 }"
 
 [sub_resource type="ShaderMaterial" id=2]
 shader = SubResource( 1 )
 shader_param/time = null
+shader_param/offset = null
 
 [node name="LavaBackground" type="TextureRect"]
 material = SubResource( 2 )
