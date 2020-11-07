@@ -286,7 +286,7 @@ func update_binary_mask(flat_board):
 	for y in range(sizey):
 		for x in range(sizex):
 			var idx = x + y * sizey
-			if not permanent_binary_mask[idx] or (flat_board[idx] and flat_board[idx].is_good()):
+			if not permanent_binary_mask[idx] or (flat_board[idx] and flat_board[idx].is_good()) or (flat_board[idx] and flat_board[idx].is_item() and not flat_board[idx].is_walkable):
 				binary_mask[idx] = false
 			else:
 				binary_mask[idx] = true
@@ -565,4 +565,3 @@ func get_moves(flat_board):
 		bad_guy["movements"] = movements
 	
 	return consider_all_moves(bad_guys, good_guys, flat_board)
-	# return get_random_moves(bad_guys, flat_board)

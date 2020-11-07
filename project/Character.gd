@@ -42,6 +42,9 @@ func is_attacked(damage):
 	var is_dead = current_hp <= 0
 	return is_dead
 
+func is_item():
+	return false
+
 func is_evul():
 	return alignment == Alignment.evul
 
