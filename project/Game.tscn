@@ -11,18 +11,19 @@
 
 [node name="Node2D" type="Node2D"]
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera" type="Camera2D" parent="."]
 position = Vector2( 512, 300 )
 script = ExtResource( 3 )
 cameraPanScale = 160
 
-[node name="LavaBackground" parent="Camera2D" instance=ExtResource( 5 )]
+[node name="LavaBackground" parent="Camera" instance=ExtResource( 5 )]
 margin_left = -512.0
 margin_top = -300.0
 margin_right = 512.0
 margin_bottom = 300.0
 
-[node name="Line2D" type="Line2D" parent="Camera2D"]
+[node name="ViewportDebug" type="Line2D" parent="Camera"]
+visible = false
 position = Vector2( -512, -300 )
 points = PoolVector2Array( 50, 50, 974, 50, 974, 550, 50, 550, 50, 50 )
 
@@ -48,4 +49,4 @@ scale = Vector2( 2, 2 )
 position = Vector2( 168, 156 )
 
 [node name="GUI" parent="." instance=ExtResource( 7 )]
-[connection signal="ready" from="TileMap" to="Camera2D" method="_on_TileMap_ready"]
+[connection signal="ready" from="TileMap" to="Camera" method="_on_TileMap_ready"]

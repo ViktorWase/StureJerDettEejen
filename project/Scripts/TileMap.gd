@@ -25,6 +25,7 @@ var planned_enemy_movements_counter = 0
 var end_counter # used to insert a time padding when resetting the board
 
 var GUI
+var Camera
 
 enum game_states {
 	player_turn,
@@ -47,8 +48,9 @@ var game_turn_state
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	# get reference to GUI and Lava node
+	# get reference to GUI and camera
 	GUI = get_tree().get_root().get_node("Node2D").get_node("GUI")
+	Camera = get_tree().get_root().get_node("Node2D").get_node("Camera")
 	
 	# This is the list that contains all the THINGS that are on the board.
 	# Note that there can only be one THING per tile. So an object and a player
@@ -360,7 +362,7 @@ func reset_movement_of_evul_chars():
 
 func _input(event):
 	if event.is_action_pressed("ui_left_click"):
-		var map_pos = world_to_map(event.position - position)
+		var map_pos = Camera.world_to_map(event)
 		var obj = get_obj_from_tile(map_pos[0], map_pos[1])
 		
 		match(game_state):

@@ -19,7 +19,8 @@ var viewportRect : Rect2
 func _ready():
 	make_current()
 	targetPos = get_viewport().size/2
-	pass # Replace with function body.
+	
+	get_parent().get_node("TileMap").connect("ready", self, "_on_TileMap_ready")
 
 
 func _physics_process(delta):
@@ -35,7 +36,7 @@ func _physics_process(delta):
 	var pos = position + (targetPos - position)*cameraPanSpeed*delta
 	
 	# update camera position
-	position = pos
+	position = pos.round()
 	
 	# (size/imageSize)*(pos/size) = pos/imageSize
 	$LavaBackground.material.set_shader_param("offset", pos/imageSize)
@@ -60,6 +61,9 @@ func updatePan(pos):
 			panAmount = - (pos.y - viewportSize.y/2) - panRect.size.y/2
 		panAmount /= panPadding.y
 	
+	# avoid negative values
+	panAmount = max(0, panAmount)
+	
 	# set target
 	targetPos = position + dir*(0.2 + panAmount/0.8)*cameraPanScale
 	
@@ -76,6 +80,11 @@ func updatePan(pos):
 	if targetPos.y + viewportRect.size.y/2 > tileMap.position.y+levelSize.y:
 		targetPos.y = tileMap.position.y+levelSize.y - viewportRect.size.y/2
 
+func world_to_map(event):
+	var offset = position - viewportSize/2
+	var pos = tileMap.world_to_map(event.position - (tileMap.position - offset))
+	return pos
+
 func _on_TileMap_ready(tileMap):
 	self.tileMap = tileMap
 
@@ -86,4 +95,5 @@ func _on_TileMap_ready(tileMap):
 
 	# init pan to top left
 	updatePan(Vector2(0, 0))
-	position = targetPos
+	# avoid rendering glitches
+	position = targetPos.round()
