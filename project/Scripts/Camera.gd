@@ -6,7 +6,7 @@ export var viewportPadding = Vector2(150, 150)
 export var cameraPanScale = 2
 export var cameraPanSpeed = 2
 
-var imageSize = Vector2(128, 128)
+var imageSize = Vector2(640, 640)
 var tileMap = null
 var targetPos = Vector2.ZERO
 
@@ -39,7 +39,7 @@ func _physics_process(delta):
 	position = pos.round()
 	
 	# (size/imageSize)*(pos/size) = pos/imageSize
-	$LavaBackground.material.set_shader_param("offset", pos/imageSize)
+	$WaterBackground.material.set_shader_param("offset", pos/imageSize)
 	
 	# TODO: prettify
 	get_parent().get_node("GUI").position = position - viewportSize/2
