@@ -68,17 +68,25 @@ func updatePan(pos):
 	targetPos = position + dir*(0.2 + panAmount/0.8)*cameraPanScale
 	
 	# calculate limits
-	if targetPos.x - viewportRect.size.x/2 < tileMap.position.x:
-		targetPos.x = tileMap.position.x + viewportRect.size.x/2
+	if levelSize.x > viewportRect.size.x:
+		if targetPos.x - viewportRect.size.x/2 < tileMap.position.x:
+			targetPos.x = tileMap.position.x + viewportRect.size.x/2
+		
+		if targetPos.x + viewportRect.size.x/2 > tileMap.position.x+levelSize.x:
+			targetPos.x = tileMap.position.x+levelSize.x - viewportRect.size.x/2
+	else:
+		# place in the middle
+		targetPos.x = tileMap.position.x+levelSize.x/2
 	
-	if targetPos.x + viewportRect.size.x/2 > tileMap.position.x+levelSize.x:
-		targetPos.x = tileMap.position.x+levelSize.x - viewportRect.size.x/2
-	
-	if targetPos.y - viewportRect.size.y/2 < tileMap.position.y:
-		targetPos.y = tileMap.position.y + viewportRect.size.y/2
-	
-	if targetPos.y + viewportRect.size.y/2 > tileMap.position.y+levelSize.y:
-		targetPos.y = tileMap.position.y+levelSize.y - viewportRect.size.y/2
+	if levelSize.y > viewportRect.size.y:
+		if targetPos.y - viewportRect.size.y/2 < tileMap.position.y:
+			targetPos.y = tileMap.position.y + viewportRect.size.y/2
+		
+		if targetPos.y + viewportRect.size.y/2 > tileMap.position.y+levelSize.y:
+			targetPos.y = tileMap.position.y+levelSize.y - viewportRect.size.y/2
+	else:
+		# place in the middle
+		targetPos.y = tileMap.position.y+levelSize.y/2
 
 func world_to_map(event):
 	var offset = position - viewportSize/2
