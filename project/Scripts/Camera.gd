@@ -1,11 +1,19 @@
 extends Camera2D
 
 
-var imageSize = Vector2(128, 128)
-var tileMap = null
+export var panPadding = Vector2(50, 50)
+export var viewportPadding = Vector2(150, 150)
 export var cameraPanScale = 2
 export var cameraPanSpeed = 2
+
+var imageSize = Vector2(128, 128)
+var tileMap = null
 var targetPos = Vector2.ZERO
+
+var viewportSize : Vector2
+var levelSize : Vector2
+var panRect : Rect2
+var viewportRect : Rect2
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -17,67 +25,16 @@ func _ready():
 func _physics_process(delta):
 	if not tileMap:
 		return
-	
-	var viewportSize = get_viewport().size
-	var levelSize = Vector2(tileMap.width, tileMap.height)*tileMap.tileSize
-	var pos = get_viewport().get_mouse_position()
-	
-	# square rect for now
-	var viewRect = Rect2(
-		viewportSize.x/2 - levelSize.x/2,
-		viewportSize.y/2 - levelSize.y/2,
-		levelSize.x,
-		levelSize.y
-	)
-	
-#	if pos.x < tileMap.position.x:
-#		pos.x = tileMap.position.x
-#	if pos.x > viewportSize.x/2+levelSize.x/2:
-#		pos.x = viewportSize.x/2+levelSize.x/2
-#	if pos.y < tileMap.position.y:
-#		pos.y = tileMap.position.y
-#	if pos.y > viewportSize.y/2+levelSize.y/2:
-#		pos.y = viewportSize.y/2+levelSize.y/2
 
-	var pan = Vector2.ZERO
+	var mousePos = get_viewport().get_mouse_position()
 
-	if not viewRect.has_point(pos):
-		var dir = pos - viewportSize/2
-		# "length - radius" kind of
-		targetPos = position + dir.normalized()*(dir.length()-viewRect.size.x/2)*cameraPanScale
-		
-		if targetPos.x < tileMap.position.x:
-			targetPos.x = tileMap.position.x
-		if targetPos.x > viewportSize.x/2+levelSize.x/2:
-			targetPos.x = viewportSize.x/2+levelSize.x/2
-		if targetPos.y < tileMap.position.y:
-			targetPos.y = tileMap.position.y
-		if targetPos.y > viewportSize.y/2+levelSize.y/2:
-			targetPos.y = viewportSize.y/2+levelSize.y/2
-
-#	if pos.x < viewRect.position.x:
-#		pan.x = -pow((viewRect.position.x - pos.x) / viewRect.position.x, 2)
-#	if pos.x > viewRect.end.x:
-#		pan.x = pow((pos.x - viewRect.end.x) / (viewportSize.x - viewRect.end.x), 2)
-#	if pos.y < viewRect.position.y:
-#		pan.y = -pow((viewRect.position.y - pos.y) / viewRect.position.y, 2)
-#	if pos.y > viewRect.end.y:
-#		pan.y = pow((pos.y - viewRect.end.y) / (viewportSize.y - viewRect.end.y), 2)
-
-#	if pos.x < viewRect.position.x:
-#		pan.x = -(viewRect.position.x - pos.x) / viewRect.position.x
-#	if pos.x > viewRect.end.x:
-#		pan.x = (pos.x - viewRect.end.x) / (viewportSize.x - viewRect.end.x)
-#	if pos.y < viewRect.position.y:
-#		pan.y = -(viewRect.position.y - pos.y) / viewRect.position.y
-#	if pos.y > viewRect.end.y:
-#		pan.y = (pos.y - viewRect.end.y) / (viewportSize.y - viewRect.end.y)
+	if not panRect.has_point(mousePos):
+		updatePan(mousePos)
 	
-	# target
-	#pos = position + pan*cameraPanScale
 	# interpolation
-	pos = position + (targetPos - position)*cameraPanSpeed*delta
+	var pos = position + (targetPos - position)*cameraPanSpeed*delta
 	
+	# update camera position
 	position = pos
 	
 	# (size/imageSize)*(pos/size) = pos/imageSize
@@ -86,7 +43,47 @@ func _physics_process(delta):
 	# TODO: prettify
 	get_parent().get_node("GUI").position = position - viewportSize/2
 
+func updatePan(pos):
+	# get pan speed and direction
+	var dir = (pos - viewportSize/2).normalized()
+	var panAmount = 0
+	if pos.x < panPadding.x || pos.x > panPadding.x + panRect.size.x:
+		if dir.x > 0:
+			panAmount = pos.x -viewportSize.x/2- panRect.size.x/2
+		else:
+			panAmount = - (pos.x -viewportSize.x/2)- panRect.size.x/2
+		panAmount /= panPadding.x
+	else:
+		if dir.y > 0:
+			panAmount = pos.y -viewportSize.y/2- panRect.size.y/2
+		else:
+			panAmount = - (pos.y - viewportSize.y/2) - panRect.size.y/2
+		panAmount /= panPadding.y
+	
+	# set target
+	targetPos = position + dir*(0.2 + panAmount/0.8)*cameraPanScale
+	
+	# calculate limits
+	if targetPos.x - viewportRect.size.x/2 < tileMap.position.x:
+		targetPos.x = tileMap.position.x + viewportRect.size.x/2
+	
+	if targetPos.x + viewportRect.size.x/2 > tileMap.position.x+levelSize.x:
+		targetPos.x = tileMap.position.x+levelSize.x - viewportRect.size.x/2
+	
+	if targetPos.y - viewportRect.size.y/2 < tileMap.position.y:
+		targetPos.y = tileMap.position.y + viewportRect.size.y/2
+	
+	if targetPos.y + viewportRect.size.y/2 > tileMap.position.y+levelSize.y:
+		targetPos.y = tileMap.position.y+levelSize.y - viewportRect.size.y/2
 
 func _on_TileMap_ready(tileMap):
-	print("tilemap ready")
 	self.tileMap = tileMap
+
+	viewportSize = get_viewport().size
+	levelSize = Vector2(tileMap.width, tileMap.height)*tileMap.tileSize
+	panRect = Rect2(0, 0, viewportSize.x, viewportSize.y).grow_individual(-panPadding.x, -panPadding.y, -panPadding.x, -panPadding.y)
+	viewportRect = Rect2(0, 0, viewportSize.x, viewportSize.y).grow_individual(-viewportPadding.x, -viewportPadding.y, -viewportPadding.x, -viewportPadding.y)
+
+	# init pan to top left
+	updatePan(Vector2(0, 0))
+	position = targetPos
