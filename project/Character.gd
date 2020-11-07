@@ -140,7 +140,6 @@ func _physics_process(delta):
 		if (waypoint_index >= len(waypoints)):
 			play_idle()
 			waypoints = null
-			print("end")
 			is_done_moving = true
 			# TODO
 			# set_coordinates()
@@ -159,8 +158,7 @@ func _physics_process(delta):
 		scale.x = -abs(scale.x)
 	else:
 		scale.x = abs(scale.x)
-		
-	#velocity = move_and_slide(velocity)
+	
 	position += velocity*delta
 
 func play_attack_sound():
