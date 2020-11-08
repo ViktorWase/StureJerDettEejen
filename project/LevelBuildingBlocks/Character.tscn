@@ -16,15 +16,15 @@
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
-"frames": [ ExtResource( 2 ), ExtResource( 5 ), ExtResource( 3 ), ExtResource( 4 ) ],
-"loop": true,
-"name": "idle",
-"speed": 5.0
-}, {
 "frames": [ ExtResource( 9 ), ExtResource( 7 ), ExtResource( 8 ), ExtResource( 6 ) ],
 "loop": true,
 "name": "run",
 "speed": 10.0
+}, {
+"frames": [ ExtResource( 2 ), ExtResource( 5 ), ExtResource( 3 ), ExtResource( 4 ) ],
+"loop": true,
+"name": "idle",
+"speed": 5.0
 } ]
 
 [node name="Character" type="AnimatedSprite" groups=[
@@ -45,6 +45,8 @@ visible = false
 
 [node name="AttackSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 12 )
+bus = "Sound effects"
 
 [node name="FootSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 13 )
+bus = "Sound effects"

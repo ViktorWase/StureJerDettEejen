@@ -22,9 +22,11 @@ script = ExtResource( 5 )
 
 [node name="FootSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 7 )
+bus = "Sound effects"
 
 [node name="AttackSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 6 )
+bus = "Sound effects"
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 frames = SubResource( 1 )
