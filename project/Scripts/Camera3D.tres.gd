@@ -4,6 +4,9 @@ var tile
 
 func _ready():
 	tile = get_parent().get_node("tile")
+	
+	var cells = get_parent().get_node("TileMap").get_used_cells()
+	print(cells)
 
 func _input(event):
 	if event is InputEventMouseButton:

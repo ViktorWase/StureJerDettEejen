@@ -1,4 +1,4 @@
-extends TileMap
+extends Node
 
 var flat_game_board
 var flat_map
@@ -26,6 +26,7 @@ var end_counter # used to insert a time padding when resetting the board
 
 var GUI
 var Camera
+var tileMap
 
 enum game_states {
 	player_turn,
@@ -51,6 +52,7 @@ func _ready():
 	# get reference to GUI and camera
 	GUI = get_tree().get_root().get_node("Node2D").get_node("GUI")
 	Camera = get_tree().get_root().get_node("Node2D").get_node("Camera")
+	tileMap = get_tree().get_root().get_node("Node2D").get_node("TileMap")
 	
 	# This is the list that contains all the THINGS that are on the board.
 	# Note that there can only be one THING per tile. So an object and a player
@@ -67,7 +69,7 @@ func _ready():
 	number_of_steps_to = []
 	
 	# Read data from scene
-	var cells = get_used_cells()
+	var cells = tileMap.get_used_cells()
 	var minX = 0
 	var maxX = 0
 	var minY = 0
@@ -99,7 +101,8 @@ func _ready():
 		flat_map[i] = 1
 
 	# This is were the level is created.
-	update_bitmask_region(Vector2(0, 0), Vector2(X, Y))
+	if tileMap.has_method("update_bitmask_region"):
+		tileMap.update_bitmask_region(Vector2(0, 0), Vector2(X, Y))
 	
 	for character in get_tree().get_nodes_in_group("GoodGuys"):
 		var charX = floor(character.position.x / 32)
@@ -120,19 +123,19 @@ func _ready():
 		enemy.set_start_coordinates(Vector2(charX, charY))
 	
 	var rocket = $Rocket
-	var charX = floor(rocket.position.x / 32)
-	var charY = floor(rocket.position.y / 32)
+	var charX = 0 #floor(rocket.position.x / 32)
+	var charY = 0 #floor(rocket.position.y / 32)
 	var i = xy_to_flat(charX, charY)
 	flat_game_board[i] = rocket
-	rocket.set_coordinates(Vector2(charX, charY))
+	#rocket.set_coordinates(Vector2(charX, charY))
 	
 	GUI.get_node("TurnInfo").text = ""
 	GUI.get_node("End Turn").hide()
 	GUI.get_node("WinningScreen").hide()
 	GUI.get_node("DeathScreen").hide()
 	
-	GUI.connect("end_turn_pressed", self, "_on_end_turn_pressed")
-	GUI.connect("restart_pressed", self, "_on_restart_pressed")
+	GUI.connect("end_turn_pressed", tileMap, "_on_end_turn_pressed")
+	GUI.connect("restart_pressed", tileMap, "_on_restart_pressed")
 	
 	reset_loop_icons()
 
@@ -140,11 +143,11 @@ func _ready():
 	set_player_turn()
 	
 	$Rocket.show_help_text()
-	$GameStartJingle.play()
+	#$GameStartJingle.play()
 	
 	$AI.setup(flat_map, X, Y)
 
-	emit_signal("ready", self)
+	emit_signal("ready", tileMap)
 
 func _on_end_turn_pressed():
 	$Rocket.hide_help_text()
@@ -334,7 +337,7 @@ func get_movement(startX, startY, endX, endY):
 	return path
 
 func map_to_world_center(v : Vector2):
-	return map_to_world(v) + Vector2.ONE * 16
+	return tileMap.map_to_world(v) + Vector2.ONE * 16
 
 func get_obj_from_tile(x, y):
 	# Returns null if there is nothing there, otherwise it
@@ -446,11 +449,11 @@ func end_of_enemy_turn():
 
 	number_of_turns_till_apocalypse -= 1
 	if number_of_turns_till_apocalypse <= 0 or are_all_good_guys_dead():
-		GUI.get_node("End Turn").hide()
-		GUI.get_node("TurnInfo").text = ""
-		GUI.get_node("DeathScreen").show()
-		$DeathSound.play()
-		game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
+#		GUI.get_node("End Turn").hide()
+#		GUI.get_node("TurnInfo").text = ""
+#		GUI.get_node("DeathScreen").show()
+		#$DeathSound.play()
+		#game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
 		return
 	
 	for character in get_tree().get_nodes_in_group("GoodGuys"):
@@ -617,7 +620,7 @@ func place_green_tiles(x,y, max_movement):
 		if(flat_game_board[xy_to_flat(vec[0],vec[1])] == null or flat_game_board[xy_to_flat(vec[0],vec[1])].is_neutral()):
 			var green = preload("res://Green.tscn")
 			var GR = green.instance()
-			self.add_child(GR)
+			tileMap.add_child(GR)
 			GR.set_coordinates(vec)
 			active_greens.append(GR)
 
@@ -632,13 +635,13 @@ func place_attack_tiles(x,y, attackable_tiles):
 		if(flat_game_board[xy_to_flat(vec[0] + x, vec[1]+y)] != null and flat_game_board[xy_to_flat(vec[0]+x, vec[1]+y)].is_evul()):
 			var attack_icon = preload("res://Attack.tscn")
 			var attackable = attack_icon.instance()
-			self.add_child(attackable)
+			tileMap.add_child(attackable)
 			attackable.set_coordinates(vec + Vector2(x, y))
 			active_greens.append(attackable)
 	if(active_greens != []):
 		var cancel_icon = preload("res://Cancel.tscn")
 		var cancel = cancel_icon.instance()
-		self.add_child(cancel)
+		tileMap.add_child(cancel)
 		cancel.set_coordinates(Vector2(x+1,y+1))
 		active_greens.append(cancel)
 	
