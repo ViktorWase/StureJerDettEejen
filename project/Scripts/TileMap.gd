@@ -10,7 +10,7 @@ var width
 var height
 var offsetX
 var offsetY
-var tileSize = 32
+var tileSize = 1
 
 var X = 10
 var Y = 10
