@@ -77,14 +77,14 @@ func _ready():
 	for cell in cells:
 		minX = min(minX, cell.x)
 		maxX = max(maxX, cell.x)
-		minY = min(minY, cell.y)
-		maxY = max(maxY, cell.y)
-	X = int(maxX - minX) + 1 # TODO: wtf, nånstans kollar vi ett index för mycket neråt/åt höger
-	Y = X # TODO: int(maxY - minY)
+		minY = min(minY, cell.z)
+		maxY = max(maxY, cell.z)
+	X = int(maxX - minX) + 1
+	Y = int(maxY - minY) + 1
 	SIZE = X * Y
 	
-	offsetX = 0 # TODO: minX
-	offsetY = 0 # TODO: minY
+	offsetX = minX
+	offsetY = minY
 	width = X
 	height = Y
 
@@ -97,7 +97,7 @@ func _ready():
 	
 	# populate flat map
 	for cell in cells:
-		var i = xy_to_flat(cell.x, cell.y)
+		var i = xy_to_flat(cell.x - offsetX, cell.z - offsetY)
 		flat_map[i] = 1
 
 	# This is were the level is created.
@@ -105,8 +105,9 @@ func _ready():
 		tileMap.update_bitmask_region(Vector2(0, 0), Vector2(X, Y))
 	
 	for character in get_tree().get_nodes_in_group("GoodGuys"):
-		var charX = floor(character.position.x / 32)
-		var charY = floor(character.position.y / 32)
+		var p = character.get2dPos()
+		var charX = floor(p.x) - offsetX
+		var charY = floor(p.y) - offsetY
 		var i = xy_to_flat(charX, charY)
 		#character.set_as_basic_b()
 		flat_game_board[i] = character
@@ -115,19 +116,20 @@ func _ready():
 		character.set_start_coordinates(Vector2(charX, charY))
 	
 	for enemy in get_tree().get_nodes_in_group("BadGuys"):
-		var charX = floor(enemy.position.x / 32)
-		var charY = floor(enemy.position.y / 32)
+		var p = enemy.get2dPos()
+		var charX = floor(p.x) - offsetX
+		var charY = floor(p.y) - offsetY
 		var i = xy_to_flat(charX, charY)
 		flat_game_board[i] = enemy
 		enemy.play_idle()
 		enemy.set_start_coordinates(Vector2(charX, charY))
 	
 	var rocket = $Rocket
-	var charX = 0 #floor(rocket.position.x / 32)
-	var charY = 0 #floor(rocket.position.y / 32)
+	var charX = floor(rocket.transform.origin.x) - offsetX
+	var charY = floor(rocket.transform.origin.z) - offsetY
 	var i = xy_to_flat(charX, charY)
 	flat_game_board[i] = rocket
-	#rocket.set_coordinates(Vector2(charX, charY))
+	rocket.set_coordinates(Vector2(charX, charY))
 	
 	GUI.get_node("TurnInfo").text = ""
 	GUI.get_node("End Turn").hide()
@@ -143,7 +145,7 @@ func _ready():
 	set_player_turn()
 	
 	$Rocket.show_help_text()
-	#$GameStartJingle.play()
+	$GameStartJingle.play()
 	
 	$AI.setup(flat_map, X, Y)
 
@@ -231,12 +233,15 @@ func get_next_enemy(): # TODO: Remove. It should not be needed anymore.
 	return null
 
 func xy_to_flat(x, y):
-	return y * X + x
+	if x < 0 or x >= X or y < 0 or y >= Y:
+		return -1
+	var idx = y * X + x
+	return idx
 
 func flat_to_xy(idx):
 	idx = int(idx)
-	var x = idx % X
-	var y = int(idx) / Y
+	var y = floor(idx / X)
+	var x = idx - y * X
 	return Vector2(x, y)
 
 func are_all_good_guys_dead():
@@ -275,28 +280,51 @@ func get_all_possible_movement_destinations_rec_func(idx, current_number_of_step
 	if idx_right/X == idx/X and idx_right<SIZE and (flat_map[idx_right] or the_lava_is_floor) and (number_of_steps_to[idx_right]==null or number_of_steps_to[idx_right] > current_number_of_steps):
 		get_all_possible_movement_destinations_rec_func(idx_right, current_number_of_steps+1, max_movement, the_lava_is_floor)
 
-func get_all_possible_movement_destinations(idx, max_movement, the_lava_is_floor=false):  # TODO: Remove.
-	for i in range(X*Y):
-		number_of_steps_to[i] = null
+func get_all_possible_movement_destinations(pos, max_movement, the_lava_is_floor=false):  # TODO: Remove.
+#	for i in range(X*Y):
+#		number_of_steps_to[i] = null
+#
+#	# Calculate all positions that can be reached. 
+#	get_all_possible_movement_destinations_rec_func(idx, 0, max_movement, the_lava_is_floor)
+#
+#	# Convert to a more readable data format. 
+#	var destinations = []
+#	for idx in range(SIZE):
+#		if number_of_steps_to[idx] != null:
+#			var pos = flat_to_xy(idx)
+#			destinations.append(pos)
 
-	# Calculate all positions that can be reached. 
-	get_all_possible_movement_destinations_rec_func(idx, 0, max_movement, the_lava_is_floor)
+	# generate possible destinations
+	var positions = []
+	# a simple line function
+	for x1 in range(max_movement):
+		for y1 in range(1, max_movement - x1 + 1):
+			# rotate the triangle to fill every quadrant
+			positions.append(Vector2(x1, y1))
+			positions.append(Vector2(-y1, x1))
+			positions.append(Vector2(-x1, -y1))
+			positions.append(Vector2(y1, -x1))
 
-	# Convert to a more readable data format. 
+	# add valid positions
 	var destinations = []
-	for idx in range(SIZE):
-		if number_of_steps_to[idx] != null:
-			var pos = flat_to_xy(idx)
-			destinations.append(pos)
+	for p in positions:
+		p += pos
+		if is_valid_position(p, the_lava_is_floor):
+			destinations.append(p)
+
 	return destinations
+
+func is_valid_position(p, the_lava_is_floor=false):
+	var i = xy_to_flat(p.x, p.y)
+	var valid = i >= 0 and i < SIZE and (flat_map[i] or the_lava_is_floor)
+	return valid
 
 func calc_dist(from, to, max_steps, the_lava_is_floor):
 	for i in range(X*Y):
 		number_of_steps_to[i] = null
 
-	# Calculate all positions that can be reached. 
-	var idx = xy_to_flat(from[0], from[1])
-	get_all_possible_movement_destinations(idx, max_steps, the_lava_is_floor)
+	# Calculate all positions that can be reached.
+	get_all_possible_movement_destinations(from, max_steps, the_lava_is_floor)
 	var dist = number_of_steps_to[xy_to_flat(to[0], to[1])]
 	return dist
 
@@ -320,6 +348,7 @@ func get_movement(startX, startY, endX, endY):
 		push_error("MOVING TO TERRAIN THAT IS NOT ALLOWED!")
 
 	var path = Curve2D.new()
+	path.bake_interval = 0.5
 	if startX != endX:
 		for x in range(startX, endX + (1 if startX < endX else -1), 1 if startX < endX else -1):
 			var world_pos = map_to_world_center(Vector2(x, startY))
@@ -337,7 +366,7 @@ func get_movement(startX, startY, endX, endY):
 	return path
 
 func map_to_world_center(v : Vector2):
-	return tileMap.map_to_world(v) + Vector2.ONE * 16
+	return v + Vector2(offsetX, offsetY) + Vector2.ONE * 0.5
 
 func get_obj_from_tile(x, y):
 	# Returns null if there is nothing there, otherwise it
@@ -449,11 +478,11 @@ func end_of_enemy_turn():
 
 	number_of_turns_till_apocalypse -= 1
 	if number_of_turns_till_apocalypse <= 0 or are_all_good_guys_dead():
-#		GUI.get_node("End Turn").hide()
-#		GUI.get_node("TurnInfo").text = ""
-#		GUI.get_node("DeathScreen").show()
-		#$DeathSound.play()
-		#game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
+		GUI.get_node("End Turn").hide()
+		GUI.get_node("TurnInfo").text = ""
+		GUI.get_node("DeathScreen").show()
+		$DeathSound.play()
+		game_state = game_states.DEATH_DESTRUCTION_AND_THE_APOCALYPSE
 		return
 	
 	for character in get_tree().get_nodes_in_group("GoodGuys"):
@@ -607,7 +636,7 @@ func find_green(x, y):
 func place_green_tiles(x,y, max_movement):
 	var relevant_char = flat_game_board[xy_to_flat(x, y)]
 	var can_relevant_person_walk_on_lava = relevant_char and relevant_char.can_walk_on_lava
-	var greens = get_all_possible_movement_destinations(xy_to_flat(x,y), max_movement, can_relevant_person_walk_on_lava)
+	var greens = get_all_possible_movement_destinations(Vector2(x, y), max_movement, can_relevant_person_walk_on_lava)
 
 	# Remove the one corresponding to the current position
 	for i in range(len(greens)):
@@ -632,7 +661,9 @@ func remove_green_tiles():
 func place_attack_tiles(x,y, attackable_tiles):
 	active_greens = []
 	for vec in attackable_tiles:
-		if(flat_game_board[xy_to_flat(vec[0] + x, vec[1]+y)] != null and flat_game_board[xy_to_flat(vec[0]+x, vec[1]+y)].is_evul()):
+		var pos = Vector2(vec[0] + x, vec[1] + y)
+		var idx = xy_to_flat(pos.x, pos.y)
+		if is_valid_position(pos) and flat_game_board[idx] and flat_game_board[idx].is_evul():
 			var attack_icon = preload("res://Attack.tscn")
 			var attackable = attack_icon.instance()
 			tileMap.add_child(attackable)

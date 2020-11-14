@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=2]
+[gd_scene load_steps=48 format=2]
 
 [ext_resource path="res://Assets/moss_background_height.png" type="Texture" id=1]
 [ext_resource path="res://Assets/animated_character_m/elf_m_idle_anim_f2.png" type="Texture" id=2]
@@ -11,8 +11,28 @@
 [ext_resource path="res://FloorMeshLibrary.meshlib" type="MeshLibrary" id=9]
 [ext_resource path="res://Scripts/TileMap.gd" type="Script" id=10]
 [ext_resource path="res://LevelBuildingBlocks/GUI.tscn" type="PackedScene" id=11]
-[ext_resource path="res://LevelBuildingBlocks/Rocket.tscn" type="PackedScene" id=12]
+[ext_resource path="res://Assets/font_small.tres" type="DynamicFont" id=12]
 [ext_resource path="res://AI.gd" type="Script" id=13]
+[ext_resource path="res://BasicTroop.gd" type="Script" id=14]
+[ext_resource path="res://Assets/sounds/cleaver.ogg" type="AudioStream" id=15]
+[ext_resource path="res://Assets/animated_character_m/elf_m_run_anim_f2.png" type="Texture" id=16]
+[ext_resource path="res://Assets/animated_character_m/elf_m_run_anim_f0.png" type="Texture" id=17]
+[ext_resource path="res://Assets/animated_character_m/elf_m_run_anim_f3.png" type="Texture" id=18]
+[ext_resource path="res://Assets/animated_character_m/elf_m_run_anim_f1.png" type="Texture" id=19]
+[ext_resource path="res://Assets/sounds/footsteps.ogg" type="AudioStream" id=20]
+[ext_resource path="res://Assets/sounds/warp.ogg" type="AudioStream" id=21]
+[ext_resource path="res://Assets/sounds/death.ogg" type="AudioStream" id=22]
+[ext_resource path="res://Assets/music/sture at it again jingle.ogg" type="AudioStream" id=23]
+[ext_resource path="res://BasicGoon.gd" type="Script" id=24]
+[ext_resource path="res://Assets/animated_enemy/lizard_f_idle_anim_f3.png" type="Texture" id=25]
+[ext_resource path="res://Assets/animated_enemy/lizard_f_idle_anim_f0.png" type="Texture" id=26]
+[ext_resource path="res://Assets/animated_enemy/lizard_f_idle_anim_f1.png" type="Texture" id=27]
+[ext_resource path="res://Assets/animated_enemy/lizard_f_idle_anim_f2.png" type="Texture" id=28]
+[ext_resource path="res://Assets/label_long.png" type="Texture" id=29]
+[ext_resource path="res://Assets/sounds/rocket.ogg" type="AudioStream" id=30]
+[ext_resource path="res://Scripts/Rocket.gd" type="Script" id=31]
+[ext_resource path="res://Assets/rocket_fire.png" type="Texture" id=32]
+[ext_resource path="res://Assets/rocket_ship.png" type="Texture" id=33]
 
 [sub_resource type="VisualShaderNodeTexture" id=1]
 texture = ExtResource( 7 )
@@ -98,15 +118,49 @@ albedo_color = Color( 0.00392157, 0.996078, 0.92549, 1 )
 material = SubResource( 9 )
 size = Vector2( 1, 1 )
 
-[sub_resource type="SpriteFrames" id=12]
+[sub_resource type="SpriteFrames" id=11]
 animations = [ {
 "frames": [ ExtResource( 3 ), ExtResource( 8 ), ExtResource( 2 ), ExtResource( 4 ) ],
 "loop": true,
-"name": "default",
+"name": "idle",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 17 ), ExtResource( 19 ), ExtResource( 16 ), ExtResource( 18 ) ],
+"loop": true,
+"name": "run",
 "speed": 5.0
 } ]
 
-[sub_resource type="BoxShape" id=11]
+[sub_resource type="SpriteFrames" id=13]
+animations = [ {
+"frames": [ ExtResource( 26 ), ExtResource( 27 ), ExtResource( 28 ), ExtResource( 25 ) ],
+"loop": true,
+"name": "idle",
+"speed": 5.0
+}, {
+"frames": [  ],
+"loop": true,
+"name": "run",
+"speed": 5.0
+} ]
+
+[sub_resource type="Animation" id=14]
+resource_name = "point"
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.5, 1 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ), Vector2( 16, 0 ), Vector2( 0, 0 ) ]
+}
+
+[sub_resource type="BoxShape" id=12]
 
 [node name="Node2D" type="Spatial"]
 
@@ -132,7 +186,7 @@ mesh_library = ExtResource( 9 )
 cell_size = Vector3( 1, 1, 1 )
 cell_center_y = false
 data = {
-"cells": PoolIntArray( 0, 0, 0, 1, 0, 0, 2, 0, 0, 65530, 0, 0, 65531, 0, -1610612736, 65532, 0, 0, 65533, 0, 0, 65534, 0, 0, 65535, 0, 0, 0, 1, -1610612736, 1, 1, 0, 2, 1, 0, 65530, 1, 0, 65531, 1, -1610612736, 65532, 1, -1073741824, 65533, 1, -1610612736, 65534, 1, 0, 65535, 1, -1610612736, 0, 2, 0, 1, 2, 0, 2, 2, 0, 65530, 2, 0, 65531, 2, -1610612736, 65532, 2, -1610612736, 65533, 2, 0, 65534, 2, -1610612736, 65535, 2, 0, 0, 3, -1610612736, 1, 3, -1610612736, 2, 3, 0, 65530, 3, 0, 65531, 3, 0, 65532, 3, 0, 65533, 3, -1073741824, 65534, 3, 0, 65535, 3, 0, 0, 4, -1610612736, 1, 4, 0, 2, 4, 0, 65532, 4, 0, 65533, 4, 0, 65534, 4, 0, 65535, 4, -1610612736, 1, 65533, 0, 0, 65534, 0, 1, 65534, 0, 2, 65534, 0, 65532, 65534, 0, 65533, 65534, 0, 65534, 65534, 0, 65535, 65534, 0, 0, 65535, 0, 1, 65535, 0, 2, 65535, 0, 65531, 65535, 0, 65532, 65535, 0, 65533, 65535, 0, 65534, 65535, 0, 65535, 65535, -536870912 )
+"cells": PoolIntArray( 0, 0, 0, 1, 0, 0, 2, 0, 0, 65530, 0, -1610612736, 65531, 0, 0, 65532, 0, 0, 65533, 0, 0, 65534, 0, 0, 65535, 0, 0, 0, 1, -1610612736, 1, 1, 0, 2, 1, 0, 65530, 1, -1610612736, 65531, 1, -1610612736, 65532, 1, 0, 65533, 1, 0, 65534, 1, 0, 65535, 1, -1610612736, 0, 2, 0, 1, 2, 0, 2, 2, -1610612736, 65530, 2, 0, 65531, 2, 0, 65532, 2, 0, 65533, 2, 0, 65534, 2, 0, 65535, 2, 0, 0, 3, -1073741824, 1, 3, 0, 2, 3, 0, 65530, 3, -1610612736, 65531, 3, 0, 65532, 3, 0, 65533, 3, 0, 65534, 3, 0, 65535, 3, 0, 0, 4, 0, 1, 4, 0, 2, 4, 0, 65532, 4, 0, 65533, 4, 0, 65534, 4, 0, 65535, 4, 0, 1, 65533, -1610612736, 0, 65534, -1610612736, 1, 65534, -1610612736, 2, 65534, -1073741824, 65532, 65534, 0, 65533, 65534, 0, 65534, 65534, 0, 65535, 65534, 0, 0, 65535, -1610612736, 1, 65535, 0, 2, 65535, -536870912, 65531, 65535, 0, 65532, 65535, -1610612736, 65533, 65535, 0, 65534, 65535, 0, 65535, 65535, 0 )
 }
 script = ExtResource( 10 )
 __meta__ = {
@@ -145,19 +199,132 @@ layers = 2
 mesh = SubResource( 7 )
 material/0 = null
 
-[node name="homan" type="Spatial" parent="TileMap"]
-transform = Transform( 1, 0, 0, 0, 0.721893, 0.692005, 0, -0.692005, 0.721893, -1.5, 0.05, 3 )
+[node name="BasicTroop" type="Spatial" parent="TileMap" groups=[
+"GoodGuys",
+]]
+transform = Transform( 1, 0, 0, 0, 0.721893, 0.692005, 0, -0.692005, 0.721893, -1.5, 0.05, 1.55378 )
+script = ExtResource( 14 )
 
-[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="TileMap/homan"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.945757, -4.76837e-07 )
+[node name="AnimatedSprite" type="AnimatedSprite3D" parent="TileMap/BasicTroop"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.660335, 0.297748 )
 pixel_size = 0.0665
-frames = SubResource( 12 )
-playing = true
+frames = SubResource( 11 )
+animation = "idle"
+frame = 1
 
-[node name="Rocket" parent="TileMap" instance=ExtResource( 12 )]
+[node name="AttackSound" type="AudioStreamPlayer2D" parent="TileMap/BasicTroop"]
+stream = ExtResource( 15 )
+bus = "Sound effects"
+
+[node name="FootSound" type="AudioStreamPlayer2D" parent="TileMap/BasicTroop"]
+stream = ExtResource( 20 )
+bus = "Sound effects"
+
+[node name="BasicGoon" type="Spatial" parent="TileMap" groups=[
+"BadGuys",
+]]
+transform = Transform( 1, 0, 0, 0, 0.721893, 0.692005, 0, -0.692005, 0.721893, -4.46576, 0.05, 1.55378 )
+script = ExtResource( 24 )
+
+[node name="AnimatedSprite" type="AnimatedSprite3D" parent="TileMap/BasicGoon"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.660335, 0.297748 )
+pixel_size = 0.0665
+frames = SubResource( 13 )
+animation = "idle"
+
+[node name="AttackSound" type="AudioStreamPlayer2D" parent="TileMap/BasicGoon"]
+stream = ExtResource( 15 )
+bus = "Sound effects"
+
+[node name="FootSound" type="AudioStreamPlayer2D" parent="TileMap/BasicGoon"]
+stream = ExtResource( 20 )
+bus = "Sound effects"
+
+[node name="Rocket" type="Spatial" parent="TileMap"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.51087, 0, 3.50945 )
+script = ExtResource( 31 )
+
+[node name="ship" type="Sprite3D" parent="TileMap/Rocket"]
+transform = Transform( 1, 0, 0, 0, 0.826698, 0.562646, 0, -0.562646, 0.826698, 0, 0.321487, 0.165541 )
+pixel_size = 0.04
+texture = ExtResource( 33 )
+
+[node name="fire" type="Sprite3D" parent="TileMap/Rocket/ship"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.00947964, 0 )
+visible = false
+pixel_size = 0.04
+texture = ExtResource( 32 )
+
+[node name="HelpText" type="Node2D" parent="TileMap/Rocket"]
+position = Vector2( 32, 0 )
+
+[node name="Arrow" type="Node2D" parent="TileMap/Rocket/HelpText"]
+
+[node name="LabelRight" type="Node2D" parent="TileMap/Rocket/HelpText/Arrow"]
+visible = false
+
+[node name="label_long" type="Sprite" parent="TileMap/Rocket/HelpText/Arrow/LabelRight"]
+position = Vector2( 144, 0 )
+rotation = 3.14159
+scale = Vector2( 0.397, -0.397 )
+texture = ExtResource( 29 )
+
+[node name="Label" type="Label" parent="TileMap/Rocket/HelpText/Arrow/LabelRight"]
+margin_left = 24.0
+margin_top = -8.0
+margin_right = 272.0
+margin_bottom = 8.0
+custom_fonts/font = ExtResource( 12 )
+text = "Get to da ship!"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LabelLeft" type="Node2D" parent="TileMap/Rocket/HelpText/Arrow"]
+visible = false
+position = Vector2( -360, 0 )
+
+[node name="label_long" type="Sprite" parent="TileMap/Rocket/HelpText/Arrow/LabelLeft"]
+position = Vector2( 144, 0 )
+rotation = 3.14159
+scale = Vector2( -0.397, -0.397 )
+texture = ExtResource( 29 )
+
+[node name="Label" type="Label" parent="TileMap/Rocket/HelpText/Arrow/LabelLeft"]
+margin_left = 24.0
+margin_top = -8.0
+margin_right = 272.0
+margin_bottom = 8.0
+custom_fonts/font = ExtResource( 12 )
+text = "Get to da ship!"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="TileMap/Rocket/HelpText/Arrow"]
+autoplay = "point"
+anims/point = SubResource( 14 )
+
+[node name="RocketSound" type="AudioStreamPlayer2D" parent="TileMap/Rocket"]
+stream = ExtResource( 30 )
+bus = "Sound effects"
 
 [node name="AI" type="Node2D" parent="TileMap"]
 script = ExtResource( 13 )
+
+[node name="GameStartJingle" type="AudioStreamPlayer" parent="TileMap"]
+stream = ExtResource( 23 )
+volume_db = 0.8
+bus = "Music"
+
+[node name="WarpSound" type="AudioStreamPlayer" parent="TileMap"]
+stream = ExtResource( 21 )
+volume_db = -4.467
+bus = "Sound effects"
+
+[node name="DeathSound" type="AudioStreamPlayer" parent="TileMap"]
+stream = ExtResource( 22 )
+bus = "Sound effects"
 
 [node name="gridarea" type="Area" parent="."]
 transform = Transform( 20, 0, 0, 0, 1, 0, 0, 0, 10, 0, 0.01, 0 )
@@ -165,6 +332,6 @@ collision_layer = 2
 
 [node name="CollisionShape" type="CollisionShape" parent="gridarea"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0 )
-shape = SubResource( 11 )
+shape = SubResource( 12 )
 
 [node name="GUI" parent="." instance=ExtResource( 11 )]

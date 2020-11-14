@@ -1,12 +1,17 @@
 extends Camera
 
 var tile
+var tilemap
 
 func _ready():
 	tile = get_parent().get_node("tile")
 	
 	var cells = get_parent().get_node("TileMap").get_used_cells()
-	print(cells)
+	
+	get_parent().get_node("TileMap").connect("ready", self, "_on_TileMap_ready")
+
+func _on_TileMap_ready(_tilemap):
+	tilemap = _tilemap
 
 func _input(event):
 	if event is InputEventMouseButton:
@@ -24,15 +29,27 @@ func _input(event):
 func _physics_process(delta):
 	var mouse = get_viewport().get_mouse_position()
 
+	var coord = get_tile_from_screen(mouse)
+
+	if coord:
+		tile.transform.origin = Vector3(coord.x+0.5, 0.01, coord.y+0.5)
+
+func get_tile_from_screen(screen_pos : Vector2):
+	var mouse = get_viewport().get_mouse_position()
+
 	var space_state = get_world().direct_space_state
 	
-	var dir = project_ray_normal(mouse)
+	var dir = project_ray_normal(screen_pos)
 
 	var result = space_state.intersect_ray(transform.origin, dir*1000, [self], 2, false, true)
 
 	if result:
-		var p = result.position
-		p.y = 0.01
-		p.x = floor(p.x)+0.5
-		p.z = floor(p.z)+0.5
-		tile.transform.origin = p
+		var coord = Vector2(floor(result.position.x), floor(result.position.z))
+		return coord
+	return null
+
+# Converts mouse position to world coordinates.
+func world_to_map(event):
+	var coord = get_tile_from_screen(event.position)
+	var offset = Vector2(tilemap.offsetX, tilemap.offsetY)
+	return coord - offset

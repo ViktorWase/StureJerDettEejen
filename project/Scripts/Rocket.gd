@@ -1,8 +1,8 @@
-extends Node2D
+extends Spatial
 
 var alignment
-export var thrustSpeed = 40
 export var displayLeft = false
+var thrustSpeed = 2
 var thrustVelocity = 0
 var is_going_to_space = false
 
@@ -52,8 +52,8 @@ func set_coordinates(coord):
 	set_coordinates_only(coord)
 
 	var tilemap = get_parent()
-	position.x = tilemap.map_to_world(coord)[0] + 16
-	position.y = tilemap.map_to_world(coord)[1] + 16
+	transform.origin.x = coord.x + tilemap.offsetX + 0.5
+	transform.origin.z = coord.y + tilemap.offsetY + 0.5
 # end od MainDude
 
 func _ready():
@@ -66,7 +66,7 @@ func _ready():
 		$HelpText/Arrow/LabelLeft.hide()
 		$HelpText/Arrow/LabelRight.show()
 	
-	$fire.hide()
+	$ship/fire.hide()
 
 func calculate_score():
 	var remaining_time = get_parent().number_of_turns_till_apocalypse
@@ -101,7 +101,7 @@ func get_nearby_characters():
 
 func go_to_space():
 	is_going_to_space = true
-	$fire.show()
+	$ship/fire.show()
 	$RocketSound.play()
 
 func show_help_text():
@@ -113,4 +113,4 @@ func hide_help_text():
 func _physics_process(delta):
 	if (is_going_to_space):
 		thrustVelocity += thrustSpeed*delta
-		position += Vector2.UP*thrustVelocity*delta
+		transform.origin += transform.basis.y*thrustVelocity*delta
