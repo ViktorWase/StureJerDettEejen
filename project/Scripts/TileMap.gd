@@ -24,6 +24,10 @@ var planned_enemy_movements_counter = 0
 
 var end_counter # used to insert a time padding when resetting the board
 
+# A list of the items that have been collected in this map and belong to the
+# entire good-guy team.
+var collected_global_items = []
+
 var GUI
 var Camera
 
@@ -391,6 +395,9 @@ func _input(event):
 						if (green in get_tree().get_nodes_in_group("cancel")):
 							remove_green_tiles()
 							active_character.darken_character()
+
+							var effects = active_character.go_thru_all_items_after_turn(flat_game_board)
+							assert(len(effects) == 0, "I HAVEN'T WRITTEN THE SUPPORT FOR ITEM EFFECTS YET!")
 							game_turn_state = game_turn_states.choose_character
 							return
 							
@@ -409,6 +416,9 @@ func _input(event):
 						remove_green_tiles()
 						active_character.darken_character()
 						active_character.play_attack_sound()
+
+						var effects = active_character.go_thru_all_items_after_turn(flat_game_board)
+						assert(len(effects) == 0, "I HAVEN'T WRITTEN THE SUPPORT FOR ITEM EFFECTS YET!")
 						
 						# set next player turn
 						set_player_turn()
@@ -427,7 +437,12 @@ func _input(event):
 							# Check of there is an pickupable object on that position
 							if flat_game_board[xy_to_flat(green.cx, green.cy)]:
 								var objed_to_be_used = flat_game_board[xy_to_flat(green.cx, green.cy)]
-								active_character.set_target_pickup(objed_to_be_used)
+								var pickup_result = active_character.set_target_pickup(objed_to_be_used, flat_game_board)
+
+								if "effect" in pickup_result:
+									assert(false, "ITEM EFFECTS HAVE NOT BEEN IMPLEMENTED YET.")
+								if "to_global_item_list" in pickup_result:
+									collected_global_items.append(objed_to_be_used)
 
 							flat_game_board[xy_to_flat(active_character.cx, active_character.cy)] = null
 							flat_game_board[xy_to_flat(green.cx, green.cy)] = active_character
@@ -479,6 +494,8 @@ func end_of_player_turn():
 	
 	if (active_character):
 		active_character.darken_character()
+		var effects = active_character.go_thru_all_items_after_turn(flat_game_board)
+		assert(len(effects) == 0, "I HAVEN'T WRITTEN THE SUPPORT FOR ITEM EFFECTS YET!")
 
 	# check winning condition
 	if ($Rocket.is_character_nearby()):
@@ -520,6 +537,9 @@ func _process(delta):
 							game_turn_state = game_turn_states.select_attack
 						else:
 							active_character.darken_character()
+							var effects = active_character.go_thru_all_items_after_turn(flat_game_board)
+							assert(len(effects) == 0, "I HAVEN'T WRITTEN THE SUPPORT FOR ITEM EFFECTS YET!")
+
 							# set next player turn
 							set_player_turn()
 				game_turn_states.choose_character:
