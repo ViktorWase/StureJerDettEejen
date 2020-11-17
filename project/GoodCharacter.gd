@@ -6,7 +6,8 @@ var items = []
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	set_good()
-	add_to_group("Characters")  # TODO: Did I rename it to good guys or something?
+
+	add_to_group("GoodGuys")
 
 func set_target_pickup(item, flat_game_board):
 	# This function is called when an item is picked up.

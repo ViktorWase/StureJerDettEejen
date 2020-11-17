@@ -11,6 +11,7 @@ enum Alignment {
 
 var alignment = Alignment.undefined
 var max_walk_distance = 2
+var max_watch_distance = 3
 var damage = 1
 var waypoints
 var waypoint_index
@@ -142,7 +143,6 @@ func _physics_process(delta):
 		if (waypoint_index >= len(waypoints)):
 			play_idle()
 			waypoints = null
-			print("end")
 			is_done_moving = true
 			# TODO
 			# set_coordinates()
@@ -161,8 +161,7 @@ func _physics_process(delta):
 		scale.x = -abs(scale.x)
 	else:
 		scale.x = abs(scale.x)
-		
-	#velocity = move_and_slide(velocity)
+	
 	position += velocity*delta
 
 func play_attack_sound():

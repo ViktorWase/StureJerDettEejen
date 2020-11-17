@@ -1,8 +1,58 @@
+# NOTE: NEVER CHANGE ANYTHING IN THE flat_board VARIABLE, OKAY?
+#		IT IS READ-ONLY! OTHERWISE WE WILL HAVE THE MOST CONVOLUTED
+#		AND UNSOLVABLE BUGS IMAGINABLE, OKAY? Good.
+
 extends Node
 
-# NOTE: NEVER CHANGE ANYTHING IN THE flat_board VARIABLE, OKAY?
-# 		IT IS READ-ONLY! OTHERWISE WE WILL HAVE THE MOST CONVOLUTED
-#		AND UNSOLVABLE BUGS IMAGINABLE, OKAY? Good.
+# Okay, so the AI algorithm is actually rather simple. First of all, all
+# evul chars are divided into two groups based on if they plan or not
+# as defined by has_planning_personality().
+# The ones that don't plan are dealt with first. They do what they feel like.
+#
+# Then starts the planning. The AI considers all moves that the planning evul
+# chars can do, and for each of these it considers all the ways that the good
+# guy can respond. The function heuristic() takes a look at the board and returns
+# a high number if things are looking good for the bad guys, and a negative number
+# otherwise. The AI chooses the set of moves that maximises the value of heuristic(),
+# under the assumption that the player tries to minimize the value of heuristic().
+#
+# NOTE: The AI has a specific order in which the evul chars has to move. The order
+#		is arbitrary (TODO: that should probably change). This means that not all set of
+#		moves are considered, but it's probably fine. The algorithm would be significantly
+#		slower otherwise.
+
+# It should be noted that there is no grand theory behind the design of heuristic().
+# It's just trial-n-error and gut-based decisions. So feel free to change it and
+# see if something improves.
+func heuristic(flat_board):
+	var total_number_of_hp_of_good_guys = 0
+	var total_number_of_hp_of_bad_guys = 0
+	var all_bad_guys_idx = []
+	var all_good_guys_idx = []
+	# Calculate the total HP of the good guys. Do the same for the evuls.
+	for i in range(sizex*sizey):
+		var el = flat_board[i]
+		if el != null:
+			if el["is_evul"]:
+				all_bad_guys_idx.append(i)
+				total_number_of_hp_of_bad_guys += el["current_hp"]
+			if el["is_good"]:
+				total_number_of_hp_of_good_guys += el["current_hp"]
+				all_good_guys_idx.append(i)
+	
+	# This variable is large if all evuls are close to a good guy, and small
+	# if they are far away.
+	var sum_of_recip_of_closest_square_dists = 0.0
+	for idx in all_bad_guys_idx:
+		var closest_yet = INF
+		for good_idx in all_good_guys_idx:
+			var dist_sq = squareDistFromIdxs(idx, good_idx)
+			
+			if dist_sq < closest_yet:
+				closest_yet = dist_sq
+		sum_of_recip_of_closest_square_dists += 1.0 / (closest_yet + 0.1)
+	
+	return total_number_of_hp_of_bad_guys - total_number_of_hp_of_good_guys + 0.000001 * sum_of_recip_of_closest_square_dists
 
 var sizex : int = -1
 var sizey : int = -1
@@ -279,7 +329,15 @@ func extract_bad_guys(flat_board):
 	for i in range(sizex * sizey):
 		if flat_board[i] and flat_board[i].is_evul():
 			assert(binary_mask[i])
-			bad_guys.append({"character": flat_board[i], "x": i % sizex, "y": int(i / sizex)})
+			bad_guys.append({"character": flat_board[i], "x": i % sizex, "y": int(i / sizex), "idx": i})
+	return bad_guys
+
+func extract_bad_guys_that_plan(flat_board):
+	var bad_guys = []
+	for i in range(sizex * sizey):
+		if flat_board[i] and flat_board[i].is_evul() and flat_board[i].has_planning_personality():
+			assert(binary_mask[i])
+			bad_guys.append({"character": flat_board[i], "x": i % sizex, "y": int(i / sizex), "idx": i})
 	return bad_guys
 
 func update_binary_mask(flat_board):
@@ -299,33 +357,6 @@ func squareDistFromIdxs(idx1, idx2):
 	var y2 = int(idx2 / sizex)
 	
 	return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)
-
-func heuristic(flat_board):
-	var total_number_of_hp_of_good_guys = 0
-	var total_number_of_hp_of_bad_guys = 0
-	var all_bad_guys_idx = []
-	var all_good_guys_idx = []
-	for i in range(sizex*sizey):
-		var el = flat_board[i]
-		if el != null:
-			if el["is_evul"]:
-				all_bad_guys_idx.append(i)
-				total_number_of_hp_of_bad_guys += el["current_hp"]
-				# TODO: Move closer to the good guys
-			if el["is_good"]:
-				total_number_of_hp_of_good_guys += el["current_hp"]
-				all_good_guys_idx.append(i)
-	var sum_of_recip_of_closest_square_dists = 0.0
-	for idx in all_bad_guys_idx:
-		var closest_yet = INF
-		for good_idx in all_good_guys_idx:
-			var dist_sq = squareDistFromIdxs(idx, good_idx)
-			
-			if dist_sq < closest_yet:
-				closest_yet = dist_sq
-		sum_of_recip_of_closest_square_dists += 1.0 / (closest_yet + 0.1)
-	
-	return total_number_of_hp_of_bad_guys - total_number_of_hp_of_good_guys + 0.000001 * sum_of_recip_of_closest_square_dists
 
 func update_state_vec(state_vec, moves_per_char):
 	assert(len(state_vec) == len(moves_per_char))
@@ -503,11 +534,12 @@ func consider_all_moves(bad_guys, good_guys, flat_board):
 	var state_vec = []
 	var moves_per_char = []
 	for i in range(len(bad_guys)):
+		
 		state_vec.append(0)
 		moves_per_char.append(len(bad_guys[i]["movements"]))
 	
 	# Go thru all moves that can be made and check what the heuristic thinks.
-	# Return the one that the heuristisk function thinks is best.
+	# Return the one that the heuristic function thinks is best.
 	var best_state = []
 	var best_attack_state = []
 	var best_state_val = -INF
@@ -517,7 +549,6 @@ func consider_all_moves(bad_guys, good_guys, flat_board):
 		while not is_done:
 			var attack_state = []
 			debug_counter += 1
-			#var val = update_moves_on_flat_board_and_calc_heuristic(state_vec, bad_guys, flat_board, attack_state)
 			var edited_flat_board = update_moves_on_flat_board(state_vec, bad_guys, flat_board, attack_state)
 			if edited_flat_board != null:
 				
@@ -553,6 +584,17 @@ func convert_state_vec_to_interface(state_vec, bad_guys, attack_state):
 	
 	return all_chosen_moves
 
+func get_moves_all_evuls_that_dont_plan(bad_guys, good_guys, flat_board):
+	# Some evuls take stupid desciosions. They are not controlled by the
+	# great and beautiful AI, so let's take care of them first.
+	var moves = []
+	for bg in bad_guys:
+		var evul_char = bg["character"]
+		if not evul_char.has_planning_personality():
+			var move = evul_char.move_evul(bg["idx"], flat_board, sizex, sizey)
+			moves.append(move)
+	return moves
+
 func get_moves(flat_board):
 	# IMPORTANT: flat_board is read only. Don't change anything in it.
 	assert(len(flat_board) == sizex * sizey)
@@ -564,4 +606,37 @@ func get_moves(flat_board):
 		var movements = get_all_possible_movements_of_character(bad_guy, flat_board)
 		bad_guy["movements"] = movements
 	
-	return consider_all_moves(bad_guys, good_guys, flat_board)
+	var moves = get_moves_all_evuls_that_dont_plan(bad_guys, good_guys, flat_board)
+	
+	# APPLY THE MOVES BEFORE THE NEXT CALL
+	var flat_board_copy = []
+	for i in range(len(flat_board)):
+		if flat_board[i]:
+			flat_board_copy.append(flat_board[i].duplicate())
+		else:
+			flat_board_copy.append(null)
+	for move in moves:
+		var new_pos = move["new_pos"]
+		var old_pos = move["old_pos"]
+		var old_idx = old_pos[0] + old_pos[1] * sizex
+		var new_idx = new_pos[0] + new_pos[1] * sizex
+		assert(flat_board_copy[old_idx])
+		if new_idx != old_idx:
+			assert(flat_board_copy[new_idx] == null)
+		var obj = flat_board_copy[old_idx] 
+		flat_board_copy[new_idx] = obj
+		flat_board_copy[old_idx] = null
+		if move["attacked_pos"]:
+			var attacked_idx = move["attacked_pos"][0] + move["attacked_pos"][1] * sizex
+			assert(flat_board_copy[attacked_idx])
+			assert(flat_board_copy[attacked_idx].current_hp > 0)
+			flat_board_copy[attacked_idx].current_hp -= obj.damage
+			if (flat_board_copy[attacked_idx].current_hp <= 0):
+				flat_board_copy[attacked_idx] = null
+	
+	var bad_guys_that_plan = extract_bad_guys_that_plan(flat_board_copy)
+	var remaining_good_guys = extract_good_guys(flat_board_copy)
+	update_binary_mask(flat_board_copy)
+	moves += consider_all_moves(bad_guys_that_plan, remaining_good_guys, flat_board_copy)
+	
+	return moves
