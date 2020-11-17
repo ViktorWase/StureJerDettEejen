@@ -5,6 +5,13 @@ var flat_map
 var number_of_steps_to
 var active_greens = []
 
+# variables for the map
+var width
+var height
+var offsetX
+var offsetY
+var tileSize = 32
+
 var X = 10
 var Y = 10
 var SIZE = X * Y
@@ -17,7 +24,12 @@ var planned_enemy_movements_counter = 0
 
 var end_counter # used to insert a time padding when resetting the board
 
+# A list of the items that have been collected in this map and belong to the
+# entire good-guy team.
+var collected_global_items = []
+
 var GUI
+var Camera
 
 enum game_states {
 	player_turn,
@@ -40,8 +52,9 @@ var game_turn_state
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	# get reference to GUI and Lava node
+	# get reference to GUI and camera
 	GUI = get_tree().get_root().get_node("Node2D").get_node("GUI")
+	Camera = get_tree().get_root().get_node("Node2D").get_node("Camera")
 	
 	# This is the list that contains all the THINGS that are on the board.
 	# Note that there can only be one THING per tile. So an object and a player
@@ -59,20 +72,27 @@ func _ready():
 	
 	# Read data from scene
 	var cells = get_used_cells()
+	var minX = 0
 	var maxX = 0
+	var minY = 0
 	var maxY = 0
 	for cell in cells:
-		if (cell.x > maxX):
-			maxX = cell.x
-		if (cell.y > maxY):
-			maxY = cell.x
-	X = int(maxX)
-	Y = int(maxY)
+		minX = min(minX, cell.x)
+		maxX = max(maxX, cell.x)
+		minY = min(minY, cell.y)
+		maxY = max(maxY, cell.y)
+	X = int(maxX - minX) + 1 # TODO: wtf, nånstans kollar vi ett index för mycket neråt/åt höger
+	Y = X # TODO: int(maxY - minY)
 	SIZE = X * Y
+	
+	offsetX = 0 # TODO: minX
+	offsetY = 0 # TODO: minY
+	width = X
+	height = Y
 
 	#var idx = 0
-	for y in range(Y):  # TODO: Y is too small, and also it's set somewhere else I think.
-		for x in range(X):
+	for _y in range(Y):  # TODO: Y is too small, and also it's set somewhere else I think.
+		for _x in range(X):
 			flat_game_board.append(null)
 			number_of_steps_to.append(false)
 			flat_map.append(0)
@@ -127,6 +147,8 @@ func _ready():
 	$GameStartJingle.play()
 	
 	$AI.setup(flat_map, X, Y)
+
+	emit_signal("ready", self)
 
 func _on_end_turn_pressed():
 	$Rocket.hide_help_text()
@@ -344,7 +366,7 @@ func reset_movement_of_evul_chars():
 
 func _input(event):
 	if event.is_action_pressed("ui_left_click"):
-		var map_pos = world_to_map(event.position - position)
+		var map_pos = Camera.world_to_map(event)
 		var obj = get_obj_from_tile(map_pos[0], map_pos[1])
 		
 		match(game_state):
@@ -373,6 +395,9 @@ func _input(event):
 						if (green in get_tree().get_nodes_in_group("cancel")):
 							remove_green_tiles()
 							active_character.darken_character()
+
+							var effects = active_character.go_thru_all_items_after_turn(flat_game_board)
+							assert(len(effects) == 0, "I HAVEN'T WRITTEN THE SUPPORT FOR ITEM EFFECTS YET!")
 							game_turn_state = game_turn_states.choose_character
 							return
 							
@@ -390,6 +415,9 @@ func _input(event):
 						remove_green_tiles()
 						active_character.darken_character()
 						active_character.play_attack_sound()
+
+						var effects = active_character.go_thru_all_items_after_turn(flat_game_board)
+						assert(len(effects) == 0, "I HAVEN'T WRITTEN THE SUPPORT FOR ITEM EFFECTS YET!")
 						
 						# set next player turn
 						set_player_turn()
@@ -408,7 +436,12 @@ func _input(event):
 							# Check of there is an pickupable object on that position
 							if flat_game_board[xy_to_flat(green.cx, green.cy)]:
 								var objed_to_be_used = flat_game_board[xy_to_flat(green.cx, green.cy)]
-								active_character.set_target_pickup(objed_to_be_used)
+								var pickup_result = active_character.set_target_pickup(objed_to_be_used, flat_game_board)
+
+								if "effect" in pickup_result:
+									assert(false, "ITEM EFFECTS HAVE NOT BEEN IMPLEMENTED YET.")
+								if "to_global_item_list" in pickup_result:
+									collected_global_items.append(objed_to_be_used)
 
 							flat_game_board[xy_to_flat(active_character.cx, active_character.cy)] = null
 							flat_game_board[xy_to_flat(green.cx, green.cy)] = active_character
@@ -460,6 +493,8 @@ func end_of_player_turn():
 	
 	if (active_character):
 		active_character.darken_character()
+		var effects = active_character.go_thru_all_items_after_turn(flat_game_board)
+		assert(len(effects) == 0, "I HAVEN'T WRITTEN THE SUPPORT FOR ITEM EFFECTS YET!")
 
 	# check winning condition
 	if ($Rocket.is_character_nearby()):
@@ -503,6 +538,9 @@ func _process(delta):
 							game_turn_state = game_turn_states.select_attack
 						else:
 							active_character.darken_character()
+							var effects = active_character.go_thru_all_items_after_turn(flat_game_board)
+							assert(len(effects) == 0, "I HAVEN'T WRITTEN THE SUPPORT FOR ITEM EFFECTS YET!")
+
 							# set next player turn
 							set_player_turn()
 				game_turn_states.choose_character:

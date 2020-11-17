@@ -18,10 +18,13 @@ script = ExtResource( 6 )
 [node name="GameStartJingle" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 1 )
 volume_db = 0.8
+bus = "Music"
 
 [node name="WarpSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 2 )
 volume_db = -4.467
+bus = "Sound effects"
 
 [node name="DeathSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 3 )
+bus = "Sound effects"

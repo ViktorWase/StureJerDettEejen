@@ -1,5 +1,7 @@
 extends Node2D
 
+# TODO: Do we really need this this class?
+
 var alignment
 export var thrustSpeed = 40
 export var displayLeft = false
@@ -17,6 +19,9 @@ enum {
 	blocking,
 	undefined
 }
+
+func is_item():
+	return false
 
 func is_evul():
 	return alignment == evul

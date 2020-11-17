@@ -2,25 +2,16 @@
 
 [ext_resource path="res://Assets/lava.png" type="Texture" id=1]
 [ext_resource path="res://Scripts/LavaBackground.gd" type="Script" id=2]
+[ext_resource path="res://Materials/Background.shader" type="Shader" id=3]
 
-[sub_resource type="Shader" id=1]
-code = "shader_type canvas_item;
-
-uniform float time;
-
-void fragment(){
-	vec2 v = UV;
-	v.x = mod(v.x + 0.12*(1.0 + cos(UV.x*1.312+time))/2.0, 1.0);
-	v.y = mod(v.y + 0.08*(1.0 + sin(UV.y*3.333+time*1.2))/2.0, 1.0);
-	COLOR = texture(TEXTURE, v);
-}"
-
-[sub_resource type="ShaderMaterial" id=2]
-shader = SubResource( 1 )
+[sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 3 )
 shader_param/time = null
+shader_param/offset = null
+shader_param/size = Vector2( 128, 128 )
 
 [node name="LavaBackground" type="TextureRect"]
-material = SubResource( 2 )
+material = SubResource( 1 )
 margin_right = 1024.0
 margin_bottom = 600.0
 texture = ExtResource( 1 )
