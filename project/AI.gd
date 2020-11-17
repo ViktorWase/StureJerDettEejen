@@ -584,7 +584,7 @@ func convert_state_vec_to_interface(state_vec, bad_guys, attack_state):
 	
 	return all_chosen_moves
 
-func move_all_evuls_that_dont_plan(bad_guys, good_guys, flat_board):
+func get_moves_all_evuls_that_dont_plan(bad_guys, good_guys, flat_board):
 	# Some evuls take stupid desciosions. They are not controlled by the
 	# great and beautiful AI, so let's take care of them first.
 	var moves = []
@@ -606,7 +606,7 @@ func get_moves(flat_board):
 		var movements = get_all_possible_movements_of_character(bad_guy, flat_board)
 		bad_guy["movements"] = movements
 	
-	var moves = move_all_evuls_that_dont_plan(bad_guys, good_guys, flat_board)
+	var moves = get_moves_all_evuls_that_dont_plan(bad_guys, good_guys, flat_board)
 	
 	# APPLY THE MOVES BEFORE THE NEXT CALL
 	var flat_board_copy = []
