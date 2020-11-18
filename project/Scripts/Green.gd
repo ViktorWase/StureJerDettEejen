@@ -20,7 +20,7 @@ func set_coordinates(coord):
 
 	var tilemap = get_parent()	
 	transform.origin.x = coord.x + tilemap.offsetX + 0.5
-	transform.origin.y = 0.1
+	transform.origin.y = 0.01
 	transform.origin.z = coord.y + tilemap.offsetY + 0.5
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

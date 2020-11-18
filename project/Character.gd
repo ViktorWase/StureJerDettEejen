@@ -86,8 +86,8 @@ func set_coordinates(coord):
 	set_coordinates_only(coord)
 
 	var tilemap = get_parent()
-	transform.origin.x = coord.x + tilemap.offsetX + 0.5 #tilemap.map_to_world(coord)[0] + 16
-	transform.origin.z = coord.y + tilemap.offsetY + 0.5 #tilemap.map_to_world(coord)[1] + 16
+	transform.origin.x = coord.x + tilemap.offsetX + 0.5
+	transform.origin.z = coord.y + tilemap.offsetY + 0.5
 
 func reset_graphics():
 	play_idle()

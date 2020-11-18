@@ -111,6 +111,9 @@ func hide_help_text():
 	$HelpText.hide()
 
 func _physics_process(delta):
+	if $HelpText.visible:
+		$HelpText.position = get_viewport().get_camera().unproject_position(transform.origin + Vector3.UP + Vector3.RIGHT*0.5)
+	
 	if (is_going_to_space):
 		thrustVelocity += thrustSpeed*delta
 		transform.origin += transform.basis.y*thrustVelocity*delta
