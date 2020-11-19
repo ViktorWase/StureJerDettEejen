@@ -34,6 +34,10 @@ var startCoords : Vector2
 func _ready():
 	has_moved_current_turn = false
 
+	# tilt and offset the character sprite for a better effect
+	$Sprite.transform.origin.z = 0.28
+	$Sprite.rotation_degrees.x = -43
+
 func get_attack_coordinates():
 	return attack_coordinates
 

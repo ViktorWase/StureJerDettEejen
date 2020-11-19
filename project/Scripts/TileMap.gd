@@ -50,9 +50,9 @@ var game_turn_state
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# get reference to GUI and camera
-	GUI = get_tree().get_root().get_node("Node2D").get_node("GUI")
-	Camera = get_tree().get_root().get_node("Node2D").get_node("Camera")
-	tileMap = get_tree().get_root().get_node("Node2D").get_node("TileMap")
+	GUI = get_parent().get_node("GUI")
+	Camera = get_parent().get_node("Camera")
+	tileMap = get_parent().get_node("TileMap")
 	
 	# This is the list that contains all the THINGS that are on the board.
 	# Note that there can only be one THING per tile. So an object and a player

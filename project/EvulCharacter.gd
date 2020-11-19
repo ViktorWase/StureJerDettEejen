@@ -7,7 +7,7 @@ func _ready():
 	add_to_group("Enemies")  # TODO: I think I renamed them? Same in GoodCharacter
 
 func play_idle():
-	$AnimatedSprite.play("idle")
+	$Sprite/AnimatedSprite.play("idle")
 
 func move_evul(idx, max_look_distance):
 	# Checks if there is a player within max_look_distance (not as the crow flies -
