@@ -1,5 +1,7 @@
 extends Spatial
 
+# TODO: Do we really need this this class?
+
 var alignment
 export var displayLeft = false
 var thrustSpeed = 2
@@ -17,6 +19,9 @@ enum {
 	blocking,
 	undefined
 }
+
+func is_item():
+	return false
 
 func is_evul():
 	return alignment == evul
