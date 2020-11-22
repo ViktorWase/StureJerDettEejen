@@ -1,4 +1,4 @@
-extends Sprite
+extends Sprite3D
 
 
 # Declare member variables here. Examples:
@@ -19,9 +19,10 @@ func set_coordinates(coord):
 	cx = coord.x
 	cy = coord.y
 
-	var tilemap = get_parent()	
-	position.x = tilemap.map_to_world(coord)[0] + 16
-	position.y = tilemap.map_to_world(coord)[1] + 16
+	var tilemap = get_parent()
+	transform.origin.x = coord.x + tilemap.offsetX + 0.5
+	transform.origin.y = 0.1
+	transform.origin.z = coord.y + tilemap.offsetY + 0.5
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

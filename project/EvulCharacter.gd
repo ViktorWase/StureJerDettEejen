@@ -30,7 +30,7 @@ func _ready():
 
 func play_idle():
 	assert(has_battle_personality())
-	$AnimatedSprite.play("idle")
+	$Sprite/AnimatedSprite.play("idle")
 
 func can_see_any_good_guys(flat_board, sizex, sizey):
 	assert(flat_board[cx + cy * sizex].is_evul())

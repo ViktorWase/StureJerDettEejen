@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Assets/sounds/footsteps.ogg" type="AudioStream" id=1]
+[ext_resource path="res://Assets/sounds/cleaver.ogg" type="AudioStream" id=2]
+
+[node name="Character" type="Spatial"]
+
+[node name="AttackSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource( 2 )
+bus = "Sound effects"
+
+[node name="FootSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource( 1 )
+bus = "Sound effects"

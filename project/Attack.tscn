@@ -3,6 +3,8 @@
 [ext_resource path="res://Scripts/Attack.gd" type="Script" id=1]
 [ext_resource path="res://Assets/Crosshairs.png" type="Texture" id=2]
 
-[node name="Attack" type="Sprite"]
+[node name="Attack" type="Sprite3D"]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0 )
+pixel_size = 0.03
 texture = ExtResource( 2 )
 script = ExtResource( 1 )

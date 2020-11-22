@@ -10,9 +10,6 @@ var levels = [
 ]
 var level_index = -1
 
-func _ready():
-	print("from global")
-
 func load_next_level():
 	level_index += 1
 	if (level_index >= len(levels)):

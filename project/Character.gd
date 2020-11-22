@@ -1,4 +1,4 @@
-extends Node2D
+extends Spatial
 
 signal reached_waypoint
 
@@ -16,7 +16,7 @@ var damage = 1
 var waypoints
 var waypoint_index
 var velocity
-export var move_speed = 120
+var move_speed = 4
 var is_done_moving
 var has_moved_current_turn
 var can_walk_on_lava = false
@@ -34,6 +34,10 @@ var startCoords : Vector2
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	has_moved_current_turn = false
+
+	# tilt and offset the character sprite for a better effect
+	$Sprite.transform.origin.z = 0.28
+	$Sprite.rotation_degrees.x = -43
 
 func get_attack_coordinates():
 	return attack_coordinates
@@ -90,8 +94,8 @@ func set_coordinates(coord):
 	set_coordinates_only(coord)
 
 	var tilemap = get_parent()
-	position.x = tilemap.map_to_world(coord)[0] + 16
-	position.y = tilemap.map_to_world(coord)[1] + 16
+	transform.origin.x = coord.x + tilemap.offsetX + 0.5
+	transform.origin.z = coord.y + tilemap.offsetY + 0.5
 
 func reset_graphics():
 	play_idle()
@@ -122,7 +126,8 @@ func move_along_path(path : Curve2D):
 	play_run()
 
 func move_to_start_coordinates():
-	waypoints = [get_parent().map_to_world(startCoords) + Vector2.ONE*16]
+	var tilemap = get_parent()
+	waypoints = [startCoords + Vector2(tilemap.offsetX, tilemap.offsetY) + Vector2.ONE*0.5]
 	waypoint_index = 0
 	is_done_moving = false
 
@@ -138,7 +143,8 @@ func _physics_process(delta):
 		return
 	# TODO: check if waypoints is empty
 	var target = waypoints[waypoint_index]
-	if position.distance_to(target) < 1:
+	var pos = get2dPos()
+	if pos.distance_to(target) < 0.1:
 		waypoint_index += 1
 		if (waypoint_index >= len(waypoints)):
 			play_idle()
@@ -155,14 +161,15 @@ func _physics_process(delta):
 			
 			return
 		target = waypoints[waypoint_index]
-	velocity = (target - position).normalized() * move_speed
+	velocity = (target - pos).normalized() * move_speed
 	
-	if (velocity.x < -32):
+	if (velocity.x < -0.1):
 		scale.x = -abs(scale.x)
 	else:
 		scale.x = abs(scale.x)
-	
-	position += velocity*delta
+
+	#velocity = move_and_slide(velocity)
+	transform.origin += Vector3(velocity.x, 0, velocity.y)*delta
 
 func play_attack_sound():
 	$AttackSound.play()
@@ -171,7 +178,14 @@ func play_foot_sound():
 	$FootSound.play()
 
 func darken_character():
-	modulate = Color(0.35,0.35,0.35,1.0)
+	# instance of SpriteBase3D
+	$Sprite/AnimatedSprite.modulate = Color(0.35,0.35,0.35,1.0)
+	pass
 	
 func reset_darkened_character():
-	modulate = Color(1.0,1.0,1.0,1.0)
+	# instance of SpriteBase3D
+	$Sprite/AnimatedSprite.modulate = Color(1.0,1.0,1.0,1.0)
+	pass
+
+func get2dPos():
+	return Vector2(transform.origin.x, transform.origin.z)

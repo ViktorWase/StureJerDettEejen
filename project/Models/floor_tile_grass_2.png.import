@@ -2,8 +2,8 @@
 
 importer="texture"
 type="StreamTexture"
-path.s3tc="res://.import/elf_m_run_anim_f2.png-e6a1c464507c3660ea6b9af607c617f0.s3tc.stex"
-path.etc="res://.import/elf_m_run_anim_f2.png-e6a1c464507c3660ea6b9af607c617f0.etc.stex"
+path.s3tc="res://.import/floor_tile_grass_2.png-07caee9dce1ba6977fb3d5cebaee0f85.s3tc.stex"
+path.etc="res://.import/floor_tile_grass_2.png-07caee9dce1ba6977fb3d5cebaee0f85.etc.stex"
 metadata={
 "imported_formats": [ "s3tc", "etc" ],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Assets/animated_character_m/elf_m_run_anim_f2.png"
-dest_files=[ "res://.import/elf_m_run_anim_f2.png-e6a1c464507c3660ea6b9af607c617f0.s3tc.stex", "res://.import/elf_m_run_anim_f2.png-e6a1c464507c3660ea6b9af607c617f0.etc.stex" ]
+source_file="res://Models/floor_tile_grass_2.png"
+dest_files=[ "res://.import/floor_tile_grass_2.png-07caee9dce1ba6977fb3d5cebaee0f85.s3tc.stex", "res://.import/floor_tile_grass_2.png-07caee9dce1ba6977fb3d5cebaee0f85.etc.stex" ]
 
 [params]
 
@@ -22,7 +22,7 @@ compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
 flags/repeat=true
-flags/filter=false
+flags/filter=true
 flags/mipmaps=true
 flags/anisotropic=false
 flags/srgb=2

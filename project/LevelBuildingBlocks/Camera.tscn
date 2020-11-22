@@ -1,35 +1,9 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=2 format=2]
 
 [ext_resource path="res://Scripts/Camera.gd" type="Script" id=1]
-[ext_resource path="res://Assets/water.png" type="Texture" id=2]
-[ext_resource path="res://Scripts/LavaBackground.gd" type="Script" id=3]
-[ext_resource path="res://Materials/Background.shader" type="Shader" id=4]
 
-[sub_resource type="ShaderMaterial" id=1]
-shader = ExtResource( 4 )
-shader_param/time = null
-shader_param/offset = null
-shader_param/size = Vector2( 640, 640 )
-
-[node name="Camera" type="Camera2D"]
-position = Vector2( 512, 300 )
+[node name="Camera" type="Camera"]
+transform = Transform( 1, 0, 0, 0, 0.642172, 0.76656, 0, -0.76656, 0.642172, 0, 36.8811, 32.0942 )
+fov = 19.7
+far = 500.0
 script = ExtResource( 1 )
-cameraPanScale = 160
-
-[node name="WaterBackground" type="TextureRect" parent="."]
-material = SubResource( 1 )
-margin_left = -512.0
-margin_top = -300.0
-margin_right = 512.0
-margin_bottom = 300.0
-texture = ExtResource( 2 )
-stretch_mode = 2
-script = ExtResource( 3 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="ViewportDebug" type="Line2D" parent="."]
-visible = false
-position = Vector2( -512, -300 )
-points = PoolVector2Array( 50, 50, 974, 50, 974, 550, 50, 550, 50, 50 )
