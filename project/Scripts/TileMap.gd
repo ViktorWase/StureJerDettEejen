@@ -298,6 +298,9 @@ func get_all_possible_movement_destinations(pos, max_movement, the_lava_is_floor
 #			var pos = flat_to_xy(idx)
 #			destinations.append(pos)
 
+	if typeof(pos) == TYPE_INT:
+		pos = flat_to_xy(pos)
+
 	# generate possible destinations
 	var positions = []
 	# a simple line function
@@ -315,7 +318,7 @@ func get_all_possible_movement_destinations(pos, max_movement, the_lava_is_floor
 		p += pos
 		if is_valid_position(p, the_lava_is_floor):
 			destinations.append(p)
-
+	
 	return destinations
 
 func is_valid_position(p, the_lava_is_floor=false):

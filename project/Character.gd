@@ -120,7 +120,6 @@ func on_click(idx):
 
 func move_along_path(path : Curve2D):
 	waypoints = path.get_baked_points()
-	print(waypoints)
 	waypoint_index = 0
 	is_done_moving = false
 
@@ -179,11 +178,13 @@ func play_foot_sound():
 	$FootSound.play()
 
 func darken_character():
-	#modulate = Color(0.35,0.35,0.35,1.0)
+	# instance of SpriteBase3D
+	$Sprite/AnimatedSprite.modulate = Color(0.35,0.35,0.35,1.0)
 	pass
 	
 func reset_darkened_character():
-	#modulate = Color(1.0,1.0,1.0,1.0)
+	# instance of SpriteBase3D
+	$Sprite/AnimatedSprite.modulate = Color(1.0,1.0,1.0,1.0)
 	pass
 
 func get2dPos():
