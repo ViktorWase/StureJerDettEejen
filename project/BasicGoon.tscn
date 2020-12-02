@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://Assets/animated_enemy/lizard_m_idle_anim_f0.png" type="Texture" id=1]
 [ext_resource path="res://Assets/animated_enemy/lizard_m_idle_anim_f1.png" type="Texture" id=2]
@@ -7,6 +7,8 @@
 [ext_resource path="res://BasicGoon.gd" type="Script" id=5]
 [ext_resource path="res://Assets/sounds/cleaver.ogg" type="AudioStream" id=6]
 [ext_resource path="res://Assets/sounds/footsteps.ogg" type="AudioStream" id=7]
+[ext_resource path="res://Assets/shadow-character.png" type="Texture" id=8]
+[ext_resource path="res://Assets/test-character-animation.png" type="Texture" id=9]
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {
@@ -16,7 +18,25 @@ animations = [ {
 "speed": 5.0
 } ]
 
-[node name="Node2D" type="Node2D"]
+[sub_resource type="AtlasTexture" id=2]
+flags = 4
+atlas = ExtResource( 9 )
+region = Rect2( 0, 256, 256, 256 )
+
+[sub_resource type="AtlasTexture" id=3]
+flags = 4
+atlas = ExtResource( 9 )
+region = Rect2( 256, 256, 256, 256 )
+
+[sub_resource type="SpriteFrames" id=4]
+animations = [ {
+"frames": [ SubResource( 2 ), SubResource( 3 ) ],
+"loop": true,
+"name": "idle",
+"speed": 2.0
+} ]
+
+[node name="BasicGoon" type="Node2D"]
 scale = Vector2( 2, 2 )
 script = ExtResource( 5 )
 
@@ -28,6 +48,20 @@ bus = "Sound effects"
 stream = ExtResource( 6 )
 bus = "Sound effects"
 
-[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( 0, 6.39392 )
+scale = Vector2( 0.301179, 0.301179 )
+texture = ExtResource( 8 )
+
+[node name="AnimatedSprite1" type="AnimatedSprite" parent="."]
+visible = false
+position = Vector2( 0, -6.95272 )
 frames = SubResource( 1 )
 animation = "idle"
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+position = Vector2( -0.25, -6 )
+scale = Vector2( 0.111276, 0.111276 )
+frames = SubResource( 4 )
+animation = "idle"
+frame = 1

@@ -12,6 +12,8 @@ var is_going_to_space = false
 var cx : int
 var cy : int
 
+var tilemap
+
 enum {
 	good,
 	neutral,
@@ -56,7 +58,6 @@ func set_coordinates_only(coord):
 func set_coordinates(coord):
 	set_coordinates_only(coord)
 
-	var tilemap = get_parent()
 	position.x = tilemap.map_to_world(coord)[0] + 16
 	position.y = tilemap.map_to_world(coord)[1] + 16
 # end od MainDude
@@ -73,20 +74,20 @@ func _ready():
 	
 	$fire.hide()
 
+	tilemap = get_parent().get_parent()
+
 func calculate_score():
-	var remaining_time = get_parent().number_of_turns_till_apocalypse
+	var remaining_time = tilemap.number_of_turns_till_apocalypse
 	var number_of_units_close_to_rocket = 0
 	for y in range(3):
 		for x in range(3):
-			var obj = get_parent().get_obj_from_tile(cx+x-1, cy+y-1)
+			var obj = tilemap.get_obj_from_tile(cx+x-1, cy+y-1)
 			if (obj and obj.is_good()):
 				number_of_units_close_to_rocket += 1
 
 	return remaining_time + number_of_units_close_to_rocket  # TODO: Make this better somehow?
 
 func is_character_nearby():
-	var tilemap = get_parent()
-	var has_character = false
 	for y in range(3):
 		for x in range(3):
 			var obj = tilemap.get_obj_from_tile(cx+x-1, cy+y-1)
@@ -95,7 +96,6 @@ func is_character_nearby():
 	return false
 
 func get_nearby_characters():
-	var tilemap = get_parent()
 	var characters = []
 	for y in range(3):
 		for x in range(3):

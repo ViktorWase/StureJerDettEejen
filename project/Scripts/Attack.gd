@@ -19,7 +19,7 @@ func set_coordinates(coord):
 	cx = coord.x
 	cy = coord.y
 
-	var tilemap = get_parent()	
+	var tilemap = get_parent().get_parent()
 	position.x = tilemap.map_to_world(coord)[0] + 16
 	position.y = tilemap.map_to_world(coord)[1] + 16
 

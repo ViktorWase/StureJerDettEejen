@@ -153,7 +153,6 @@ func on_pick_up(pickerupper):
 func set_coordinates(coord):
 	set_coordinates_only(coord)
 
-	var tilemap = get_parent()
 	position.x = tilemap.map_to_world(coord)[0] + 16
 	position.y = tilemap.map_to_world(coord)[1] + 16
 
@@ -167,10 +166,10 @@ func find_idx_of_victim():
 		var x = int(cx + neighbour_delta[0])
 		var y = int(cy + neighbour_delta[1])
 		
-		if x >= 0 and y >= 0 and x < get_parent().X and y < get_parent().Y:
-			var obj = get_parent().flat_game_board[get_parent().xy_to_flat(x, y)]
+		if x >= 0 and y >= 0 and x < tilemap.X and y < tilemap.Y:
+			var obj = tilemap.flat_game_board[tilemap.xy_to_flat(x, y)]
 			if obj and ((is_evul() and obj.is_good()) or (obj.is_evul() and is_good())):
-				return get_parent().xy_to_flat(x, y)
+				return tilemap.xy_to_flat(x, y)
 	return null
 
 func move_evul(idx, max_look_distance):
@@ -184,16 +183,16 @@ func move_evul(idx, max_look_distance):
 	# TODO: THIS WILL NOT WORK FOR SNIPERS! They should stay at a distance, but this
 	#       code will put them as close as possible.
 
-	var possible_squares = get_parent().get_all_possible_movement_destinations(idx, max_look_distance, can_walk_on_lava)
-	var positions_of_good_chars = get_parent().get_positions_of_good_chars_from_list_of_positions(possible_squares)
+	var possible_squares = tilemap.get_all_possible_movement_destinations(idx, max_look_distance, can_walk_on_lava)
+	var positions_of_good_chars = tilemap.get_positions_of_good_chars_from_list_of_positions(possible_squares)
 	
 	if len(positions_of_good_chars) > 0:
 		# Find closest good char.
-		var from = get_parent().flat_to_xy(idx)
+		var from = tilemap.flat_to_xy(idx)
 		var closest_dist = max_look_distance + 10
 		var choosen_pos = null
 		for pos in positions_of_good_chars:
-			var dist = get_parent().calc_dist(from, pos, max_look_distance, can_walk_on_lava)
+			var dist = tilemap.calc_dist(from, pos, max_look_distance, can_walk_on_lava)
 			if dist != null and dist < closest_dist:
 				closest_dist = dist
 				choosen_pos = pos
@@ -201,11 +200,11 @@ func move_evul(idx, max_look_distance):
 			push_error("You've done messed up proper, algo boy.")
 		
 		# Move towards the closest good char.
-		var destinations = get_parent().get_all_possible_movement_destinations(idx, max_walk_distance, can_walk_on_lava)
+		var destinations = tilemap.get_all_possible_movement_destinations(idx, max_walk_distance, can_walk_on_lava)
 		var best_dest = null
 		var best_remaining_dist = null
 		for dest in destinations:
-			var remaining_dist = get_parent().calc_dist(dest, choosen_pos, max_look_distance, can_walk_on_lava)  # TODO: I think the max can be look-walk?
+			var remaining_dist = tilemap.calc_dist(dest, choosen_pos, max_look_distance, can_walk_on_lava)  # TODO: I think the max can be look-walk?
 
 			if remaining_dist and remaining_dist > 0: # We don't want to step on the opponent.
 				if remaining_dist == 1: # This is the best case scenario.
@@ -222,9 +221,9 @@ func move_evul(idx, max_look_distance):
 
 func on_click(idx):
 	print("YOU CLICKED THE MAIN DUDE")
-	var x = self.get_parent().flat_to_xy(idx)[0]
-	var y = self.get_parent().flat_to_xy(idx)[1]
-	self.get_parent().place_green_tiles(x, y, max_walk_distance)
+	var x = self.tilemap.flat_to_xy(idx)[0]
+	var y = self.tilemap.flat_to_xy(idx)[1]
+	self.tilemap.place_green_tiles(x, y, max_walk_distance)
 
 func move_along_path(path : Curve2D):
 	waypoints = path.get_baked_points()
@@ -234,7 +233,7 @@ func move_along_path(path : Curve2D):
 	play("run")
 
 func move_to_start_coordinates():
-	waypoints = [get_parent().map_to_world(startCoords) + Vector2.ONE*16]
+	waypoints = [tilemap.map_to_world(startCoords) + Vector2.ONE*16]
 	waypoint_index = 0
 	is_done_moving = false
 

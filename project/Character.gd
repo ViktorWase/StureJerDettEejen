@@ -31,9 +31,12 @@ var cy : int
 
 var startCoords : Vector2
 
+var tilemap
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	has_moved_current_turn = false
+	tilemap = get_parent().get_parent()
 
 func get_attack_coordinates():
 	return attack_coordinates
@@ -89,7 +92,6 @@ func set_coordinates_only(coord):
 func set_coordinates(coord):
 	set_coordinates_only(coord)
 
-	var tilemap = get_parent()
 	position.x = tilemap.map_to_world(coord)[0] + 16
 	position.y = tilemap.map_to_world(coord)[1] + 16
 
@@ -103,16 +105,16 @@ func find_idx_of_victim():
 		var x = int(cx + neighbour_delta[0])
 		var y = int(cy + neighbour_delta[1])
 		
-		if x >= 0 and y >= 0 and x < get_parent().X and y < get_parent().Y:
-			var obj = get_parent().flat_game_board[get_parent().xy_to_flat(x, y)]
+		if x >= 0 and y >= 0 and x < tilemap.X and y < tilemap.Y:
+			var obj = tilemap.flat_game_board[tilemap.xy_to_flat(x, y)]
 			if obj and ((is_evul() and obj.is_good()) or (obj.is_evul() and is_good())):
-				return get_parent().xy_to_flat(x, y)
+				return tilemap.xy_to_flat(x, y)
 	return null
 
 func on_click(idx):
-	var x = self.get_parent().flat_to_xy(idx)[0]
-	var y = self.get_parent().flat_to_xy(idx)[1]
-	self.get_parent().place_green_tiles(x, y, max_walk_distance)
+	var x = self.tilemap.flat_to_xy(idx)[0]
+	var y = self.tilemap.flat_to_xy(idx)[1]
+	self.tilemap.place_green_tiles(x, y, max_walk_distance)
 
 func move_along_path(path : Curve2D):
 	waypoints = path.get_baked_points()
@@ -122,7 +124,7 @@ func move_along_path(path : Curve2D):
 	play_run()
 
 func move_to_start_coordinates():
-	waypoints = [get_parent().map_to_world(startCoords) + Vector2.ONE*16]
+	waypoints = [tilemap.map_to_world(startCoords) + Vector2.ONE*16]
 	waypoint_index = 0
 	is_done_moving = false
 

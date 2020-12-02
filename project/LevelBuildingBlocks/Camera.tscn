@@ -1,20 +1,21 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Scripts/Camera.gd" type="Script" id=1]
 [ext_resource path="res://Assets/water.png" type="Texture" id=2]
 [ext_resource path="res://Scripts/LavaBackground.gd" type="Script" id=3]
 [ext_resource path="res://Materials/Background.shader" type="Shader" id=4]
+[ext_resource path="res://Assets/noise.png" type="Texture" id=5]
 
 [sub_resource type="ShaderMaterial" id=1]
 shader = ExtResource( 4 )
-shader_param/time = null
-shader_param/offset = null
-shader_param/size = Vector2( 640, 640 )
+shader_param/time = 0.0
+shader_param/offset = Vector2( 0, 0 )
+shader_param/size = Vector2( 2, 2 )
+shader_param/noise = ExtResource( 5 )
 
 [node name="Camera" type="Camera2D"]
 position = Vector2( 512, 300 )
 script = ExtResource( 1 )
-cameraPanScale = 160
 
 [node name="WaterBackground" type="TextureRect" parent="."]
 material = SubResource( 1 )

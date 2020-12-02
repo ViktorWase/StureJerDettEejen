@@ -123,7 +123,7 @@ func _ready():
 		enemy.play_idle()
 		enemy.set_start_coordinates(Vector2(charX, charY))
 	
-	var rocket = $Rocket
+	var rocket = $YSort/Rocket
 	var charX = floor(rocket.position.x / 32)
 	var charY = floor(rocket.position.y / 32)
 	var i = xy_to_flat(charX, charY)
@@ -143,15 +143,15 @@ func _ready():
 	# player starts
 	set_player_turn()
 	
-	$Rocket.show_help_text()
+	$YSort/Rocket.show_help_text()
 	$GameStartJingle.play()
 	
-	$AI.setup(flat_map, X, Y)
+	$YSort/AI.setup(flat_map, X, Y)
 
 	emit_signal("ready", self)
 
 func _on_end_turn_pressed():
-	$Rocket.hide_help_text()
+	$YSort/Rocket.hide_help_text()
 	GUI.play_menu_sound()
 	
 	player_ends_their_turn()
@@ -382,7 +382,7 @@ func _input(event):
 						
 						GUI.play_menu_sound()
 						
-						$Rocket.hide_help_text()
+						$YSort/Rocket.hide_help_text()
 					
 					game_turn_states.select_attack:
 						if active_character == null:
@@ -497,15 +497,15 @@ func end_of_player_turn():
 		assert(len(effects) == 0, "I HAVEN'T WRITTEN THE SUPPORT FOR ITEM EFFECTS YET!")
 
 	# check winning condition
-	if ($Rocket.is_character_nearby()):
+	if ($YSort/Rocket.is_character_nearby()):
 		print("winning")
 		GUI.get_node("End Turn").hide()
 		GUI.get_node("TurnInfo").text = ""
 		GUI.get_node("WinningScreen").show()
-		for character in $Rocket.get_nearby_characters():
+		for character in $YSort/Rocket.get_nearby_characters():
 			flat_game_board[xy_to_flat(character.cx, character.cy)] = null
 			character.queue_free()
-		$Rocket.go_to_space()
+		$YSort/Rocket.go_to_space()
 		game_state = game_states.winning
 		
 		# wait a few seconds before changing level
@@ -513,7 +513,7 @@ func end_of_player_turn():
 		
 		Global.load_next_level()
 	else:
-		planned_enemy_movements = $AI.get_moves(flat_game_board)
+		planned_enemy_movements = $YSort/AI.get_moves(flat_game_board)
 		assert(len(planned_enemy_movements) <= len(get_tree().get_nodes_in_group("BadGuys")), "Some bad guy has been planned multiple times.")
 		assert(len(planned_enemy_movements) >= len(get_tree().get_nodes_in_group("BadGuys")), "Some bad guy has not been planned.")
 		planned_enemy_movements_counter = 0
@@ -637,7 +637,7 @@ func place_green_tiles(x,y, max_movement):
 		if(flat_game_board[xy_to_flat(vec[0],vec[1])] == null or flat_game_board[xy_to_flat(vec[0],vec[1])].is_neutral()):
 			var green = preload("res://Green.tscn")
 			var GR = green.instance()
-			self.add_child(GR)
+			$YSort.add_child(GR)
 			GR.set_coordinates(vec)
 			active_greens.append(GR)
 
@@ -652,13 +652,13 @@ func place_attack_tiles(x,y, attackable_tiles):
 		if(flat_game_board[xy_to_flat(vec[0] + x, vec[1]+y)] != null and flat_game_board[xy_to_flat(vec[0]+x, vec[1]+y)].is_evul()):
 			var attack_icon = preload("res://Attack.tscn")
 			var attackable = attack_icon.instance()
-			self.add_child(attackable)
+			$YSort.add_child(attackable)
 			attackable.set_coordinates(vec + Vector2(x, y))
 			active_greens.append(attackable)
 	if(active_greens != []):
 		var cancel_icon = preload("res://Cancel.tscn")
 		var cancel = cancel_icon.instance()
-		self.add_child(cancel)
+		$YSort.add_child(cancel)
 		cancel.set_coordinates(Vector2(x+1,y+1))
 		active_greens.append(cancel)
 	

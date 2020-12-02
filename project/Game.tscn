@@ -1,36 +1,238 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://LevelBuildingBlocks/TileMap.tscn" type="PackedScene" id=1]
 [ext_resource path="res://BasicTroop.tscn" type="PackedScene" id=2]
 [ext_resource path="res://LevelBuildingBlocks/Camera.tscn" type="PackedScene" id=3]
 [ext_resource path="res://AI.gd" type="Script" id=4]
+[ext_resource path="res://Assets/bushes.png" type="Texture" id=5]
 [ext_resource path="res://LevelBuildingBlocks/Rocket.tscn" type="PackedScene" id=6]
 [ext_resource path="res://LevelBuildingBlocks/GUI.tscn" type="PackedScene" id=7]
 [ext_resource path="res://BasicGoon.tscn" type="PackedScene" id=8]
+[ext_resource path="res://Assets/light.png" type="Texture" id=9]
+[ext_resource path="res://Assets/light2.png" type="Texture" id=10]
+
+[sub_resource type="Environment" id=1]
+background_mode = 4
+background_energy = 1.04
+ambient_light_energy = 0.98
 
 [node name="Node2D" type="Node2D"]
 
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource( 1 )
+
 [node name="Camera" parent="." instance=ExtResource( 3 )]
 
-[node name="TileMap" parent="." instance=ExtResource( 1 )]
-tile_data = PoolIntArray( 0, 0, 131072, 1, 0, 131073, 2, 0, 131073, 3, 0, 131073, 4, 0, 131073, 5, 0, 131073, 6, 0, 131073, 7, 0, 131073, 8, 0, 131073, 9, 0, 131073, 10, 0, 131074, 65536, 0, 196608, 65537, 0, 196609, 65538, 0, 327682, 65539, 0, 196609, 65540, 0, 196609, 65541, 0, 196609, 65542, 0, 196609, 65543, 0, 196609, 65544, 0, 196609, 65545, 0, 196609, 65546, 0, 196610, 131072, 0, 196608, 131073, 0, 196609, 131074, 0, 196609, 131075, 0, 196609, 131076, 0, 196609, 131077, 0, 196609, 131078, 0, 327681, 131079, 0, 327680, 131080, 0, 196609, 131081, 0, 196609, 131082, 0, 196610, 196608, 0, 196608, 196609, 0, 196609, 196610, 0, 196609, 196611, 0, 196609, 196612, 0, 327681, 196613, 0, 196609, 196614, 0, 196609, 196615, 0, 327681, 196616, 0, 196609, 196617, 0, 196609, 196618, 0, 196610, 262144, 0, 196608, 262145, 0, 327681, 262146, 0, 196609, 262147, 0, 196609, 262148, 0, 196609, 262149, 0, 196609, 262150, 0, 196609, 262151, 0, 196609, 262152, 0, 196609, 262153, 0, 196609, 262154, 0, 65537, 262155, 0, 131073, 262156, 0, 131073, 262157, 0, 131073, 262158, 0, 131073, 262159, 0, 131073, 262160, 0, 131073, 262161, 0, 131073, 262162, 0, 131073, 262163, 0, 131073, 262164, 0, 131073, 262165, 0, 131073, 262166, 0, 131073, 262167, 0, 131073, 262168, 0, 131073, 262169, 0, 131074, 327680, 0, 196608, 327681, 0, 196609, 327682, 0, 196609, 327683, 0, 196609, 327684, 0, 196609, 327685, 0, 196609, 327686, 0, 196609, 327687, 0, 196609, 327688, 0, 327682, 327689, 0, 196609, 327690, 0, 1, 327691, 0, 262145, 327692, 0, 262145, 327693, 0, 262145, 327694, 0, 262145, 327695, 0, 262145, 327696, 0, 262145, 327697, 0, 262145, 327698, 0, 262145, 327699, 0, 262145, 327700, 0, 262145, 327701, 0, 262145, 327702, 0, 262145, 327703, 0, 262145, 327704, 0, 2, 327705, 0, 196610, 393216, 0, 196608, 393217, 0, 196609, 393218, 0, 196609, 393219, 0, 196609, 393220, 0, 196609, 393221, 0, 196609, 393222, 0, 196609, 393223, 0, 196609, 393224, 0, 196609, 393225, 0, 196609, 393226, 0, 196610, 393240, 0, 196608, 393241, 0, 196610, 458752, 0, 196608, 458753, 0, 196609, 458754, 0, 196609, 458755, 0, 327680, 458756, 0, 327681, 458757, 0, 196609, 458758, 0, 196609, 458759, 0, 196609, 458760, 0, 196609, 458761, 0, 196609, 458762, 0, 196610, 458776, 0, 196608, 458777, 0, 196610, 524288, 0, 196608, 524289, 0, 196609, 524290, 0, 196609, 524291, 0, 196609, 524292, 0, 196609, 524293, 0, 327681, 524294, 0, 196609, 524295, 0, 196609, 524296, 0, 327682, 524297, 0, 196609, 524298, 0, 196610, 524312, 0, 196608, 524313, 0, 196610, 589824, 0, 262144, 589825, 0, 262145, 589826, 0, 262145, 589827, 0, 262145, 589828, 0, 262145, 589829, 0, 262145, 589830, 0, 262145, 589831, 0, 2, 589832, 0, 196609, 589833, 0, 196609, 589834, 0, 196610, 589848, 0, 196608, 589849, 0, 65537, 589850, 0, 131074, 655367, 0, 196608, 655368, 0, 196609, 655369, 0, 327682, 655370, 0, 196610, 655383, 0, 131072, 655384, 0, 65538, 655385, 0, 196609, 655386, 0, 65537, 655387, 0, 131074, 720903, 0, 262144, 720904, 0, 2, 720905, 0, 196609, 720906, 0, 196610, 720918, 0, 131072, 720919, 0, 65538, 720920, 0, 196609, 720921, 0, 196609, 720922, 0, 196609, 720923, 0, 65537, 720924, 0, 131074, 786440, 0, 196608, 786441, 0, 196609, 786442, 0, 65537, 786443, 0, 131074, 786454, 0, 196608, 786455, 0, 196609, 786456, 0, 196609, 786457, 0, 327682, 786458, 0, 196609, 786459, 0, 196609, 786460, 0, 196610, 851976, 0, 262144, 851977, 0, 2, 851978, 0, 196609, 851979, 0, 65537, 851980, 0, 131074, 851990, 0, 196608, 851991, 0, 196609, 851992, 0, 327682, 851993, 0, 196609, 851994, 0, 196609, 851995, 0, 196609, 851996, 0, 196610, 917513, 0, 196608, 917514, 0, 196609, 917515, 0, 196609, 917516, 0, 196610, 917526, 0, 262144, 917527, 0, 2, 917528, 0, 196609, 917529, 0, 196609, 917530, 0, 196609, 917531, 0, 1, 917532, 0, 262146, 983048, 0, 131072, 983049, 0, 65538, 983050, 0, 327682, 983051, 0, 196609, 983052, 0, 196610, 983063, 0, 262144, 983064, 0, 262145, 983065, 0, 2, 983066, 0, 1, 983067, 0, 262146, 1048584, 0, 196608, 1048585, 0, 196609, 1048586, 0, 196609, 1048587, 0, 1, 1048588, 0, 262146, 1048601, 0, 262144, 1048602, 0, 262146, 1114120, 0, 196608, 1114121, 0, 327682, 1114122, 0, 196609, 1114123, 0, 196610, 1179656, 0, 262144, 1179657, 0, 2, 1179658, 0, 196609, 1179659, 0, 196610, 1245193, 0, 262144, 1245194, 0, 262145, 1245195, 0, 262146 )
+[node name="Light2D" type="Light2D" parent="Camera"]
+position = Vector2( 6.02063, 7.18353 )
+scale = Vector2( 0.627397, 0.627397 )
+texture = ExtResource( 9 )
+energy = 1.45
+mode = 2
 
-[node name="Rocket" parent="TileMap" instance=ExtResource( 6 )]
+[node name="Light2D5" type="Light2D" parent="."]
+position = Vector2( 496.201, 317.18 )
+scale = Vector2( 0.51277, 0.51277 )
+texture = ExtResource( 10 )
+mode = 2
+
+[node name="Light2D2" type="Light2D" parent="."]
+position = Vector2( 680.357, 650.119 )
+scale = Vector2( 0.543579, 0.543579 )
+texture = ExtResource( 10 )
+mode = 2
+
+[node name="Light2D" type="Light2D" parent="."]
+position = Vector2( 1138.97, 541.766 )
+scale = Vector2( 0.543579, 0.543579 )
+texture = ExtResource( 10 )
+mode = 2
+
+[node name="TileMap" parent="." instance=ExtResource( 1 )]
+position = Vector2( 320, 144 )
+tile_data = PoolIntArray( 0, 0, 131072, 1, 0, 131073, 2, 0, 131073, 3, 0, 131073, 4, 0, 131073, 5, 0, 131073, 6, 0, 131073, 7, 0, 131073, 8, 0, 131073, 9, 0, 131073, 10, 0, 131074, 65536, 0, 196608, 65537, 0, 0, 65538, 0, 0, 65539, 0, 0, 65540, 0, 0, 65541, 0, 0, 65542, 0, 0, 65543, 0, 0, 65544, 0, 0, 65545, 0, 0, 65546, 0, 196610, 131072, 0, 196608, 131073, 0, 0, 131074, 0, 0, 131075, 0, 0, 131076, 0, 0, 131077, 0, 0, 131078, 0, 0, 131079, 0, 0, 131080, 0, 0, 131081, 0, 0, 131082, 0, 196610, 196608, 0, 196608, 196609, 0, 0, 196610, 0, 0, 196611, 0, 0, 196612, 0, 0, 196613, 0, 0, 196614, 0, 0, 196615, 0, 0, 196616, 0, 0, 196617, 0, 0, 196618, 0, 196610, 262144, 0, 196608, 262145, 0, 0, 262146, 0, 0, 262147, 0, 0, 262148, 0, 0, 262149, 0, 0, 262150, 0, 0, 262151, 0, 0, 262152, 0, 0, 262153, 0, 0, 262154, 0, 65537, 262155, 0, 131073, 262156, 0, 131073, 262157, 0, 131073, 262158, 0, 131073, 262159, 0, 131073, 262160, 0, 131073, 262161, 0, 131073, 262162, 0, 131073, 262163, 0, 131073, 262164, 0, 131073, 262165, 0, 131073, 262166, 0, 131073, 262167, 0, 131073, 262168, 0, 131073, 262169, 0, 131074, 327680, 0, 196608, 327681, 0, 0, 327682, 0, 0, 327683, 0, 0, 327684, 0, 0, 327685, 0, 0, 327686, 0, 0, 327687, 0, 0, 327688, 0, 0, 327689, 0, 0, 327690, 0, 1, 327691, 0, 262145, 327692, 0, 262145, 327693, 0, 262145, 327694, 0, 262145, 327695, 0, 262145, 327696, 0, 262145, 327697, 0, 262145, 327698, 0, 262145, 327699, 0, 262145, 327700, 0, 262145, 327701, 0, 262145, 327702, 0, 262145, 327703, 0, 262145, 327704, 0, 2, 327705, 0, 196610, 393216, 0, 196608, 393217, 0, 0, 393218, 0, 0, 393219, 0, 0, 393220, 0, 0, 393221, 0, 0, 393222, 0, 0, 393223, 0, 0, 393224, 0, 0, 393225, 0, 0, 393226, 0, 196610, 393240, 0, 196608, 393241, 0, 196610, 458752, 0, 196608, 458753, 0, 0, 458754, 0, 0, 458755, 0, 0, 458756, 0, 0, 458757, 0, 0, 458758, 0, 0, 458759, 0, 0, 458760, 0, 0, 458761, 0, 0, 458762, 0, 196610, 458776, 0, 196608, 458777, 0, 196610, 524288, 0, 196608, 524289, 0, 0, 524290, 0, 0, 524291, 0, 0, 524292, 0, 0, 524293, 0, 0, 524294, 0, 0, 524295, 0, 0, 524296, 0, 0, 524297, 0, 0, 524298, 0, 196610, 524312, 0, 196608, 524313, 0, 196610, 589824, 0, 262144, 589825, 0, 262145, 589826, 0, 262145, 589827, 0, 262145, 589828, 0, 262145, 589829, 0, 262145, 589830, 0, 262145, 589831, 0, 2, 589832, 0, 0, 589833, 0, 0, 589834, 0, 196610, 589848, 0, 196608, 589849, 0, 65537, 589850, 0, 131074, 655367, 0, 196608, 655368, 0, 0, 655369, 0, 0, 655370, 0, 196610, 655383, 0, 131072, 655384, 0, 65538, 655385, 0, 0, 655386, 0, 65537, 655387, 0, 131074, 720903, 0, 262144, 720904, 0, 2, 720905, 0, 0, 720906, 0, 196610, 720918, 0, 131072, 720919, 0, 65538, 720920, 0, 0, 720921, 0, 0, 720922, 0, 0, 720923, 0, 65537, 720924, 0, 131074, 786440, 0, 196608, 786441, 0, 0, 786442, 0, 65537, 786443, 0, 131074, 786454, 0, 196608, 786455, 0, 0, 786456, 0, 0, 786457, 0, 0, 786458, 0, 0, 786459, 0, 0, 786460, 0, 196610, 851976, 0, 262144, 851977, 0, 2, 851978, 0, 0, 851979, 0, 65537, 851980, 0, 131074, 851990, 0, 196608, 851991, 0, 0, 851992, 0, 0, 851993, 0, 0, 851994, 0, 0, 851995, 0, 0, 851996, 0, 196610, 917513, 0, 196608, 917514, 0, 0, 917515, 0, 0, 917516, 0, 196610, 917526, 0, 262144, 917527, 0, 2, 917528, 0, 0, 917529, 0, 0, 917530, 0, 0, 917531, 0, 1, 917532, 0, 262146, 983048, 0, 131072, 983049, 0, 65538, 983050, 0, 0, 983051, 0, 0, 983052, 0, 196610, 983063, 0, 262144, 983064, 0, 262145, 983065, 0, 2, 983066, 0, 1, 983067, 0, 262146, 1048584, 0, 196608, 1048585, 0, 0, 1048586, 0, 0, 1048587, 0, 1, 1048588, 0, 262146, 1048601, 0, 262144, 1048602, 0, 262146, 1114120, 0, 196608, 1114121, 0, 0, 1114122, 0, 0, 1114123, 0, 196610, 1179656, 0, 262144, 1179657, 0, 2, 1179658, 0, 0, 1179659, 0, 196610, 1245193, 0, 262144, 1245194, 0, 262145, 1245195, 0, 262146 )
+
+[node name="YSort" type="YSort" parent="TileMap"]
+
+[node name="Rocket" parent="TileMap/YSort" instance=ExtResource( 6 )]
 position = Vector2( 241.282, 207.753 )
 thrustSpeed = 94
 
-[node name="AI" type="Node2D" parent="TileMap"]
+[node name="AI" type="Node2D" parent="TileMap/YSort"]
 script = ExtResource( 4 )
 
-[node name="BasicTroop" parent="TileMap" groups=[
+[node name="BasicTroop" parent="TileMap/YSort" groups=[
 "GoodGuys",
 ] instance=ExtResource( 2 )]
-position = Vector2( 81, 231 )
+position = Vector2( 80, 240 )
 scale = Vector2( 2, 2 )
 
-[node name="BasicGoon" parent="TileMap" groups=[
+[node name="BasicTroop2" parent="TileMap/YSort" groups=[
+"GoodGuys",
+] instance=ExtResource( 2 )]
+position = Vector2( 432, 144 )
+scale = Vector2( 2, 2 )
+
+[node name="BasicTroop3" parent="TileMap/YSort" groups=[
+"GoodGuys",
+] instance=ExtResource( 2 )]
+position = Vector2( 304, 304 )
+scale = Vector2( 2, 2 )
+
+[node name="BasicGoon" parent="TileMap/YSort" groups=[
 "GoodGuys",
 ] instance=ExtResource( 8 )]
-position = Vector2( 168, 156 )
+position = Vector2( 176, 176 )
+
+[node name="Sprite" type="Sprite" parent="TileMap/YSort"]
+position = Vector2( 89.0899, 176.414 )
+scale = Vector2( 0.218036, 0.218036 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 220, 150, 300, 200 )
+
+[node name="Sprite2" type="Sprite" parent="TileMap/YSort"]
+position = Vector2( 265.488, 71.272 )
+scale = Vector2( 0.218036, 0.218036 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 220, 150, 300, 200 )
+
+[node name="Sprite3" type="Sprite" parent="TileMap/YSort"]
+position = Vector2( 283.306, 276.001 )
+scale = Vector2( 0.218036, 0.218036 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 220, 150, 300, 200 )
+
+[node name="Sprite4" type="Sprite" parent="TileMap/YSort"]
+position = Vector2( 426.741, 158.58 )
+scale = Vector2( 0.218036, 0.218036 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 220, 150, 300, 200 )
+
+[node name="Sprite5" type="Sprite" parent="TileMap/YSort"]
+position = Vector2( 249.941, 263.462 )
+scale = Vector2( 0.218036, 0.218036 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 220, 150, 300, 200 )
+
+[node name="Sprite9" type="Sprite" parent="TileMap/YSort"]
+position = Vector2( 169.777, 270.605 )
+scale = Vector2( 0.132353, 0.132353 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 220, 150, 300, 200 )
+
+[node name="Sprite10" type="Sprite" parent="TileMap/YSort"]
+position = Vector2( 334.073, 162.662 )
+scale = Vector2( 0.132353, 0.132353 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 220, 150, 300, 200 )
+
+[node name="Sprite11" type="Sprite" parent="TileMap/YSort"]
+position = Vector2( 41.1978, 169.011 )
+scale = Vector2( 0.132353, 0.132353 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 220, 150, 300, 200 )
+
+[node name="Sprite12" type="Sprite" parent="TileMap/YSort"]
+position = Vector2( 124.536, 36.4634 )
+scale = Vector2( 0.132353, 0.132353 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 220, 150, 300, 200 )
+
+[node name="Sprite6" type="Sprite" parent="TileMap/YSort"]
+position = Vector2( 366.06, 443.259 )
+scale = Vector2( 0.218036, 0.218036 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 220, 150, 300, 200 )
+
+[node name="Sprite7" type="Sprite" parent="TileMap/YSort"]
+position = Vector2( 289.646, 416.289 )
+scale = Vector2( 0.218036, 0.218036 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 220, 150, 300, 200 )
+
+[node name="Sprite8" type="Sprite" parent="TileMap/YSort"]
+position = Vector2( 45.3774, 277.821 )
+scale = Vector2( 0.218036, 0.218036 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 220, 150, 300, 200 )
+
+[node name="tree" type="Node2D" parent="TileMap/YSort"]
+position = Vector2( 41.4088, 38.9174 )
+scale = Vector2( 0.218036, 0.218036 )
+
+[node name="tree" type="Sprite" parent="TileMap/YSort/tree"]
+position = Vector2( -10.9209, -447.747 )
+scale = Vector2( 1.90656, 1.90656 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 80, 400, 200, 620 )
+
+[node name="tree2" type="Node2D" parent="TileMap/YSort"]
+position = Vector2( 173.163, 62.7283 )
+scale = Vector2( 0.218036, 0.218036 )
+
+[node name="tree" type="Sprite" parent="TileMap/YSort/tree2"]
+position = Vector2( -10.9209, -447.747 )
+scale = Vector2( 1.90656, 1.90656 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 80, 400, 200, 620 )
+
+[node name="tree3" type="Node2D" parent="TileMap/YSort"]
+position = Vector2( 296.98, 211.15 )
+scale = Vector2( 0.218036, 0.218036 )
+
+[node name="tree" type="Sprite" parent="TileMap/YSort/tree3"]
+position = Vector2( -10.9209, -447.747 )
+scale = Vector2( 1.90656, 1.90656 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 80, 400, 200, 620 )
+
+[node name="tree4" type="Node2D" parent="TileMap/YSort"]
+position = Vector2( 100.143, 264.328 )
+scale = Vector2( 0.218036, 0.218036 )
+
+[node name="tree" type="Sprite" parent="TileMap/YSort/tree4"]
+position = Vector2( -10.9209, -447.747 )
+scale = Vector2( 1.90656, 1.90656 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 80, 400, 200, 620 )
+
+[node name="tree5" type="Node2D" parent="TileMap/YSort"]
+position = Vector2( 595.412, 145.273 )
+scale = Vector2( 0.218036, 0.218036 )
+
+[node name="tree" type="Sprite" parent="TileMap/YSort/tree5"]
+position = Vector2( -10.9209, -447.747 )
+scale = Vector2( 1.90656, 1.90656 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 80, 400, 200, 620 )
+
+[node name="tree6" type="Node2D" parent="TileMap/YSort"]
+position = Vector2( 352.539, 411.163 )
+scale = Vector2( 0.218036, 0.218036 )
+
+[node name="tree" type="Sprite" parent="TileMap/YSort/tree6"]
+position = Vector2( -10.9209, -447.747 )
+scale = Vector2( 1.90656, 1.90656 )
+texture = ExtResource( 5 )
+region_enabled = true
+region_rect = Rect2( 80, 400, 200, 620 )
 
 [node name="GUI" parent="." instance=ExtResource( 7 )]
+light_mask = 0
